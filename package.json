@@ -1,0 +1,38 @@
+{
+  "name": "emupunks-contracts",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git"
+  },
+  "scripts": {
+    "lint": "eslint -c .eslintrc.js src",
+    "prettify": "prettier --write ./src",
+    "test": "jest"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "endOfLine": "lf",
+    "semi": true,
+    "useTabs": false,
+    "singleQuote": false,
+    "trailingComma": "all",
+    "tabWidth": 2
+  },
+  "dependencies": {
+    "@onflow/config": "^0.0.2",
+    "@onflow/fcl": "^0.0.77",
+    "@onflow/fcl-config": "^0.0.1",
+    "@onflow/types": "^0.0.5",
+    "flow-js-testing": "^0.1.15-alpha.4"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.16.0",
+    "@babel/preset-env": "^7.16.0",
+    "babel-jest": "^27.3.1",
+    "eslint": "^8.2.0",
+    "eslint-plugin-jest": "^25.2.4",
+    "jest": "^27.3.1",
+    "jest-esm-transformer": "^1.0.0",
+    "prettier": "^2.4.1"
+  }
+}
