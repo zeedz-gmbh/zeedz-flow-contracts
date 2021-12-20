@@ -6,6 +6,7 @@ import {
   shallPass,
   shallResolve,
   shallRevert,
+  shallThrow,
 } from "flow-js-testing";
 
 import {
@@ -19,6 +20,8 @@ import {
   transferZeedle,
   zeedleMetadataToMint,
   zeedleTypeIDToMint,
+  levelUpZeedle,
+  getZeedleLevel,
 } from "../src/zeedz";
 
 import { deployNonFungibleToken, getZeedzAdminAddress, toUFix64 } from "../src/common";
@@ -170,5 +173,91 @@ describe("Zeedz", () => {
 
     // Burn transaction shall revert -> id doesn't exist in the account's collection
     await shallRevert(burnZeedle(Bob, 1));
+  });
+
+  it("account owner and admin should be able to cosign and levelup a zeedle", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployZeedz();
+
+    // Setup
+    const Bob = await getAccountAddress("Bob");
+    await setupZeedzOnAccount(Bob);
+    const ZeedzAdmin = await getZeedzAdminAddress();
+
+    // Mint instruction for Bob account shall be resolved
+    await shallPass(await mintZeedle(Bob, zeedleTypeIDToMint, zeedleMetadataToMint));
+
+    // LevelUp instruction for Bob's Zeedle shall be resolved
+    await shallPass(await levelUpZeedle(Bob, ZeedzAdmin, 0));
+  });
+
+  it("account owner and admin should not be able to cosign and levelup a zeedle he doesnt own", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployZeedz();
+
+    // Setup
+    const Bob = await getAccountAddress("Bob");
+    await setupZeedzOnAccount(Bob);
+    const ZeedzAdmin = await getZeedzAdminAddress();
+
+    // Mint instruction for Bob account shall be resolved
+    await shallPass(await mintZeedle(Bob, zeedleTypeIDToMint, zeedleMetadataToMint));
+
+    // LevelUp instruction for Bob's Zeedle shall be resolved
+    await shallRevert(await levelUpZeedle(Bob, ZeedzAdmin, 1));
+  });
+
+  it("account owner should not be able to levelup a zeedle without an admin's signature", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployZeedz();
+
+    // Setup
+    const Bob = await getAccountAddress("Bob");
+    await setupZeedzOnAccount(Bob);
+    const Alice = await getAccountAddress("Alice");
+    await setupZeedzOnAccount(Alice);
+
+    // Mint instruction for Bob account shall be resolved
+    await shallPass(await mintZeedle(Bob, zeedleTypeIDToMint, zeedleMetadataToMint));
+
+    // LevelUp instruction for Bob's Zeedle shall be resolved
+    await shallRevert(await levelUpZeedle(Bob, Alice, 0));
+  });
+
+  it("shall be able to get a zeedle's current level", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployZeedz();
+
+    // Setup
+    const Bob = await getAccountAddress("Bob");
+    await setupZeedzOnAccount(Bob);
+    const ZeedzAdmin = await getZeedzAdminAddress();
+
+    // Mint instruction for Bob account shall be resolved
+    await shallPass(await mintZeedle(Bob, zeedleTypeIDToMint, zeedleMetadataToMint));
+
+    // LevelUp instruction for Bob's Zeedle shall be resolved
+    await shallPass(await levelUpZeedle(Bob, ZeedzAdmin, 0));
+
+    const level = await getZeedleLevel(Bob, 0);
+
+    // Check the Zeedle's level
+    await shallResolve(async () => {
+      expect(level).toBe(1);
+    });
+
+    // LevelUp instruction for Bob's Zeedle shall be resolved
+    await shallPass(await levelUpZeedle(Bob, ZeedzAdmin, 0));
+
+    const levelTwo = await getZeedleLevel(Bob, 0);
+
+    // Check the Zeedle's level
+    await shallResolve(async () => {
+      expect(levelTwo).toBe(2);
+    });
   });
 });

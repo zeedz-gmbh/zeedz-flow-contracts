@@ -120,3 +120,18 @@ export const burnZeedle = async (owner, zeedleId) => {
 
   return sendTransaction({ name, args, signers });
 };
+
+export const levelUpZeedle = async (owner, admin, zeedleId) => {
+  const name = "Zeedz/admin_levelup_zeedle";
+  const args = [zeedleId];
+  const signers = [owner, admin];
+
+  return sendTransaction({ name, args, signers });
+};
+
+export const getZeedleLevel = async (account, zeedleID) => {
+  const name = "zeedz/get_zeedle_level";
+  const args = [account, zeedleID];
+
+  return executeScript({ name, args });
+};

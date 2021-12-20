@@ -11,6 +11,7 @@ pub contract ZeedzINO: NonFungibleToken {
     pub event Deposit(id: UInt64, to: Address?)
     pub event Minted(id: UInt64, metadata: {String : String})
     pub event Burned(id: UInt64, from: Address?)
+    pub event ZeedleLeveledUp(id: UInt64)
 
     // Named Paths
     pub let CollectionStoragePath: StoragePath
@@ -22,17 +23,31 @@ pub contract ZeedzINO: NonFungibleToken {
 
     pub resource NFT: NonFungibleToken.INFT {
         pub let id: UInt64
-        pub let typeID: UInt64
-        access(self) let metadata: {String: String}
+        pub let typeID: UInt64 // Zeedle type -> e.g "Ginger, Aloe etc"
+        pub var level: UInt64 // Zeedle level
+        access(self) let metadata: {String: String} // Additional metadata
 
         init(initID: UInt64, initTypeID: UInt64, initMetadata: {String: String}) {
             self.id = initID
             self.typeID = initTypeID
+            self.level = 0
             self.metadata = initMetadata
         }
 
         pub fun getMetadata(): {String: String} {
             return self.metadata
+        }
+
+        pub fun getLevel(): UInt64 {
+            return self.level
+        }
+
+        access(contract) fun levelUp() {
+            self.level = self.level + 1
+        }
+
+        pub fun getTypeID(): UInt64 {
+            return self.typeID
         }
     }
 
@@ -141,6 +156,14 @@ pub contract ZeedzINO: NonFungibleToken {
             emit Minted(id: ZeedzINO.totalSupply, metadata: metadata)
             recipient.deposit(token: <-create ZeedzINO.NFT(initID: ZeedzINO.totalSupply, initTypeID: typeID, metadata: metadata))
             ZeedzINO.totalSupply = ZeedzINO.totalSupply + (1 as UInt64)
+        }
+
+        /*
+            Increse the Zeedle's level by 1
+        */
+        pub fun levelUpZeedle(zeedleRef: &ZeedzINO.NFT) {
+            zeedleRef.levelUp()
+            emit ZeedleLeveledUp(id: zeedleRef.id)
         }
     }
 
