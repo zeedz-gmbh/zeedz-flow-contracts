@@ -1,28 +1,21 @@
 {
-  "emulators": {
-    "default": {
-      "port": 3569,
-      "serviceAccount": "emulator-account"
-    }
-  },
-  "contracts": {
-    "Zeedz": "./cadence/contracts/Zeedz.cdc",
-    "NonFungibleToken": "./cadence/contracts/NonFungibleToken.cdc"
-  },
-  "networks": {
-    "emulator": "127.0.0.1:3569",
-    "mainnet": "access.mainnet.nodes.onflow.org:9000",
-    "testnet": "access.devnet.nodes.onflow.org:9000"
-  },
-  "accounts": {
-    "emulator-account": {
-      "address": "f8d6e0586b0a20c7",
-      "key": "d5e7ed205a15bc8f23741374b5fb6e2be8d39eea2d8ef0110504931047a31ba8"
-    }
-  },
-  "deployments": {
-    "testnet": {
-      "admin-account-dev": ["Zeedz", "NonFungibleToken"]
-    }
-  }
+	"emulators": {
+		"default": {
+			"port": 3569,
+			"serviceAccount": "emulator-account"
+		}
+	},
+	"contracts": {},
+	"networks": {
+		"emulator": "127.0.0.1:3569",
+		"mainnet": "access.mainnet.nodes.onflow.org:9000",
+		"testnet": "access.devnet.nodes.onflow.org:9000"
+	},
+	"accounts": {
+		"emulator-account": {
+			"address": "f8d6e0586b0a20c7",
+			"key": "4aeefddb470fd69187694302da4adc71688bcb7416301a3cac808caa811e9437"
+		}
+	},
+	"deployments": {}
 }
