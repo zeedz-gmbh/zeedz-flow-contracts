@@ -1,10 +1,10 @@
 # Zeedz
 
-> This repository contains the cadence contracts & tests for the Zeedz NFT Contract
+This repository contains the Cadence contracts & flow-js test cases for the ZeedzINO NFT Contract.
 
-# Scripts
+## Scripts
 
-## Testing
+### Testing
 
 1. `git clone` the repository to your local machine.
 2. run `npm install` to install all the dependencies.
