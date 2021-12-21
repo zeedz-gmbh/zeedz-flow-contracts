@@ -8,7 +8,7 @@ import ZeedzINO from "../../contracts/ZeedzINO.cdc"
 // It must be run with the account that has the minter resource
 // stored at path /storage/ZeedzINOMinter.
 
-transaction(recipient: Address, typeID: UInt64, metadata: {String : String}) {
+transaction(recipient: Address, typeID: UInt32, metadata: {String : String}) {
     
     // local variable for storing the minter reference
    let minter: &ZeedzINO.Administrator

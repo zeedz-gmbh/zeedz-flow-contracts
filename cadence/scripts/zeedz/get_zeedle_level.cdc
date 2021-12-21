@@ -5,7 +5,7 @@ import ZeedzINO from "../../contracts/ZeedzINO.cdc"
     This script returns the metadata for a Zeedle NFT in an account's collection.
 */
 
-pub fun main(address: Address, zeedleID: UInt64): UInt64 {
+pub fun main(address: Address, zeedleID: UInt64): UInt32 {
 
     let owner = getAccount(address)
 
@@ -16,5 +16,5 @@ pub fun main(address: Address, zeedleID: UInt64): UInt64 {
     let Zeedle = collectionBorrow.borrowZeedle(id: zeedleID)
         ?? panic("No such zeedleID in that collection")
 
-    return Zeedle.getLevel()
+    return Zeedle.level
 }

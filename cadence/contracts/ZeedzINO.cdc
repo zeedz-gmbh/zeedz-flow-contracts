@@ -21,13 +21,15 @@ pub contract ZeedzINO: NonFungibleToken {
 
     pub var totalSupply: UInt64
 
+    pub var numberMintedPerType: {UInt32: UInt64}
+
     pub resource NFT: NonFungibleToken.INFT {
         pub let id: UInt64
-        pub let typeID: UInt64 // Zeedle type -> e.g "Ginger, Aloe etc"
-        pub var level: UInt64 // Zeedle level
+        pub let typeID: UInt32 // Zeedle type -> e.g "1 = Ginger, 2 = Aloe etc"
+        pub var level: UInt32 // Zeedle level
         access(self) let metadata: {String: String} // Additional metadata
 
-        init(initID: UInt64, initTypeID: UInt64, initMetadata: {String: String}) {
+        init(initID: UInt64, initTypeID: UInt32, initMetadata: {String: String}) {
             self.id = initID
             self.typeID = initTypeID
             self.level = 0
@@ -38,16 +40,8 @@ pub contract ZeedzINO: NonFungibleToken {
             return self.metadata
         }
 
-        pub fun getLevel(): UInt64 {
-            return self.level
-        }
-
         access(contract) fun levelUp() {
-            self.level = self.level + 1
-        }
-
-        pub fun getTypeID(): UInt64 {
-            return self.typeID
+            self.level = self.level + (1 as UInt32)
         }
     }
 
@@ -83,9 +77,15 @@ pub contract ZeedzINO: NonFungibleToken {
         }
 
         pub fun burn(burnID: UInt64){
-             let token <- self.ownedNFTs.remove(key: burnID) ?? panic("missing NFT")
-             destroy token
-             emit Burned(id: burnID, from: self.owner?.address)
+            let token <- self.ownedNFTs.remove(key: burnID) ?? panic("missing NFT")
+            let zeedle <- token as! @ZeedzINO.NFT
+
+            // reduce numberOfMinterPerType and totalSupply
+            ZeedzINO.numberMintedPerType[zeedle.typeID] = ZeedzINO.numberMintedPerType[zeedle.typeID]! - (1 as UInt64)
+            ZeedzINO.totalSupply = ZeedzINO.totalSupply - (1 as UInt64)
+
+            destroy zeedle
+            emit Burned(id: burnID, from: self.owner?.address)
         }
 
         pub fun deposit(token: @NonFungibleToken.NFT) {
@@ -152,10 +152,17 @@ pub contract ZeedzINO: NonFungibleToken {
             Mints a new NFT with a new ID
             and deposit it in the recipients collection using their collection reference
         */
-        pub fun mintNFT(recipient: &{NonFungibleToken.CollectionPublic}, typeID: UInt64, metadata: {String : String}) {
+        pub fun mintNFT(recipient: &{NonFungibleToken.CollectionPublic}, typeID: UInt32, metadata: {String : String}) {
             emit Minted(id: ZeedzINO.totalSupply, metadata: metadata)
             recipient.deposit(token: <-create ZeedzINO.NFT(initID: ZeedzINO.totalSupply, initTypeID: typeID, metadata: metadata))
+
+            // increase numberOfMinterPerType and totalSupply
             ZeedzINO.totalSupply = ZeedzINO.totalSupply + (1 as UInt64)
+            if ZeedzINO.numberMintedPerType[typeID] == nil {
+                ZeedzINO.numberMintedPerType[typeID] = 1 
+            } else {
+                ZeedzINO.numberMintedPerType[typeID] = ZeedzINO.numberMintedPerType[typeID]! + (1 as UInt64)
+            }
         }
 
         /*
@@ -189,6 +196,7 @@ pub contract ZeedzINO: NonFungibleToken {
         self.AdminPrivatePath=/private/ZeedzINOAdminPrivate
 
         self.totalSupply = 0
+        self.numberMintedPerType = {}
 
         self.account.save(<- create Administrator(), to: self.AdminStoragePath)
         self.account.link<&Administrator>(self.AdminPrivatePath, target: self.AdminStoragePath)

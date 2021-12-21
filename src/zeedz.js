@@ -135,3 +135,9 @@ export const getZeedleLevel = async (account, zeedleID) => {
 
   return executeScript({ name, args });
 };
+
+export const getZeedzMintedPerType = async () => {
+  const name = "zeedz/get_minted_per_type";
+
+  return executeScript({ name });
+};

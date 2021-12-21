@@ -22,6 +22,7 @@ import {
   zeedleTypeIDToMint,
   levelUpZeedle,
   getZeedleLevel,
+  getZeedzMintedPerType,
 } from "../src/zeedz";
 
 import { deployNonFungibleToken, getZeedzAdminAddress, toUFix64 } from "../src/common";
@@ -205,7 +206,7 @@ describe("Zeedz", () => {
     // Mint instruction for Bob account shall be resolved
     await shallPass(await mintZeedle(Bob, zeedleTypeIDToMint, zeedleMetadataToMint));
 
-    // LevelUp instruction for Bob's Zeedle shall be resolved
+    // LevelUp instruction for Bob's Zeedle shall revert
     await shallRevert(await levelUpZeedle(Bob, ZeedzAdmin, 1));
   });
 
@@ -223,7 +224,7 @@ describe("Zeedz", () => {
     // Mint instruction for Bob account shall be resolved
     await shallPass(await mintZeedle(Bob, zeedleTypeIDToMint, zeedleMetadataToMint));
 
-    // LevelUp instruction for Bob's Zeedle shall be resolved
+    // LevelUp instruction for Bob's Zeedle shall be revert
     await shallRevert(await levelUpZeedle(Bob, Alice, 0));
   });
 
@@ -258,6 +259,30 @@ describe("Zeedz", () => {
     // Check the Zeedle's level
     await shallResolve(async () => {
       expect(levelTwo).toBe(2);
+    });
+  });
+  it("shall be able to get minted zeedles per type", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployZeedz();
+
+    // Setup
+    const Bob = await getAccountAddress("Bob");
+    await setupZeedzOnAccount(Bob);
+
+    // Mint instruction for Bob account shall be resolved
+    await shallPass(await mintZeedle(Bob, 1, zeedleMetadataToMint));
+    await shallPass(await mintZeedle(Bob, 1, zeedleMetadataToMint));
+    await shallPass(await mintZeedle(Bob, 2, zeedleMetadataToMint));
+    await shallPass(await mintZeedle(Bob, 3, zeedleMetadataToMint));
+    await shallPass(await mintZeedle(Bob, 2, zeedleMetadataToMint));
+    await shallPass(await mintZeedle(Bob, 1, zeedleMetadataToMint));
+
+    const mintedPerType = await getZeedzMintedPerType();
+
+    // Check if mintedPerType returnes the right values
+    await shallResolve(async () => {
+      expect(mintedPerType.toString()).toBe({ 1: 3, 2: 2, 3: 1 }.toString());
     });
   });
 });
