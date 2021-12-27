@@ -43,11 +43,13 @@ describe("Zeedz", () => {
   afterEach(async () => {
     await emulator.stop();
   });
+
   it("shall deploy the ZeedzINO contract", async () => {
     // Deploy
     await deployNonFungibleToken();
     await deployZeedz();
   });
+
   it("supply shall be 0 after contract is deployed", async () => {
     // Deploy
     await deployNonFungibleToken();
@@ -58,10 +60,11 @@ describe("Zeedz", () => {
     await shallPass(setupZeedzOnAccount(ZeedzAdmin));
 
     await shallResolve(async () => {
-      const supply = await getZeedzSupply();
+      const [supply] = await getZeedzSupply();
       expect(supply).toBe(0);
     });
   });
+
   it("admin shall be able to mint a Zeedle", async () => {
     // Deploy
     await deployNonFungibleToken();
@@ -86,7 +89,7 @@ describe("Zeedz", () => {
 
     // Shall be able te read Bob's collection and ensure it's empty
     await shallResolve(async () => {
-      const zeedleCount = await getZeedleCount(Bob);
+      const [zeedleCount] = await getZeedleCount(Bob);
       expect(zeedleCount).toBe(0);
     });
   });
@@ -103,7 +106,7 @@ describe("Zeedz", () => {
     // Mint instruction for Bob account shall be resolved
     await shallPass(await mintZeedle(Bob, zeedleTypeIDToMint, zeedleMetadataToMint));
 
-    const metadata = await getZeedleMetadata(Bob, 0);
+    const [metadata] = await getZeedleMetadata(Bob, 0);
 
     // Check if it's the correct name
     await shallResolve(async () => {
@@ -244,7 +247,7 @@ describe("Zeedz", () => {
     // LevelUp instruction for Bob's Zeedle shall be resolved
     await shallPass(await levelUpZeedle(Bob, ZeedzAdmin, 0));
 
-    const level = await getZeedleLevel(Bob, 0);
+    const [level] = await getZeedleLevel(Bob, 0);
 
     // Check the Zeedle's level
     await shallResolve(async () => {
@@ -254,7 +257,7 @@ describe("Zeedz", () => {
     // LevelUp instruction for Bob's Zeedle shall be resolved
     await shallPass(await levelUpZeedle(Bob, ZeedzAdmin, 0));
 
-    const levelTwo = await getZeedleLevel(Bob, 0);
+    const [levelTwo] = await getZeedleLevel(Bob, 0);
 
     // Check the Zeedle's level
     await shallResolve(async () => {
@@ -278,7 +281,7 @@ describe("Zeedz", () => {
     await shallPass(await mintZeedle(Bob, 2, zeedleMetadataToMint));
     await shallPass(await mintZeedle(Bob, 1, zeedleMetadataToMint));
 
-    const mintedPerType = await getZeedzMintedPerType();
+    const [mintedPerType] = await getZeedzMintedPerType();
 
     // Check if mintedPerType returnes the right values
     await shallResolve(async () => {

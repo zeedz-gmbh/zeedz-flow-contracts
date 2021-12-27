@@ -114,7 +114,7 @@ export const getZeedleCount = async (account) => {
  * @returns {Promise<*>}
  * */
 export const burnZeedle = async (owner, zeedleId) => {
-  const name = "Zeedz/burn_zeedle";
+  const name = "zeedz/burn_zeedle";
   const args = [zeedleId];
   const signers = [owner];
 
@@ -122,7 +122,7 @@ export const burnZeedle = async (owner, zeedleId) => {
 };
 
 export const levelUpZeedle = async (owner, admin, zeedleId) => {
-  const name = "Zeedz/admin_levelup_zeedle";
+  const name = "zeedz/admin_levelup_zeedle";
   const args = [zeedleId];
   const signers = [owner, admin];
 
