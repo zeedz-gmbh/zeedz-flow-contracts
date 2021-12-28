@@ -18,6 +18,8 @@ pub contract ZeedzINO: NonFungibleToken {
     pub let CollectionPublicPath: PublicPath
     pub let AdminStoragePath: StoragePath
     pub let AdminPrivatePath: PrivatePath
+    pub let AdminClientPublicPath: PublicPath
+    pub let AdminClientStoragePath: StoragePath
 
     pub var totalSupply: UInt64
 
@@ -260,10 +262,10 @@ pub contract ZeedzINO: NonFungibleToken {
         self.CollectionStoragePath = /storage/ZeedzINOCollection
         self.CollectionPublicPath = /public/ZeedzINOCollection
         self.AdminStoragePath = /storage/ZeedzINOMinter
-        self.AdminPrivatePath=/private/ZeedzINOAdminPrivate
+        self.AdminPrivatePath= /private/ZeedzINOAdminPrivate
 
         self.AdminClientPublicPath= /public/ZeedzINOAdminClient
-        self.AdminClientStoragePath=/storage/ZeedzINOAdminClien
+        self.AdminClientStoragePath= /storage/ZeedzINOAdminClient
 
         self.totalSupply = 0
         self.numberMintedPerType = {}
