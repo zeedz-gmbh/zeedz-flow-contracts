@@ -144,7 +144,67 @@ pub contract ZeedzINO: NonFungibleToken {
     }
 
     /*
-        The Admin/Minter resource used to mint Zeedz
+        AdminClient interface used to add the Admin capability to a user
+    */
+    pub resource interface AdminClient {
+        pub fun addCapability(_ cap: Capability<&Administrator>)
+        pub fun isAdmin(): Bool
+    }
+
+    /*
+       AdminClientReciever resrouce used to store the Administrator capabilities
+    */
+    pub resource AdminClientReciever: AdminClient {
+
+        access(self) var server: Capability<&Administrator>?
+
+        init() {
+            self.server = nil
+        }
+
+        pub fun addCapability(_ cap: Capability<&Administrator>) {
+            pre {
+                cap.check() : "Invalid server capablity"
+                self.server == nil : "Server already set"
+            }
+            self.server = cap
+        }
+
+        /*
+            Delegate minting to Administrator if the admin capability is set
+        */
+        pub fun mintNFT(recipient: &{NonFungibleToken.CollectionPublic}, typeID: UInt32, metadata: {String : String}) {
+            pre {
+                self.server != nil: 
+                    "Cannot mint without admin capability"
+            }
+            self.server!.borrow()!.mintNFT(recipient: recipient, typeID: typeID, metadata: metadata)
+        }
+
+        /*
+            Delegate level-up to Administrator if the admin capability is set
+        */
+        pub fun levelUpZeedle(zeedleRef: &ZeedzINO.NFT) {
+            pre {
+                self.server != nil: 
+                    "Cannot level-up without admin capability"
+            }
+            self.server!.borrow()!.levelUpZeedle(zeedleRef: zeedleRef)
+        }
+
+        /*
+            Check if the admin capability is set
+        */
+        pub fun isAdmin(): Bool {
+            if (self.server != nil){ 
+                    return true
+            }
+            return false
+        }
+    }
+
+    /*
+        The Admin/Minter resource than an Administrator or something similar would own to be able to mint & level-up NFT's
     */
     pub resource Administrator {
 
@@ -172,6 +232,13 @@ pub contract ZeedzINO: NonFungibleToken {
             zeedleRef.levelUp()
             emit ZeedleLeveledUp(id: zeedleRef.id)
         }
+
+        /*
+            Create an AdminClientReciever
+        */ 
+        pub fun createAdminClientReciever(): @AdminClientReciever {
+            return <- create AdminClientReciever()
+        }
     }
 
     /*
@@ -194,6 +261,9 @@ pub contract ZeedzINO: NonFungibleToken {
         self.CollectionPublicPath = /public/ZeedzINOCollection
         self.AdminStoragePath = /storage/ZeedzINOMinter
         self.AdminPrivatePath=/private/ZeedzINOAdminPrivate
+
+        self.AdminClientPublicPath= /public/ZeedzINOAdminClient
+        self.AdminClientStoragePath=/storage/ZeedzINOAdminClien
 
         self.totalSupply = 0
         self.numberMintedPerType = {}
