@@ -156,7 +156,7 @@ pub contract ZeedzINO: NonFungibleToken {
     /*
        AdminClientReciever resrouce used to store the Administrator capabilities
     */
-    pub resource AdminClientReciever: AdminClient {
+    pub resource ZeedzINOAdminClient: AdminClient {
 
         access(self) var server: Capability<&Administrator>?
 
@@ -236,10 +236,10 @@ pub contract ZeedzINO: NonFungibleToken {
         }
 
         /*
-            Create an AdminClientReciever
+            Create an AdminClient
         */ 
-        pub fun createAdminClientReciever(): @AdminClientReciever {
-            return <- create AdminClientReciever()
+        pub fun createAdminClient(): @ZeedzINOAdminClient{
+            return <- create ZeedzINOAdminClient()
         }
     }
 
