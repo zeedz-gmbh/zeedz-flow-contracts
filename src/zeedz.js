@@ -121,6 +121,13 @@ export const burnZeedle = async (owner, zeedleId) => {
   return sendTransaction({ name, args, signers });
 };
 
+/**
+ * Levels up a zeedle
+ * @param {*} owner zeedle owner
+ * @param {*} admin zeedle admin
+ * @param {*} zeedleId zeedleId
+ * @returns
+ */
 export const levelUpZeedle = async (owner, admin, zeedleId) => {
   const name = "zeedz/admin_levelup_zeedle";
   const args = [zeedleId];
@@ -129,6 +136,12 @@ export const levelUpZeedle = async (owner, admin, zeedleId) => {
   return sendTransaction({ name, args, signers });
 };
 
+/**
+ * Gets a zeedle's level
+ * @param {*} account zeedle owner account
+ * @param {*} zeedleID zeedle id
+ * @returns
+ */
 export const getZeedleLevel = async (account, zeedleID) => {
   const name = "zeedz/get_zeedle_level";
   const args = [account, zeedleID];
@@ -136,8 +149,64 @@ export const getZeedleLevel = async (account, zeedleID) => {
   return executeScript({ name, args });
 };
 
+/**
+ * Gets the number of inted zeedle's per each minted typeId
+ * @returns
+ */
 export const getZeedzMintedPerType = async () => {
   const name = "zeedz/get_minted_per_type";
 
   return executeScript({ name });
+};
+
+/**
+ * Checks if a user has the admin capability
+ */
+export const checkIfUserHasAdmin = async (account) => {
+  const name = "zeedz/is_user_admin";
+  const args = [account];
+
+  return executeScript({ name, args });
+};
+
+/**
+ * Gives a user the AdminClient capability
+ * @param {*} user user
+ * @param {*} admin admin
+ * @returns
+ */
+export const promoteToAdmin = async (user, admin) => {
+  const name = "zeedz/promote_user_to_admin";
+  const signers = [user, admin];
+
+  return sendTransaction({ name, signers });
+};
+
+/**
+ * Levels up a zeedle using admin client
+ * @param {*} owner zeedle owner
+ * @param {*} admin zeedle adminclient
+ * @param {*} zeedleId zeedleId
+ * @returns
+ */
+export const levelUpZeedleViaAdminClient = async (owner, admin, zeedleId) => {
+  const name = "zeedz/adminclient_levelup_zeedle";
+  const args = [zeedleId];
+  const signers = [owner, admin];
+
+  return sendTransaction({ name, args, signers });
+};
+
+/*
+ * Mints a Zeedle using admin client and sends it to **recipient**.
+ * @param {string} recipient - recipient account address
+ * @throws Will throw an error if execution will be halted
+ * @returns {Promise<*>}
+ * */
+export const mintZeedleViaAdminClient = async (recipient, admin, typeID, metadata) => {
+  const name = "zeedz/adminclient_mint_zeedle";
+  const args = [recipient, typeID, metadata];
+  const signers = [admin];
+
+  return sendTransaction({ name, args, signers });
 };

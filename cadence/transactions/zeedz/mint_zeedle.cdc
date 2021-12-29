@@ -1,5 +1,3 @@
-
-   
 import NonFungibleToken from "../../contracts/NonFungibleToken.cdc"
 import ZeedzINO from "../../contracts/ZeedzINO.cdc"
 

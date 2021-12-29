@@ -2,7 +2,7 @@ import NonFungibleToken from "../../contracts/NonFungibleToken.cdc"
 import ZeedzINO from "../../contracts/ZeedzINO.cdc"
 
 /*
-This script returns the size of an account's ZeedzINO collection.
+    This script returns the size of an account's ZeedzINO collection.
 */
 
 pub fun main(address: Address): Int {
