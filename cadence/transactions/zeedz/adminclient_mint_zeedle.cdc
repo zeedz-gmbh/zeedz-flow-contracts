@@ -12,8 +12,7 @@ transaction(recipient: Address, typeID: UInt32, metadata: {String : String}) {
             ?? panic("Signer is not an admin")
     }
 
-    execute {
-        
+    execute {        
         // get the public account object for the recipient
         let recipient = getAccount(recipient)
 
