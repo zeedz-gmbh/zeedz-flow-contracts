@@ -1,19 +1,18 @@
 import NonFungibleToken from "./NonFungibleToken.cdc"
 
-/*
-    The official ZeedzINO contract
-*/
+//
+//  The official ZeedzINO contract
+//
 pub contract ZeedzINO: NonFungibleToken {
 
-    // Events
+    //  Events
     pub event ContractInitialized()
     pub event Withdraw(id: UInt64, from: Address?)
     pub event Deposit(id: UInt64, to: Address?)
     pub event Minted(id: UInt64, metadata: {String : String})
     pub event Burned(id: UInt64, from: Address?)
-    pub event ZeedleLeveledUp(id: UInt64)
 
-    // Named Paths
+    //  Named Paths
     pub let CollectionStoragePath: StoragePath
     pub let CollectionPublicPath: PublicPath
     pub let AdminStoragePath: StoragePath
@@ -27,31 +26,25 @@ pub contract ZeedzINO: NonFungibleToken {
 
     pub resource NFT: NonFungibleToken.INFT {
         pub let id: UInt64
-        pub let typeID: UInt32 // Zeedle type -> e.g "1 = Ginger, 2 = Aloe etc"
-        pub var level: UInt32 // Zeedle level
-        access(self) let metadata: {String: String} // Additional metadata
+        pub let typeID: UInt32 //   Zeedle type -> e.g "1 = Ginger, 2 = Aloe etc"
+        access(self) let metadata: {String: String} //  Additional metadata
 
         init(initID: UInt64, initTypeID: UInt32, initMetadata: {String: String}) {
             self.id = initID
             self.typeID = initTypeID
-            self.level = 0
             self.metadata = initMetadata
         }
 
         pub fun getMetadata(): {String: String} {
             return self.metadata
         }
-
-        access(contract) fun levelUp() {
-            self.level = self.level + (1 as UInt32)
-        }
     }
 
-    /* 
-        This is the interface that users can cast their Zeedz Collection as
-        to allow others to deposit Zeedles into their Collection. It also allows for reading
-        the details of Zeedles in the Collection.
-    */ 
+    // 
+    //  This is the interface that users can cast their Zeedz Collection as
+    //  to allow others to deposit Zeedles into their Collection. It also allows for reading
+    //  the details of Zeedles in the Collection.
+    // 
     pub resource interface ZeedzCollectionPublic {
         pub fun deposit(token: @NonFungibleToken.NFT)
         pub fun getIDs(): [UInt64]
@@ -65,9 +58,9 @@ pub contract ZeedzINO: NonFungibleToken {
         }
     }
 
-    /* 
-        A collection of Zeedz NFTs owned by an account
-    */
+    //
+    //  A collection of Zeedz NFTs owned by an account.
+    //   
     pub resource Collection: ZeedzCollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic {
 
         pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
@@ -82,7 +75,7 @@ pub contract ZeedzINO: NonFungibleToken {
             let token <- self.ownedNFTs.remove(key: burnID) ?? panic("missing NFT")
             let zeedle <- token as! @ZeedzINO.NFT
 
-            // reduce numberOfMinterPerType and totalSupply
+            //  reduce numberOfMinterPerType and totalSupply
             ZeedzINO.numberMintedPerType[zeedle.typeID] = ZeedzINO.numberMintedPerType[zeedle.typeID]! - (1 as UInt64)
             ZeedzINO.totalSupply = ZeedzINO.totalSupply - (1 as UInt64)
 
@@ -93,33 +86,32 @@ pub contract ZeedzINO: NonFungibleToken {
         pub fun deposit(token: @NonFungibleToken.NFT) {
             let token <- token as! @ZeedzINO.NFT
             let id: UInt64 = token.id
-            // add the new token to the dictionary which removes the old one
+            //  add the new token to the dictionary which removes the old one
             let oldToken <- self.ownedNFTs[id] <- token
             emit Deposit(id: id, to: self.owner?.address)
             destroy oldToken
         }
 
-        /*
-            Returns an array of the IDs that are in the collection
-         */
+        //
+        //  Returns an array of the IDs that are in the collection.
+        //
         pub fun getIDs(): [UInt64] {
             return self.ownedNFTs.keys
         }
 
-        /*
-            Gets a reference to an NFT in the collection
-            so that the caller can read its metadata and call its methods
-        */
+        //
+        //  Gets a reference to an NFT in the collection
+        //  so that the caller can read its metadata and call its methods.
+        //
         pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
             return &self.ownedNFTs[id] as &NonFungibleToken.NFT
         }
 
-        /*
-            borrowZeedle
-            Gets a reference to an NFT in the collection as a Zeed,
-            exposing all of its fields
-            this is safe as there are no functions that can be called on the Zeed.
-        */
+        //
+        //  Gets a reference to an NFT in the collection as a Zeed,
+        //  exposing all of its fields
+        //  this is safe as there are no functions that can be called on the Zeed.
+        //
         pub fun borrowZeedle(id: UInt64): &ZeedzINO.NFT? {
             if self.ownedNFTs[id] != nil {
                 let ref = &self.ownedNFTs[id] as auth &NonFungibleToken.NFT
@@ -138,24 +130,24 @@ pub contract ZeedzINO: NonFungibleToken {
         }
     }
 
-    /*
-        Public function that anyone can call to create a new empty collection
-    */ 
+    //
+    //  Public function that anyone can call to create a new empty collection.
+    // 
     pub fun createEmptyCollection(): @NonFungibleToken.Collection {
         return <- create Collection()
     }
 
-    /*
-        AdminClient interface used to add the Admin capability to a user
-    */
+    //
+    //   The AdminClient interface is used to add the Administrator capability to a user.
+    //
     pub resource interface AdminClient {
         pub fun addCapability(_ cap: Capability<&Administrator>)
         pub fun isAdmin(): Bool
     }
 
-    /*
-       AdminClientReciever resrouce used to store the Administrator capabilities
-    */
+    //
+    //  The ZeedzINOAdminClient resource is used to store the Administrator capability.
+    //
     pub resource ZeedzINOAdminClient: AdminClient {
 
         access(self) var server: Capability<&Administrator>?
@@ -172,9 +164,9 @@ pub contract ZeedzINO: NonFungibleToken {
             self.server = cap
         }
 
-        /*
-            Delegate minting to Administrator if the admin capability is set
-        */
+        //
+        //  Delegate minting to Administrator if the admin capability is set.
+        //
         pub fun mintNFT(recipient: &{NonFungibleToken.CollectionPublic}, typeID: UInt32, metadata: {String : String}) {
             pre {
                 self.server != nil: 
@@ -183,20 +175,10 @@ pub contract ZeedzINO: NonFungibleToken {
             self.server!.borrow()!.mintNFT(recipient: recipient, typeID: typeID, metadata: metadata)
         }
 
-        /*
-            Delegate level-up to Administrator if the admin capability is set
-        */
-        pub fun levelUpZeedle(zeedleRef: &ZeedzINO.NFT) {
-            pre {
-                self.server != nil: 
-                    "Cannot level-up without admin capability"
-            }
-            self.server!.borrow()!.levelUpZeedle(zeedleRef: zeedleRef)
-        }
 
-        /*
-            Check if the admin capability is set
-        */
+        //
+        //  Check if the admin capability is set.
+        //
         pub fun isAdmin(): Bool {
             if (self.server != nil){ 
                     return true
@@ -205,15 +187,16 @@ pub contract ZeedzINO: NonFungibleToken {
         }
     }
 
-    /*
-        The Admin/Minter resource than an Administrator or something similar would own to be able to mint & level-up NFT's
-    */
+    //
+    //  The Administrator resource that an Administrator or something similar 
+    //  would own to be able to mint & level-up NFT's.
+    //
     pub resource Administrator {
 
-        /*
-            Mints a new NFT with a new ID
-            and deposit it in the recipients collection using their collection reference
-        */
+        //
+        //  Mints a new NFT with a new ID
+        //  and deposit it in the recipients collection using their collection reference.
+        //
         pub fun mintNFT(recipient: &{NonFungibleToken.CollectionPublic}, typeID: UInt32, metadata: {String : String}) {
             emit Minted(id: ZeedzINO.totalSupply, metadata: metadata)
             recipient.deposit(token: <-create ZeedzINO.NFT(initID: ZeedzINO.totalSupply, initTypeID: typeID, metadata: metadata))
@@ -227,28 +210,20 @@ pub contract ZeedzINO: NonFungibleToken {
             }
         }
 
-        /*
-            Increse the Zeedle's level by 1
-        */
-        pub fun levelUpZeedle(zeedleRef: &ZeedzINO.NFT) {
-            zeedleRef.levelUp()
-            emit ZeedleLeveledUp(id: zeedleRef.id)
-        }
-
-        /*
-            Create an AdminClient
-        */ 
+        //
+        //  Create an AdminClient,
+        //
         pub fun createAdminClient(): @ZeedzINOAdminClient{
             return <- create ZeedzINOAdminClient()
         }
     }
 
-    /*
-        Get a reference to a Zeedle from an account's Collection, if available.
-        If an account does not have a Zeedz.Collection, panic.
-        If it has a collection but does not contain the zeedleId, return nil.
-        If it has a collection and that collection contains the zeedleId, return a reference to that.
-    */
+    //
+    //  Get a reference to a Zeedle from an account's Collection, if available.
+    //  If an account does not have a Zeedz.Collection, panic.
+    //  If it has a collection but does not contain the zeedleId, return nil.
+    //  If it has a collection and that collection contains the zeedleId, return a reference to that.
+    //
     pub fun fetch(_ from: Address, zeedleID: UInt64): &ZeedzINO.NFT? {
         let collection = getAccount(from)
             .getCapability(ZeedzINO.CollectionPublicPath)!
