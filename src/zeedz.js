@@ -4,9 +4,38 @@ import { getZeedzAdminAddress } from "./common";
 
 export const zeedleMetadataToMint = {
   name: "Ginger Zeedle",
-  url: "https://zeedlz.io/images/ino/zeedle123.jpg",
-  serialNumber: "123",
-  editions: "3000",
+  description: "A wild ginger with a wild imagination",
+  typeID: 1,
+  serialNumber: "Test123",
+  edition: 1,
+  editionCap: 3000,
+  evolutionStage: 2,
+  rarity: "RARE",
+  imageURI: "https://zeedlz.io/images/ino/zeedle123.jpg",
+};
+
+export const zeedleMetadataToMint2 = {
+  name: "Mint Zeedle",
+  description: "A wild mint with a wild imagination",
+  typeID: 2,
+  serialNumber: "Test323",
+  edition: 1,
+  editionCap: 1000,
+  evolutionStage: 2,
+  rarity: "RARE",
+  imageURI: "https://zeedlz.io/images/ino/zeedle223.jpg",
+};
+
+export const zeedleMetadataToMint3 = {
+  name: "Aloe Zeedle",
+  description: "A wild aloe with a wild imagination",
+  typeID: 3,
+  serialNumber: "Test423",
+  edition: 1,
+  editionCap: 2000,
+  evolutionStage: 2,
+  rarity: "LEGENDARY",
+  imageURI: "https://zeedlz.io/images/ino/zeedle323.jpg",
 };
 
 export const zeedleTypeIDToMint = 1;
@@ -53,11 +82,22 @@ export const getZeedzSupply = async () => {
  * @throws Will throw an error if execution will be halted
  * @returns {Promise<*>}
  * */
-export const mintZeedle = async (recipient, typeID, metadata) => {
+export const mintZeedle = async (recipient, metadata) => {
   const ZeedzAdmin = await getZeedzAdminAddress();
 
   const name = "zeedz/mint_zeedle";
-  const args = [recipient, typeID, metadata];
+  const args = [
+    recipient,
+    metadata.name,
+    metadata.description,
+    metadata.typeID,
+    metadata.serialNumber,
+    metadata.edition,
+    metadata.editionCap,
+    metadata.evolutionStage,
+    metadata.rarity,
+    metadata.imageURI,
+  ];
   const signers = [ZeedzAdmin];
 
   return sendTransaction({ name, args, signers });

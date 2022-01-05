@@ -18,7 +18,8 @@ import {
   setupZeedzOnAccount,
   transferZeedle,
   zeedleMetadataToMint,
-  zeedleTypeIDToMint,
+  zeedleMetadataToMint2,
+  zeedleMetadataToMint3,
   getZeedzMintedPerType,
 } from "../src/zeedz";
 
@@ -44,7 +45,7 @@ describe("Zeedz", () => {
   it("shall deploy the ZeedzINO contract", async () => {
     // Deploy
     await deployNonFungibleToken();
-    await deployZeedz();
+    await shallPass(await deployZeedz());
   });
 
   it("supply shall be 0 after contract is deployed", async () => {
@@ -54,7 +55,7 @@ describe("Zeedz", () => {
 
     // Setup
     const ZeedzAdmin = await getZeedzAdminAddress();
-    await shallPass(setupZeedzOnAccount(ZeedzAdmin));
+    await shallPass(await setupZeedzOnAccount(ZeedzAdmin));
 
     await shallResolve(async () => {
       const [supply] = await getZeedzSupply();
@@ -72,7 +73,7 @@ describe("Zeedz", () => {
     await setupZeedzOnAccount(Alice);
 
     // Mint instruction for Alice account shall be resolved
-    await shallPass(await mintZeedle(Alice, zeedleTypeIDToMint, zeedleMetadataToMint));
+    await shallPass(await mintZeedle(Alice, zeedleMetadataToMint));
   });
 
   it("shall be able to create a new empty ZeedzINO NFT Collection", async () => {
@@ -101,10 +102,10 @@ describe("Zeedz", () => {
     await setupZeedzOnAccount(Bob);
 
     // Mint instruction for Bob account shall be resolved
-    await shallPass(await mintZeedle(Bob, zeedleTypeIDToMint, zeedleMetadataToMint));
+    await shallPass(await mintZeedle(Bob, zeedleMetadataToMint));
 
     const [metadata] = await getZeedleMetadata(Bob, 0);
-
+    console.log(metadata);
     // Check if it's the correct name
     await shallResolve(async () => {
       expect(metadata.name).toBe(zeedleMetadataToMint.name);
@@ -123,7 +124,7 @@ describe("Zeedz", () => {
     await setupZeedzOnAccount(Alice);
 
     // Mint instruction for Alice account shall be resolved
-    await shallPass(await mintZeedle(Alice, zeedleTypeIDToMint, zeedleMetadataToMint));
+    await shallPass(await mintZeedle(Alice, zeedleMetadataToMint));
 
     // Transfer transaction shall pass
     await shallPass(transferZeedle(Alice, Bob, 0));
@@ -154,7 +155,7 @@ describe("Zeedz", () => {
     await setupZeedzOnAccount(Bob);
 
     // Mint instruction for Bob account shall be resolved
-    await shallPass(await mintZeedle(Bob, zeedleTypeIDToMint, zeedleMetadataToMint));
+    await shallPass(await mintZeedle(Bob, zeedleMetadataToMint));
 
     // Burn transaction shall pass
     await shallPass(burnZeedle(Bob, 0));
@@ -172,8 +173,8 @@ describe("Zeedz", () => {
     await setupZeedzOnAccount(Alice);
 
     // Mint instruction for Bob & Alice accounts shall be resolved
-    await shallPass(await mintZeedle(Bob, zeedleTypeIDToMint, zeedleMetadataToMint));
-    await shallPass(await mintZeedle(Alice, zeedleTypeIDToMint, zeedleMetadataToMint));
+    await shallPass(await mintZeedle(Bob, zeedleMetadataToMint));
+    await shallPass(await mintZeedle(Alice, zeedleMetadataToMint));
 
     // Burn transaction shall revert -> id doesn't exist in the account's collection
     await shallRevert(burnZeedle(Bob, 1));
@@ -187,14 +188,16 @@ describe("Zeedz", () => {
     // Setup
     const Bob = await getAccountAddress("Bob");
     await setupZeedzOnAccount(Bob);
+    const Alice = await getAccountAddress("Alice");
+    await setupZeedzOnAccount(Alice);
 
     // Mint instruction for Bob account shall be resolved
-    await shallPass(await mintZeedle(Bob, 1, zeedleMetadataToMint));
-    await shallPass(await mintZeedle(Bob, 1, zeedleMetadataToMint));
-    await shallPass(await mintZeedle(Bob, 2, zeedleMetadataToMint));
-    await shallPass(await mintZeedle(Bob, 3, zeedleMetadataToMint));
-    await shallPass(await mintZeedle(Bob, 2, zeedleMetadataToMint));
-    await shallPass(await mintZeedle(Bob, 1, zeedleMetadataToMint));
+    await shallPass(await mintZeedle(Bob, zeedleMetadataToMint));
+    await shallPass(await mintZeedle(Alice, zeedleMetadataToMint));
+    await shallPass(await mintZeedle(Bob, zeedleMetadataToMint2));
+    await shallPass(await mintZeedle(Bob, zeedleMetadataToMint3));
+    await shallPass(await mintZeedle(Bob, zeedleMetadataToMint2));
+    await shallPass(await mintZeedle(Bob, zeedleMetadataToMint));
 
     const [mintedPerType] = await getZeedzMintedPerType();
 

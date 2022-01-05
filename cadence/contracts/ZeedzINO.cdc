@@ -9,7 +9,7 @@ pub contract ZeedzINO: NonFungibleToken {
     pub event ContractInitialized()
     pub event Withdraw(id: UInt64, from: Address?)
     pub event Deposit(id: UInt64, to: Address?)
-    pub event Minted(id: UInt64, metadata: {String : String})
+    pub event Minted(id: UInt64, name: String, description: String, typeID: UInt32, serialNumber: String, edition: UInt32, rarity: String)
     pub event Burned(id: UInt64, from: Address?)
 
     //  Named Paths
@@ -25,17 +25,32 @@ pub contract ZeedzINO: NonFungibleToken {
     pub resource NFT: NonFungibleToken.INFT {
         pub let id: UInt64
 
-        pub let typeID: UInt32 //   Zeedle type -> e.g "1 = Ginger, 2 = Aloe etc"
-        access(self) let metadata: {String: String} //  Additional metadata
+        pub let name: String // The memorable short name for the Zeedle, e.g. “Baby Aloe"
+        pub let description: String //  "A short description of the ZeedleType"
+        pub let typeID: UInt32 //   Zeedle type -> e.g "1 = Ginger Biggy, 2 = Baby Aloe, etc”
+        pub let serialNumber: String  
+        pub let edition: UInt32 
+        pub let editionCap: UInt32
+        pub let evolutionStage: UInt32
+        pub let rarity: String 
+        pub let imageURI: String
 
-        init(initID: UInt64, initTypeID: UInt32, initMetadata: {String: String}) {
+        init(initID: UInt64, initName: String, initDescription: String, initTypeID: UInt32, initSerialNumber: String, initEdition: UInt32, initEditionCap: UInt32, initEvolutionStage: UInt32, initRarity: String, initImageURI: String) {
             self.id = initID
+            self.name = initName
+            self.description = initDescription
             self.typeID = initTypeID
-            self.metadata = initMetadata
+            self.serialNumber = initSerialNumber
+            self.edition = initEdition
+            self.editionCap = initEditionCap
+            self.evolutionStage = initEvolutionStage
+            self.rarity = initRarity
+            self.imageURI = initImageURI
+
         }
 
-        pub fun getMetadata(): {String: String} {
-            return self.metadata
+        pub fun getMetadata(): {String: AnyStruct} {
+            return {"name": self.name, "description": self.description, "typeID": self.typeID, "serialNumber": self.serialNumber, "edition": self.edition, "editionCap": self.editionCap, "evolutionStage": self.evolutionStage, "rarity": self.rarity, "imageURI": self.imageURI}
         }
     }
 
@@ -152,9 +167,9 @@ pub contract ZeedzINO: NonFungibleToken {
         //  Mints a new NFT with a new ID
         //  and deposit it in the recipients collection using their collection reference.
         //
-        pub fun mintNFT(recipient: &{NonFungibleToken.CollectionPublic}, typeID: UInt32, metadata: {String : String}) {
-            emit Minted(id: ZeedzINO.totalSupply, metadata: metadata)
-            recipient.deposit(token: <-create ZeedzINO.NFT(initID: ZeedzINO.totalSupply, initTypeID: typeID, metadata: metadata))
+        pub fun mintNFT(recipient: &{NonFungibleToken.CollectionPublic}, name: String, description: String, typeID: UInt32, serialNumber: String, edition: UInt32, editionCap: UInt32, evolutionStage: UInt32, rarity: String, imageURI: String) {
+            recipient.deposit(token: <-create ZeedzINO.NFT(initID: ZeedzINO.totalSupply, initName: name, initDescription: description, initTypeID: typeID, initSerialNumber: serialNumber, initEdition: edition, initEdition: editionCap, initEvolutionStage: evolutionStage, initRarity: rarity, initImageURI: imageURI))
+            emit Minted(id: ZeedzINO.totalSupply, name: name, description: description, typeID: typeID, serialNumber: serialNumber, edition: edition, rarity: rarity)
 
             // increase numberOfMinterPerType and totalSupply
             ZeedzINO.totalSupply = ZeedzINO.totalSupply + (1 as UInt64)
