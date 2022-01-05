@@ -168,9 +168,12 @@ describe("Zeedz", () => {
     // Setup
     const Bob = await getAccountAddress("Bob");
     await setupZeedzOnAccount(Bob);
+    const Alice = await getAccountAddress("Alice");
+    await setupZeedzOnAccount(Alice);
 
-    // Mint instruction for Bob account shall be resolved
+    // Mint instruction for Bob & Alice accounts shall be resolved
     await shallPass(await mintZeedle(Bob, zeedleTypeIDToMint, zeedleMetadataToMint));
+    await shallPass(await mintZeedle(Alice, zeedleTypeIDToMint, zeedleMetadataToMint));
 
     // Burn transaction shall revert -> id doesn't exist in the account's collection
     await shallRevert(burnZeedle(Bob, 1));

@@ -24,6 +24,7 @@ pub contract ZeedzINO: NonFungibleToken {
 
     pub resource NFT: NonFungibleToken.INFT {
         pub let id: UInt64
+
         pub let typeID: UInt32 //   Zeedle type -> e.g "1 = Ginger, 2 = Aloe etc"
         access(self) let metadata: {String: String} //  Additional metadata
 
@@ -46,7 +47,6 @@ pub contract ZeedzINO: NonFungibleToken {
     pub resource interface ZeedzCollectionPublic {
         pub fun deposit(token: @NonFungibleToken.NFT)
         pub fun getIDs(): [UInt64]
-        pub fun burn(burnID: UInt64)
         pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
         pub fun borrowZeedle(id: UInt64): &ZeedzINO.NFT? {
             post {
@@ -56,24 +56,32 @@ pub contract ZeedzINO: NonFungibleToken {
         }
     }
 
+    // 
+    //  This is the interface that users can cast their Zeedz Collection as
+    //  to allow themselves to call the burn function on their own collection.
+    // 
+    pub resource interface ZeedzCollectionPrivate {
+        pub fun burn(burnID: UInt64)
+    }
+
     //
     //  A collection of Zeedz NFTs owned by an account.
     //   
-    pub resource Collection: ZeedzCollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic {
+    pub resource Collection: ZeedzCollectionPublic, ZeedzCollectionPrivate, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic {
 
         pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
 
         pub fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
-            let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("Not able to find specified NFT")
+            let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("Not able to find specified NFT within the owner's collection")
             emit Withdraw(id: token.id, from: self.owner?.address)
             return <-token
         }
 
         pub fun burn(burnID: UInt64){
-            let token <- self.ownedNFTs.remove(key: burnID) ?? panic("Not able to find specified NFT")
+            let token <- self.ownedNFTs.remove(key: burnID) ?? panic("Not able to find specified NFT within the owner's collection")
             let zeedle <- token as! @ZeedzINO.NFT
 
-            //  reduce numberOfMinterPerType and totalSupply
+            //  reduce numberOfMinterPerType
             ZeedzINO.numberMintedPerType[zeedle.typeID] = ZeedzINO.numberMintedPerType[zeedle.typeID]! - (1 as UInt64)
 
             destroy zeedle

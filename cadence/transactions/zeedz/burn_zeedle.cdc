@@ -3,7 +3,7 @@ import ZeedzINO from "../../contracts/ZeedzINO.cdc"
 
 transaction(zeedleID: UInt64) {
     
-    let zeedleProvider: &AnyResource{ZeedzINO.ZeedzCollectionPublic}
+    let zeedleProvider: &AnyResource{ZeedzINO.ZeedzCollectionPrivate}
 
     prepare(signer: AuthAccount) {
 
