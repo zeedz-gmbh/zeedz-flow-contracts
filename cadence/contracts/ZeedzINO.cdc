@@ -21,6 +21,12 @@ import NonFungibleToken from "./NonFungibleToken.cdc"
     Each batch-minting of Zeedles is resembled by an edition number, with the community pre-sale 
     being the first-ever edition (0). This way, each Zeedle can be traced back to the edition it
     was created in, and the number of minted Zeedles of that type in the specific edition.
+
+    Many of the in-game purchases lead to real-world donations to NGOs focused on climate action. 
+    The carbonOffset attribute of a Zeedle proves the impact the in-game purchases related to this Zeedle
+    have already made with regards to reducing greenhouse gases. This value is computed by taking the 
+    current dollar-value of each purchase at the time of the purchase, and applying the dollar-to-CO2-offset
+    formular of the current climate action partner. 
 */
 pub contract ZeedzINO: NonFungibleToken {
 
