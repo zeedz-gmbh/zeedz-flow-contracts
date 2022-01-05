@@ -42,17 +42,26 @@ pub contract ZeedzINO: NonFungibleToken {
     pub var numberMintedPerType: {UInt32: UInt64}
 
     pub resource NFT: NonFungibleToken.INFT {
+        //  The token's ID
         pub let id: UInt64
-
-        pub let name: String // The memorable short name for the Zeedle, e.g. “Baby Aloe"
-        pub let description: String //  A short description of the Zeedle's type
-        pub let typeID: UInt32 //   Number id of the Zeedle type -> e.g "1 = Ginger Biggy, 2 = Baby Aloe, etc”
-        pub let serialNumber: String  //    A Zeedle's unique serial number from the Zeedle's edition
-        pub let edition: UInt32 //  Number id of the Zeedle's edition -> e.g "1 = first edition, 2 = second edition, etc"
-        pub let editionCap: UInt32 //   The total number of Zeedle's minted in this edition
-        pub let evolutionStage: UInt32 //   The Zeedle's evolutionary stage 
-        pub let rarity: String //   The Zeedle's rarity -> e.g "RARE, COMMON, LEGENDARY, etc"
-        pub let imageURI: String // A URI to the image of the Zeedle
+        //  The memorable short name for the Zeedle, e.g. “Baby Aloe"
+        pub let name: String 
+        //  A short description of the Zeedle's type
+        pub let description: String 
+        //  Number id of the Zeedle type -> e.g "1 = Ginger Biggy, 2 = Baby Aloe, etc”
+        pub let typeID: UInt32
+        //  A Zeedle's unique serial number from the Zeedle's edition 
+        pub let serialNumber: String
+        //  Number id of the Zeedle's edition -> e.g "1 = first edition, 2 = second edition, etc"  
+        pub let edition: UInt32 
+        //  The total number of Zeedle's minted in this edition
+        pub let editionCap: UInt32 
+        //  The Zeedle's evolutionary stage 
+        pub let evolutionStage: UInt32
+        //  The Zeedle's rarity -> e.g "RARE, COMMON, LEGENDARY, etc" 
+        pub let rarity: String
+        //  URI to the image of the Zeedle 
+        pub let imageURI: String 
 
         init(initID: UInt64, initName: String, initDescription: String, initTypeID: UInt32, initSerialNumber: String, initEdition: UInt32, initEditionCap: UInt32, initEvolutionStage: UInt32, initRarity: String, initImageURI: String) {
             self.id = initID
