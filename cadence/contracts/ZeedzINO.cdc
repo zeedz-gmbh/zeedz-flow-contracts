@@ -1,8 +1,27 @@
 import NonFungibleToken from "./NonFungibleToken.cdc"
 
-//
-//  The official ZeedzINO contract
-//
+/*
+    Description: Central Smart Contract for the first generation of Zeedle NFTs
+
+    Zeedles are cute little nature-inspired monsters that grow with the real world weather.
+    They are the main characters of Zeedz, the first play-for-purpose game where players 
+    reduce global carbon emissions by growing Zeedles. 
+    
+    This smart contract encompasses the main functionality for the first generation
+    of Zeedle NFTs. 
+
+    Oriented much on the standard NFT contract, each Zeedle NFT has a certain typeID,
+    which is the type of Zeedle - e.g. "Baby Aloe Vera" or "Ginger Biggy". A contract-level
+    dictionary takes account of the different quentities that have been minted per Zeedle type.
+
+    Different types also imply different rarities, and these are also hardcoded inside 
+    the given Zeedle NFT in order to allow the direct querying of the Zeedle's rarity 
+    in external applications and wallets.
+
+    Each batch-minting of Zeedles is resembled by an edition number, with the community pre-sale 
+    being the first-ever edition (0). This way, each Zeedle can be traced back to the edition it
+    was created in, and the number of minted Zeedles of that type in the specific edition.
+*/
 pub contract ZeedzINO: NonFungibleToken {
 
     //  Events
