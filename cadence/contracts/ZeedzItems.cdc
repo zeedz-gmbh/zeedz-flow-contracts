@@ -1,6 +1,18 @@
 import NonFungibleToken from "./NonFungibleToken.cdc"
 
-// ZeedzItems
+/*
+    Description: Central Smart Contract for arbitrary ZeedzItems
+
+    The main heros of Zeedz are Zeedles - cute little nature-inspired monsters that grow 
+    with the real world weather. But there are manifold items that users can pick up
+    along their journey, from Early Access keys to Zeedle wearables. These items are
+    so called ZeedzItems. 
+    
+    This smart contract encompasses the main functionality for ZeedzItems. Since the main 
+    functionality lies in their plain ownership, their design is held intentionally simple. 
+    A single typeID denominates their specific type, and additional metadata can be passed
+    along into a flexible {String: String} dictionary. 
+*/
 pub contract ZeedzItems: NonFungibleToken {
 
     // Events
