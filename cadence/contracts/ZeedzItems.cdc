@@ -64,8 +64,8 @@ pub contract ZeedzItems: NonFungibleToken {
     }
 
     // 
-    //  This is the interface that users can cast their ZeedzItems Collection as
-    //  to allow themselves to call the burn function on their own collection.
+    // This is the interface that users can cast their ZeedzItems Collection as
+    // to allow themselves to call the burn function on their own collection.
     // 
     pub resource interface ZeedzItemsCollectionPrivate {
         pub fun burn(burnID: UInt64)
