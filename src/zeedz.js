@@ -162,11 +162,40 @@ export const burnZeedle = async (owner, zeedleId) => {
 };
 
 /**
- * Gets the number of inted zeedle's per each minted typeId
+ * Gets the number of inted Zeedle's per each minted typeId
  * @returns
  */
 export const getZeedzMintedPerType = async () => {
   const name = "zeedz/get_minted_per_type";
 
   return executeScript({ name });
+};
+
+/**
+ * Increases a Zeedle's carbon offset field by the given amount
+ * @param {account} owner zeedle owner
+ * @param {account} admin zeedle adminclient
+ * @param {UInt64} zeedleId zeedleId
+ * @param {UInt64} amount amount to increase the offset by
+ * @returns
+ */
+export const increaseOffset = async (owner, admin, zeedleId, amount) => {
+  const name = "zeedz/admin_increase_zeedle_offset";
+  const args = [zeedleId, amount];
+  const signers = [owner, admin];
+
+  return sendTransaction({ name, args, signers });
+};
+
+/**
+ * Gets a Zeedle's carbon offset
+ * @param {*} account zeedle owner account
+ * @param {*} zeedleID zeedle id
+ * @returns
+ */
+export const getZeedleOffset = async (account, zeedleID) => {
+  const name = "zeedz/get_zeedle_offset";
+  const args = [account, zeedleID];
+
+  return executeScript({ name, args });
 };

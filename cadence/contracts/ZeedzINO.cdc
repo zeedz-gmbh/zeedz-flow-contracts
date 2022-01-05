@@ -30,6 +30,7 @@ pub contract ZeedzINO: NonFungibleToken {
     pub event Deposit(id: UInt64, to: Address?)
     pub event Minted(id: UInt64, name: String, description: String, typeID: UInt32, serialNumber: String, edition: UInt32, rarity: String)
     pub event Burned(id: UInt64, from: Address?)
+    pub event Offset(id: UInt64, amount: UInt64)
 
     //  Named Paths
     pub let CollectionStoragePath: StoragePath
@@ -61,7 +62,9 @@ pub contract ZeedzINO: NonFungibleToken {
         //  The Zeedle's rarity -> e.g "RARE, COMMON, LEGENDARY, etc" 
         pub let rarity: String
         //  URI to the image of the Zeedle 
-        pub let imageURI: String 
+        pub let imageURI: String
+        //  The total amount this Zeedle has contributed to offsetting CO2 emissions
+        pub var carbonOffset: UInt64
 
         init(initID: UInt64, initName: String, initDescription: String, initTypeID: UInt32, initSerialNumber: String, initEdition: UInt32, initEditionCap: UInt32, initEvolutionStage: UInt32, initRarity: String, initImageURI: String) {
             self.id = initID
@@ -74,11 +77,15 @@ pub contract ZeedzINO: NonFungibleToken {
             self.evolutionStage = initEvolutionStage
             self.rarity = initRarity
             self.imageURI = initImageURI
-
+            self.carbonOffset = 0
         }
 
         pub fun getMetadata(): {String: AnyStruct} {
             return {"name": self.name, "description": self.description, "typeID": self.typeID, "serialNumber": self.serialNumber, "edition": self.edition, "editionCap": self.editionCap, "evolutionStage": self.evolutionStage, "rarity": self.rarity, "imageURI": self.imageURI}
+        }
+
+        access(contract) fun increaseOffset(amount: UInt64) {
+            self.carbonOffset = self.carbonOffset + amount
         }
     }
 
@@ -206,6 +213,14 @@ pub contract ZeedzINO: NonFungibleToken {
             } else {
                 ZeedzINO.numberMintedPerType[typeID] = ZeedzINO.numberMintedPerType[typeID]! + (1 as UInt64)
             }
+        }
+
+        //
+        //  Increase the Zeedle's total carbon offset by the given amount
+        //
+        pub fun increaseOffset(zeedleRef: &ZeedzINO.NFT, amount: UInt64) {
+            zeedleRef.increaseOffset(amount: amount)
+            emit Offset(id: zeedleRef.id, amount: amount)
         }
     }
 

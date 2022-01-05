@@ -21,6 +21,8 @@ import {
   zeedleMetadataToMint2,
   zeedleMetadataToMint3,
   getZeedzMintedPerType,
+  getZeedleOffset,
+  increaseOffset,
 } from "../src/zeedz";
 
 import { deployNonFungibleToken, getZeedzAdminAddress, toUFix64 } from "../src/common";
@@ -105,7 +107,7 @@ describe("Zeedz", () => {
     await shallPass(await mintZeedle(Bob, zeedleMetadataToMint));
 
     const [metadata] = await getZeedleMetadata(Bob, 0);
-    console.log(metadata);
+
     // Check if it's the correct name
     await shallResolve(async () => {
       expect(metadata.name).toBe(zeedleMetadataToMint.name);
@@ -204,6 +206,92 @@ describe("Zeedz", () => {
     // Check if mintedPerType returnes the right values
     await shallResolve(async () => {
       expect(mintedPerType.toString()).toBe({ 1: 3, 2: 2, 3: 1 }.toString());
+    });
+  });
+
+  it("account owner and admin should be able to cosign and increase a zeedle's carbon offset", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployZeedz();
+
+    // Setup
+    const Bob = await getAccountAddress("Bob");
+    await setupZeedzOnAccount(Bob);
+    const ZeedzAdmin = await getZeedzAdminAddress();
+
+    // Mint instruction for Bob account shall be resolved
+    await shallPass(await mintZeedle(Bob, zeedleMetadataToMint));
+
+    // Increase offset for Bob's Zeedle shall be resolved
+    await shallPass(await increaseOffset(Bob, ZeedzAdmin, 0, 1000));
+  });
+
+  it("account owner and admin should not be able to cosign and increase a zeedle's carbon offset a zeedle he doesnt own", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployZeedz();
+
+    // Setup
+    const Bob = await getAccountAddress("Bob");
+    await setupZeedzOnAccount(Bob);
+    const ZeedzAdmin = await getZeedzAdminAddress();
+
+    // Mint instruction for Bob account shall be resolved
+    await shallPass(await mintZeedle(Bob, zeedleMetadataToMint));
+
+    // Increase offset instruction for Bob's Zeedle shall be reverted
+    await shallRevert(await increaseOffset(Bob, ZeedzAdmin, 1, 1000));
+  });
+
+  it("account owner should not be able to increase a zeedle's carbon offset without an admin's signature", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployZeedz();
+
+    // Setup
+    const Bob = await getAccountAddress("Bob");
+    await setupZeedzOnAccount(Bob);
+    const Alice = await getAccountAddress("Alice");
+    await setupZeedzOnAccount(Alice);
+
+    // Mint instruction for Bob account shall be resolved
+    await shallPass(await mintZeedle(Bob, zeedleMetadataToMint));
+
+    // Increase offset instruction for Bob's Zeedle shall be reverted
+    await shallRevert(await increaseOffset(Bob, Alice, 1, 1000));
+  });
+
+  it("shall be able to get a zeedle's current carbon offset", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployZeedz();
+
+    // Setup
+    const Bob = await getAccountAddress("Bob");
+    await setupZeedzOnAccount(Bob);
+    const ZeedzAdmin = await getZeedzAdminAddress();
+
+    // Mint instruction for Bob account shall be resolved
+    await shallPass(await mintZeedle(Bob, zeedleMetadataToMint));
+
+    // Increase offset for Bob's Zeedle shall be resolved
+    await shallPass(await increaseOffset(Bob, ZeedzAdmin, 0, 1000));
+
+    let [offset] = await getZeedleOffset(Bob, 0);
+
+    // Check the Zeedle's offset
+    await shallResolve(async () => {
+      expect(offset).toBe(1000);
+    });
+
+    // Increase offset for Bob's Zeedle shall be resolved
+    await shallPass(await increaseOffset(Bob, ZeedzAdmin, 0, 1500));
+
+    [offset] = await getZeedleOffset(Bob, 0);
+
+    // Check the Zeedle's offset
+    await shallResolve(async () => {
+      expect(offset).toBe(2500);
     });
   });
 });
