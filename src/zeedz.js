@@ -4,9 +4,38 @@ import { getZeedzAdminAddress } from "./common";
 
 export const zeedleMetadataToMint = {
   name: "Ginger Zeedle",
-  url: "https://zeedlz.io/images/ino/zeedle123.jpg",
-  serialNumber: "123",
-  editions: "3000",
+  description: "A wild ginger with a wild imagination",
+  typeID: 1,
+  serialNumber: "Test123",
+  edition: 1,
+  editionCap: 3000,
+  evolutionStage: 2,
+  rarity: "RARE",
+  imageURI: "https://zeedlz.io/images/ino/zeedle123.jpg",
+};
+
+export const zeedleMetadataToMint2 = {
+  name: "Mint Zeedle",
+  description: "A wild mint with a wild imagination",
+  typeID: 2,
+  serialNumber: "Test323",
+  edition: 1,
+  editionCap: 1000,
+  evolutionStage: 2,
+  rarity: "RARE",
+  imageURI: "https://zeedlz.io/images/ino/zeedle223.jpg",
+};
+
+export const zeedleMetadataToMint3 = {
+  name: "Aloe Zeedle",
+  description: "A wild aloe with a wild imagination",
+  typeID: 3,
+  serialNumber: "Test423",
+  edition: 1,
+  editionCap: 2000,
+  evolutionStage: 2,
+  rarity: "LEGENDARY",
+  imageURI: "https://zeedlz.io/images/ino/zeedle323.jpg",
 };
 
 export const zeedleTypeIDToMint = 1;
@@ -53,11 +82,22 @@ export const getZeedzSupply = async () => {
  * @throws Will throw an error if execution will be halted
  * @returns {Promise<*>}
  * */
-export const mintZeedle = async (recipient, typeID, metadata) => {
+export const mintZeedle = async (recipient, metadata) => {
   const ZeedzAdmin = await getZeedzAdminAddress();
 
   const name = "zeedz/mint_zeedle";
-  const args = [recipient, typeID, metadata];
+  const args = [
+    recipient,
+    metadata.name,
+    metadata.description,
+    metadata.typeID,
+    metadata.serialNumber,
+    metadata.edition,
+    metadata.editionCap,
+    metadata.evolutionStage,
+    metadata.rarity,
+    metadata.imageURI,
+  ];
   const signers = [ZeedzAdmin];
 
   return sendTransaction({ name, args, signers });
@@ -122,7 +162,7 @@ export const burnZeedle = async (owner, zeedleId) => {
 };
 
 /**
- * Gets the number of inted zeedle's per each minted typeId
+ * Gets the number of inted Zeedle's per each minted typeId
  * @returns
  */
 export const getZeedzMintedPerType = async () => {
@@ -132,38 +172,30 @@ export const getZeedzMintedPerType = async () => {
 };
 
 /**
- * Checks if a user has the admin capability
+ * Increases a Zeedle's carbon offset field by the given amount
+ * @param {account} owner zeedle owner
+ * @param {account} admin zeedle adminclient
+ * @param {UInt64} zeedleId zeedleId
+ * @param {UInt64} amount amount to increase the offset by
+ * @returns
  */
-export const checkIfUserHasAdmin = async (account) => {
-  const name = "zeedz/is_user_admin";
-  const args = [account];
+export const increaseOffset = async (owner, admin, zeedleId, amount) => {
+  const name = "zeedz/admin_increase_zeedle_offset";
+  const args = [zeedleId, amount];
+  const signers = [owner, admin];
 
-  return executeScript({ name, args });
+  return sendTransaction({ name, args, signers });
 };
 
 /**
- * Gives a user the AdminClient capability
- * @param {*} user user
- * @param {*} admin admin
+ * Gets a Zeedle's carbon offset
+ * @param {*} account zeedle owner account
+ * @param {*} zeedleID zeedle id
  * @returns
  */
-export const promoteToAdmin = async (user, admin) => {
-  const name = "zeedz/promote_user_to_admin";
-  const signers = [user, admin];
+export const getZeedleOffset = async (account, zeedleID) => {
+  const name = "zeedz/get_zeedle_offset";
+  const args = [account, zeedleID];
 
-  return sendTransaction({ name, signers });
-};
-
-/*
- * Mints a Zeedle using admin client and sends it to **recipient**.
- * @param {string} recipient - recipient account address
- * @throws Will throw an error if execution will be halted
- * @returns {Promise<*>}
- * */
-export const mintZeedleViaAdminClient = async (recipient, admin, typeID, metadata) => {
-  const name = "zeedz/adminclient_mint_zeedle";
-  const args = [recipient, typeID, metadata];
-  const signers = [admin];
-
-  return sendTransaction({ name, args, signers });
+  return executeScript({ name, args });
 };
