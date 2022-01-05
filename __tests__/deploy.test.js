@@ -20,12 +20,9 @@ import {
   transferZeedle,
   zeedleMetadataToMint,
   zeedleTypeIDToMint,
-  levelUpZeedle,
-  getZeedleLevel,
   getZeedzMintedPerType,
   checkIfUserHasAdmin,
   promoteToAdmin,
-  levelUpZeedleViaAdminClient,
   mintZeedleViaAdminClient,
 } from "../src/zeedz";
 
@@ -183,91 +180,6 @@ describe("Zeedz", () => {
     await shallRevert(burnZeedle(Bob, 1));
   });
 
-  it("account owner and admin should be able to cosign and levelup a zeedle", async () => {
-    // Deploy
-    await deployNonFungibleToken();
-    await deployZeedz();
-
-    // Setup
-    const Bob = await getAccountAddress("Bob");
-    await setupZeedzOnAccount(Bob);
-    const ZeedzAdmin = await getZeedzAdminAddress();
-
-    // Mint instruction for Bob account shall be resolved
-    await shallPass(await mintZeedle(Bob, zeedleTypeIDToMint, zeedleMetadataToMint));
-
-    // LevelUp instruction for Bob's Zeedle shall be resolved
-    await shallPass(await levelUpZeedle(Bob, ZeedzAdmin, 0));
-  });
-
-  it("account owner and admin should not be able to cosign and levelup a zeedle he doesnt own", async () => {
-    // Deploy
-    await deployNonFungibleToken();
-    await deployZeedz();
-
-    // Setup
-    const Bob = await getAccountAddress("Bob");
-    await setupZeedzOnAccount(Bob);
-    const ZeedzAdmin = await getZeedzAdminAddress();
-
-    // Mint instruction for Bob account shall be resolved
-    await shallPass(await mintZeedle(Bob, zeedleTypeIDToMint, zeedleMetadataToMint));
-
-    // LevelUp instruction for Bob's Zeedle shall revert
-    await shallRevert(await levelUpZeedle(Bob, ZeedzAdmin, 1));
-  });
-
-  it("account owner should not be able to levelup a zeedle without an admin's signature", async () => {
-    // Deploy
-    await deployNonFungibleToken();
-    await deployZeedz();
-
-    // Setup
-    const Bob = await getAccountAddress("Bob");
-    await setupZeedzOnAccount(Bob);
-    const Alice = await getAccountAddress("Alice");
-    await setupZeedzOnAccount(Alice);
-
-    // Mint instruction for Bob account shall be resolved
-    await shallPass(await mintZeedle(Bob, zeedleTypeIDToMint, zeedleMetadataToMint));
-
-    // LevelUp instruction for Bob's Zeedle shall be revert
-    await shallRevert(await levelUpZeedle(Bob, Alice, 0));
-  });
-
-  it("shall be able to get a zeedle's current level", async () => {
-    // Deploy
-    await deployNonFungibleToken();
-    await deployZeedz();
-
-    // Setup
-    const Bob = await getAccountAddress("Bob");
-    await setupZeedzOnAccount(Bob);
-    const ZeedzAdmin = await getZeedzAdminAddress();
-
-    // Mint instruction for Bob account shall be resolved
-    await shallPass(await mintZeedle(Bob, zeedleTypeIDToMint, zeedleMetadataToMint));
-
-    // LevelUp instruction for Bob's Zeedle shall be resolved
-    await shallPass(await levelUpZeedle(Bob, ZeedzAdmin, 0));
-
-    const [level] = await getZeedleLevel(Bob, 0);
-
-    // Check the Zeedle's level
-    await shallResolve(async () => {
-      expect(level).toBe(1);
-    });
-
-    // LevelUp instruction for Bob's Zeedle shall be resolved
-    await shallPass(await levelUpZeedle(Bob, ZeedzAdmin, 0));
-
-    const [levelTwo] = await getZeedleLevel(Bob, 0);
-
-    // Check the Zeedle's level
-    await shallResolve(async () => {
-      expect(levelTwo).toBe(2);
-    });
-  });
   it("shall be able to get minted zeedles per type", async () => {
     // Deploy
     await deployNonFungibleToken();
@@ -354,46 +266,6 @@ describe("Zeedz", () => {
     await shallResolve(async () => {
       expect(check).toBe(false);
     });
-  });
-
-  it("user promoted to admin shall be able to levelup a zeedle", async () => {
-    // Deploy
-    await deployNonFungibleToken();
-    await deployZeedz();
-
-    // Setup
-    const Bob = await getAccountAddress("Bob");
-    await setupZeedzOnAccount(Bob);
-    const ZeedzAdmin = await getZeedzAdminAddress();
-    const Alice = await getAccountAddress("Alice");
-    await setupZeedzOnAccount(Alice);
-
-    // Promote to admin instruction for Bob's account  shall be resolved
-    await shallPass(await promoteToAdmin(Bob, ZeedzAdmin));
-
-    // Mint instruction for Alice's account shall be resolved
-    await shallPass(await mintZeedle(Alice, zeedleTypeIDToMint, zeedleMetadataToMint));
-
-    // LevelUp instruction for Alice's Zeedle shall pass
-    await shallPass(await levelUpZeedleViaAdminClient(Alice, Bob, 0));
-  });
-
-  it("user not promoted to admin shall not be able to levelup a zeedle", async () => {
-    // Deploy
-    await deployNonFungibleToken();
-    await deployZeedz();
-
-    // Setup
-    const Bob = await getAccountAddress("Bob");
-    await setupZeedzOnAccount(Bob);
-    const Alice = await getAccountAddress("Alice");
-    await setupZeedzOnAccount(Alice);
-
-    // Mint instruction for Alice's account shall be resolved
-    await shallPass(await mintZeedle(Alice, zeedleTypeIDToMint, zeedleMetadataToMint));
-
-    // LevelUp instruction for Alice's Zeedle shall pass
-    await shallRevert(await levelUpZeedleViaAdminClient(Alice, Bob, 0));
   });
 
   it("user promoted to admin shall be able to mint a Zeedle", async () => {
