@@ -25,12 +25,25 @@ import {
   increaseOffset,
 } from "../src/zeedz";
 
+import {
+  deployZeedzItems,
+  getZeedzItemMetadata,
+  getZeedzItemCount,
+  getZeedzItemSupply,
+  itemMetadataToMint1,
+  mintZeedzItem,
+  setupZeedzItemsOnAccount,
+  transferZeedzItem,
+  typeID1,
+  burnZeedzItem,
+} from "../src/zeedz_items";
+
 import { deployNonFungibleToken, getZeedzAdminAddress, toUFix64 } from "../src/common";
 
 // We need to set timeout for a higher number, because some transactions might take up some time
 jest.setTimeout(50000);
 
-describe("Zeedz", () => {
+describe("Zeedz INO", () => {
   // Instantiate emulator and path to Cadence files
   beforeEach(async () => {
     const basePath = path.resolve(__dirname, "../cadence");
@@ -293,5 +306,154 @@ describe("Zeedz", () => {
     await shallResolve(async () => {
       expect(offset).toBe(2500);
     });
+  });
+});
+
+describe("Zeedz Items", () => {
+  // Instantiate emulator and path to Cadence files
+  beforeEach(async () => {
+    const basePath = path.resolve(__dirname, "../cadence");
+    const port = 8080;
+    await init(basePath);
+    await emulator.start(port, false);
+  });
+
+  // Stop emulator, so it could be restarted
+  afterEach(async () => {
+    await emulator.stop();
+  });
+
+  it("shall deploy Zeedz Items contract", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await shallPass(await deployZeedzItems());
+  });
+  it("supply shall be 0 after contract is deployed", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployZeedzItems();
+
+    // Setup
+    const ZeedzAdmin = await getZeedzAdminAddress();
+    await shallPass(setupZeedzItemsOnAccount(ZeedzAdmin));
+
+    // Test
+    await shallResolve(async () => {
+      const [supply] = await getZeedzItemSupply();
+      expect(supply).toBe(0);
+    });
+  });
+  it("shall be able to mint a ZeedzItems", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployZeedzItems();
+
+    // Setup
+    const Alice = await getAccountAddress("Alice");
+    await setupZeedzItemsOnAccount(Alice);
+
+    const itemTypeID = typeID1;
+    const itemMetadataToMint = itemMetadataToMint1;
+
+    // Mint instruction for Alice account shall be resolved
+    await shallPass(mintZeedzItem(itemTypeID, Alice, itemMetadataToMint));
+  });
+
+  it("shall be able to create a new empty NFT Collection", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployZeedzItems();
+
+    // Setup
+    const Bob = await getAccountAddress("Bob");
+    await setupZeedzItemsOnAccount(Bob);
+
+    // shall be able te read Bob's collection and ensure it's empty
+    await shallResolve(async () => {
+      const [itemCount] = await getZeedzItemCount(Bob);
+      expect(itemCount).toBe(0);
+    });
+  });
+
+  it("shall be able to read NFT metadata from an accounts collection", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployZeedzItems();
+
+    // Setup
+    const Bob = await getAccountAddress("Bob");
+    await setupZeedzItemsOnAccount(Bob);
+
+    // Mint instruction for Bob account shall be resolved
+    await shallPass(mintZeedzItem(typeID1, Bob, itemMetadataToMint1));
+
+    const [metadata] = await getZeedzItemMetadata(Bob, 0);
+
+    // Test
+    await shallResolve(async () => {
+      expect(metadata.Name).toBe(itemMetadataToMint1.Name);
+    });
+  });
+
+  it("shall not be able to withdraw an NFT that doesn't exist in a collection", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployZeedzItems();
+
+    // Setup
+    const Alice = await getAccountAddress("Alice");
+    const Bob = await getAccountAddress("Bob");
+    await setupZeedzItemsOnAccount(Alice);
+    await setupZeedzItemsOnAccount(Bob);
+
+    // Transfer transaction shall fail for non-existent item
+    await shallRevert(transferZeedzItem(Alice, Bob, 1337));
+  });
+
+  it("shall be able to withdraw an NFT and deposit to another accounts collection", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployZeedzItems();
+
+    // Setup
+    const Alice = await getAccountAddress("Alice");
+    const Bob = await getAccountAddress("Bob");
+    await setupZeedzItemsOnAccount(Alice);
+    await setupZeedzItemsOnAccount(Bob);
+
+    // Mint instruction for Alice account shall be resolved
+    await shallPass(mintZeedzItem(typeID1, Alice, itemMetadataToMint1));
+
+    // Transfer transaction shall pass
+    await shallPass(transferZeedzItem(Alice, Bob, 0));
+  });
+
+  it("shall be able to burn an NFT from an accounts collection", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployZeedzItems();
+
+    // Setup
+    const Bob = await getAccountAddress("Bob");
+    await setupZeedzItemsOnAccount(Bob);
+
+    // Mint instruction for Bob account shall be resolved
+    await shallPass(mintZeedzItem(typeID1, Bob, itemMetadataToMint1));
+
+    // Burn transaction shall pass
+    await shallPass(burnZeedzItem(Bob, 0));
+  });
+
+  it("shall not be able to burn an NFT that doesn't exist in a collection", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployZeedzItems();
+
+    // Setup
+    const Bob = await getAccountAddress("Bob");
+    await setupZeedzItemsOnAccount(Bob);
+
+    // Burn transaction shall fail for non-existent item
+    await shallRevert(burnZeedzItem(Bob, 0));
   });
 });
