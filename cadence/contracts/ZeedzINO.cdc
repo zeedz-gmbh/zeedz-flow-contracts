@@ -66,13 +66,13 @@ pub contract ZeedzINO: NonFungibleToken {
         pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
 
         pub fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
-            let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
+            let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("Not able to find specified NFT")
             emit Withdraw(id: token.id, from: self.owner?.address)
             return <-token
         }
 
         pub fun burn(burnID: UInt64){
-            let token <- self.ownedNFTs.remove(key: burnID) ?? panic("missing NFT")
+            let token <- self.ownedNFTs.remove(key: burnID) ?? panic("Not able to find specified NFT")
             let zeedle <- token as! @ZeedzINO.NFT
 
             //  reduce numberOfMinterPerType and totalSupply
