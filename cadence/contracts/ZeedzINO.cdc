@@ -77,7 +77,6 @@ pub contract ZeedzINO: NonFungibleToken {
 
             //  reduce numberOfMinterPerType and totalSupply
             ZeedzINO.numberMintedPerType[zeedle.typeID] = ZeedzINO.numberMintedPerType[zeedle.typeID]! - (1 as UInt64)
-            ZeedzINO.totalSupply = ZeedzINO.totalSupply - (1 as UInt64)
 
             destroy zeedle
             emit Burned(id: burnID, from: self.owner?.address)
