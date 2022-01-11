@@ -46,7 +46,7 @@ pub contract ZeedzINO: NonFungibleToken {
 
     pub var totalSupply: UInt64
 
-    pub var numberMintedPerType: {UInt32: UInt64}
+    access(contract) var numberMintedPerType: {UInt32: UInt64}
 
     pub resource NFT: NonFungibleToken.INFT {
         //  The token's ID
@@ -242,6 +242,13 @@ pub contract ZeedzINO: NonFungibleToken {
             .borrow<&ZeedzINO.Collection{ZeedzINO.ZeedzCollectionPublic}>()
             ?? panic("Couldn't get collection")
         return collection.borrowZeedle(id: zeedleID)
+    }
+
+    // 
+    //  Returns the number of minted Zeedles for each Zeedle type.
+    //
+    pub fun getMintedPerType(): {UInt32: UInt64} {
+        return self.numberMintedPerType
     }
 
 

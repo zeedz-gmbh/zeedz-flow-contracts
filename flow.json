@@ -1,21 +1,33 @@
 {
-	"emulators": {
-		"default": {
-			"port": 3569,
-			"serviceAccount": "emulator-account"
-		}
-	},
-	"contracts": {},
-	"networks": {
-		"emulator": "127.0.0.1:3569",
-		"mainnet": "access.mainnet.nodes.onflow.org:9000",
-		"testnet": "access.devnet.nodes.onflow.org:9000"
-	},
-	"accounts": {
-		"emulator-account": {
-			"address": "f8d6e0586b0a20c7",
-			"key": "4aeefddb470fd69187694302da4adc71688bcb7416301a3cac808caa811e9437"
-		}
-	},
-	"deployments": {}
+  "emulators": {
+    "default": {
+      "port": 3569,
+      "serviceAccount": "emulator-account"
+    }
+  },
+  "contracts": {
+    "ZeedzINO": "./cadence/contracts/ZeedzINO.cdc",
+    "ZeedzItems": "./cadence/contracts/ZeedzItems.cdc",
+    "NonFungibleToken": "./cadence/contracts/NonFungibleToken.cdc"
+  },
+  "networks": {
+    "emulator": "127.0.0.1:3569",
+    "mainnet": "access.mainnet.nodes.onflow.org:9000",
+    "testnet": "access.devnet.nodes.onflow.org:9000"
+  },
+  "accounts": {
+    "emulator-account": {
+      "address": "f8d6e0586b0a20c7",
+      "key": "4aeefddb470fd69187694302da4adc71688bcb7416301a3cac808caa811e9437"
+    },
+    "testnet-admin": {
+      "address": "0xd35bad52c7e1ab65",
+      "key": "a319ce444cbec602568c9e9b77871048a5b9ef12a13f63302f05377effef68ed"
+    }
+  },
+  "deployments": {
+    "testnet": {
+      "testnet-admin": ["ZeedzItems", "ZeedzINO", "NonFungibleToken"]
+    }
+  }
 }
