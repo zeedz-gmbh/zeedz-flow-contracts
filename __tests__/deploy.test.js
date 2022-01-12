@@ -38,6 +38,8 @@ import {
   burnZeedzItem,
 } from "../src/zeedz_items";
 
+import { deployZeedzMarketplace } from "../src/zeedz_marketplace";
+
 import { deployNonFungibleToken, getZeedzAdminAddress, toUFix64 } from "../src/common";
 
 // We need to set timeout for a higher number, because some transactions might take up some time
@@ -455,5 +457,26 @@ describe("Zeedz Items", () => {
 
     // Burn transaction shall fail for non-existent item
     await shallRevert(burnZeedzItem(Bob, 0));
+  });
+});
+
+describe("Zeedz Marketplace", () => {
+  // Instantiate emulator and path to Cadence files
+  beforeEach(async () => {
+    const basePath = path.resolve(__dirname, "../cadence");
+    const port = 8080;
+    await init(basePath);
+    await emulator.start(port, false);
+  });
+
+  // Stop emulator, so it could be restarted
+  afterEach(async () => {
+    await emulator.stop();
+  });
+
+  it("shall deploy the ZeedzINO contract", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await shallPass(await deployZeedzMarketplace());
   });
 });
