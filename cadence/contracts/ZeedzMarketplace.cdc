@@ -3,8 +3,16 @@ import NFTStorefront from "./NFTStorefront.cdc"
 
 pub contract ZeedzMarketplace {
 
-    pub event NewListingAvailable(
+    pub event AddedListing(
         storefrontAddress: Address,
+        listingResourceID: UInt64,
+        nftType: Type,
+        nftID: UInt64,
+        ftVaultType: Type,
+        price: UFix64
+    )
+
+    pub event RemovedListing(
         listingResourceID: UInt64,
         nftType: Type,
         nftID: UInt64,
@@ -51,7 +59,7 @@ pub contract ZeedzMarketplace {
         }
     }
 
-    pub let MarketplaceAdminStoragePath: StoragePath
+    pub let ZeedzMarketplaceAdminStoragePath: StoragePath
 
     // listingID order by time, listingID asc
     access(contract) let listingIDs: [UInt64]
@@ -75,12 +83,12 @@ pub contract ZeedzMarketplace {
                 totalRatio = totalRatio + requirement.ratio
             }
             assert(totalRatio <= 1.0, message: "total ratio must be less than or equal to 1.0")
-            Marketplace.saleCutRequirements[nftType.identifier] = requirements
+            ZeedzMarketplace.saleCutRequirements[nftType.identifier] = requirements
         }
 
         pub fun forceRemoveListing(id: UInt64) {
-            if let item = Marketplace.listingIDItems[id] {
-                Marketplace.removeItem(item)
+            if let item = ZeedzMarketplace.listingIDItems[id] {
+                ZeedzMarketplace.removeItem(item)
             }
         }
     }
@@ -238,13 +246,13 @@ pub contract ZeedzMarketplace {
             self.removeItem(previousItem)
         }
 
-        emit ListingAvailable(
-            storefrontAddress: self.owner?.address!,
-            listingResourceID: listingResourceID,
-            nftType: nftType,
-            nftID: nftID,
-            ftVaultType: salePaymentVaultType,
-            price: listingPrice
+        emit AddedListing(
+            storefrontAddress: storefrontPublicCapability.address,
+            listingResourceID: item.listingID,
+            nftType: item.listingDetails.nftType,
+            nftID: item.listingDetails.nftID,
+            ftVaultType: item.listingDetails.salePaymentVaultType,
+            price: item.listingDetails.salePrice
         )
     }
 
@@ -271,6 +279,14 @@ pub contract ZeedzMarketplace {
         let nftListingIDs = self.collectionNFTListingIDs[item.listingDetails.nftType.identifier] ?? {}
         nftListingIDs.remove(key: item.listingDetails.nftID)
         self.collectionNFTListingIDs[item.listingDetails.nftType.identifier] = nftListingIDs
+
+        emit RemovedListing(
+            listingResourceID: item.listingID,
+            nftType: item.listingDetails.nftType,
+            nftID: item.listingDetails.nftID,
+            ftVaultType: item.listingDetails.salePaymentVaultType,
+            price: item.listingDetails.salePrice
+        )
     }
 
     // Run reverse for loop to find out the index to insert
@@ -341,7 +357,7 @@ pub contract ZeedzMarketplace {
     }
 
     init () {
-        self.MarketplaceAdminStoragePath = /storage/BloctoBayMarketplaceAdmin
+        self.ZeedzMarketplaceAdminStoragePath = /storage/BloctoBayZeedzMarketplaceAdmin
 
         self.listingIDs = []
         self.listingIDItems = {}
@@ -349,6 +365,6 @@ pub contract ZeedzMarketplace {
         self.saleCutRequirements = {}
 
         let admin <- create Administrator()
-        self.account.save(<-admin, to: self.MarketplaceAdminStoragePath)
+        self.account.save(<-admin, to: self.ZeedzMarketplaceAdminStoragePath)
     }
 }
