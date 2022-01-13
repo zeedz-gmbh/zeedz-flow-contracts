@@ -91,17 +91,17 @@ pub contract ZeedzMarketplace {
                 ZeedzMarketplace.removeItem(item)
             }
         }
+    }
 
-        pub fun addListing(id: UInt64, storefrontPublicCapability: Capability<&{NFTStorefront.StorefrontPublic}>) {
-            let item = Item(storefrontPublicCapability: storefrontPublicCapability, listingID: id)
+    pub fun addListing(id: UInt64, storefrontPublicCapability: Capability<&{NFTStorefront.StorefrontPublic}>) {
+        let item = Item(storefrontPublicCapability: storefrontPublicCapability, listingID: id)
 
-            let indexToInsertListingID = ZeedzMarketplace.getIndexToAddListingID(item: item, items: ZeedzMarketplace.listingIDs)
+        let indexToInsertListingID = self.getIndexToAddListingID(item: item, items: self.listingIDs)
 
-            ZeedzMarketplace.addItem(
-                item,
-                storefrontPublicCapability: storefrontPublicCapability,
-                indexToInsertListingID: indexToInsertListingID)
-        }
+        self.addItem(
+            item,
+            storefrontPublicCapability: storefrontPublicCapability,
+            indexToInsertListingID: indexToInsertListingID)
     }
 
     pub fun getListingIDs(): [UInt64] {
