@@ -91,6 +91,17 @@ pub contract ZeedzMarketplace {
                 ZeedzMarketplace.removeItem(item)
             }
         }
+
+        pub fun addListing(id: UInt64, storefrontPublicCapability: Capability<&{NFTStorefront.StorefrontPublic}>) {
+            let item = Item(storefrontPublicCapability: storefrontPublicCapability, listingID: id)
+
+            let indexToInsertListingID = self.getIndexToAddListingID(item: item, items: self.listingIDs)
+
+            self.addItem(
+                item,
+                storefrontPublicCapability: storefrontPublicCapability,
+                indexToInsertListingID: indexToInsertListingID)
+        }
     }
 
     pub fun getListingIDs(): [UInt64] {
@@ -112,35 +123,6 @@ pub contract ZeedzMarketplace {
 
     pub fun getSaleCutRequirements(nftType: Type): [SaleCutRequirement] {
         return self.saleCutRequirements[nftType.identifier] ?? []
-    }
-
-    pub fun addListing(id: UInt64, storefrontPublicCapability: Capability<&{NFTStorefront.StorefrontPublic}>) {
-        let item = Item(storefrontPublicCapability: storefrontPublicCapability, listingID: id)
-
-        let indexToInsertListingID = self.getIndexToAddListingID(item: item, items: self.listingIDs)
-
-        self.addItem(
-            item,
-            storefrontPublicCapability: storefrontPublicCapability,
-            indexToInsertListingID: indexToInsertListingID)
-    }
-
-    pub fun addListingWithIndex(
-        id: UInt64,
-        storefrontPublicCapability: Capability<&{NFTStorefront.StorefrontPublic}>,
-        indexToInsertListingID: Int
-    ) {
-        let item = Item(storefrontPublicCapability: storefrontPublicCapability, listingID: id)
-
-        self.checkValidIndexToInsert(
-            item: item,
-            index: indexToInsertListingID,
-            items: self.listingIDs)
-
-        self.addItem(
-            item,
-            storefrontPublicCapability: storefrontPublicCapability,
-            indexToInsertListingID: indexToInsertListingID)
     }
 
     // Anyone can remove it if the listing item has been removed or purchased.
@@ -181,6 +163,24 @@ pub contract ZeedzMarketplace {
                 item,
                 indexToRemoveListingID: indexToRemoveListingID)
         }
+    }
+
+    acesses(contract) fun addListingWithIndex(
+        id: UInt64,
+        storefrontPublicCapability: Capability<&{NFTStorefront.StorefrontPublic}>,
+        indexToInsertListingID: Int
+    ) {
+        let item = Item(storefrontPublicCapability: storefrontPublicCapability, listingID: id)
+
+        self.checkValidIndexToInsert(
+            item: item,
+            index: indexToInsertListingID,
+            items: self.listingIDs)
+
+        self.addItem(
+            item,
+            storefrontPublicCapability: storefrontPublicCapability,
+            indexToInsertListingID: indexToInsertListingID)
     }
 
     // Add item and indexes.
