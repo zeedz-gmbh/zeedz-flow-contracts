@@ -70,20 +70,20 @@ pub contract ZeedzMarketplace {
     // collection identifier => (NFT id => listingID)
     access(contract) let collectionNFTListingIDs: {String: {UInt64: UInt64}}
 
-    // collection identifier => SaleCutRequirements
-    access(contract) let saleCutRequirements: {String: [SaleCutRequirement]}
+    // arary of SaleCutRequirements
+    access(contract) var saleCutRequirements: [SaleCutRequirement]
 
     // Administrator
     //
     pub resource Administrator {
 
-        pub fun updateSaleCutRequirements(_ requirements: [SaleCutRequirement], nftType: Type) {
+        pub fun updateSaleCutRequirement(_ requirements: [SaleCutRequirement]) {
             var totalRatio: UFix64 = 0.0
             for requirement in requirements {
                 totalRatio = totalRatio + requirement.ratio
             }
             assert(totalRatio <= 1.0, message: "total ratio must be less than or equal to 1.0")
-            ZeedzMarketplace.saleCutRequirements[nftType.identifier] = requirements
+            ZeedzMarketplace.saleCutRequirements = requirements
         }
 
         pub fun forceRemoveListing(id: UInt64) {
@@ -95,9 +95,9 @@ pub contract ZeedzMarketplace {
         pub fun addListing(id: UInt64, storefrontPublicCapability: Capability<&{NFTStorefront.StorefrontPublic}>) {
             let item = Item(storefrontPublicCapability: storefrontPublicCapability, listingID: id)
 
-            let indexToInsertListingID = self.getIndexToAddListingID(item: item, items: self.listingIDs)
+            let indexToInsertListingID = ZeedzMarketplace.getIndexToAddListingID(item: item, items: ZeedzMarketplace.listingIDs)
 
-            self.addItem(
+            ZeedzMarketplace.addItem(
                 item,
                 storefrontPublicCapability: storefrontPublicCapability,
                 indexToInsertListingID: indexToInsertListingID)
@@ -117,12 +117,8 @@ pub contract ZeedzMarketplace {
         return nftListingIDs[nftID]
     }
 
-    pub fun getAllSaleCutRequirements(): {String: [SaleCutRequirement]} {
+    pub fun getAllSaleCutRequirements(): [SaleCutRequirement] {
         return self.saleCutRequirements
-    }
-
-    pub fun getSaleCutRequirements(nftType: Type): [SaleCutRequirement] {
-        return self.saleCutRequirements[nftType.identifier] ?? []
     }
 
     // Anyone can remove it if the listing item has been removed or purchased.
@@ -165,7 +161,7 @@ pub contract ZeedzMarketplace {
         }
     }
 
-    acesses(contract) fun addListingWithIndex(
+    access(contract) fun addListingWithIndex(
         id: UInt64,
         storefrontPublicCapability: Capability<&{NFTStorefront.StorefrontPublic}>,
         indexToInsertListingID: Int
@@ -210,8 +206,8 @@ pub contract ZeedzMarketplace {
         }
 
         // check sale cut
-        let requirements = self.saleCutRequirements[item.listingDetails.nftType.identifier]
-            ?? panic("no SaleCutRequirements")
+        let requirements = self.saleCutRequirements
+
         for requirement in requirements {
             let saleCutAmount = item.listingDetails.salePrice * requirement.ratio
 
@@ -362,7 +358,7 @@ pub contract ZeedzMarketplace {
         self.listingIDs = []
         self.listingIDItems = {}
         self.collectionNFTListingIDs = {}
-        self.saleCutRequirements = {}
+        self.saleCutRequirements = []
 
         let admin <- create Administrator()
         self.account.save(<-admin, to: self.ZeedzMarketplaceAdminStoragePath)

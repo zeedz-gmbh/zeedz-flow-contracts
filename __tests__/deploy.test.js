@@ -38,7 +38,11 @@ import {
   burnZeedzItem,
 } from "../src/zeedz_items";
 
-import { deployZeedzMarketplace } from "../src/zeedz_marketplace";
+import {
+  deployZeedzMarketplace,
+  updateSaleCutRequirements,
+  getSaleCutRequirements,
+} from "../src/zeedz_marketplace";
 
 import { deployNFTStorefront } from "../src/nft_storefront";
 
@@ -476,10 +480,75 @@ describe("Zeedz Marketplace", () => {
     await emulator.stop();
   });
 
-  it("shall deploy the NFTStorefront contract", async () => {
+  it("shall deploy the ZeedzMarketplace contract", async () => {
     // Deploy
     await deployNonFungibleToken();
     await deployNFTStorefront();
     await shallPass(await deployZeedzMarketplace());
+  });
+
+  it("sale reqirements shall be emtpy after contract is deployed", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployNFTStorefront();
+    await deployZeedzMarketplace();
+
+    const [requirements] = await getSaleCutRequirements();
+
+    // Check Result
+    await shallResolve(async () => {
+      expect(requirements.toString()).toBe("");
+    });
+  });
+
+  it("shall be able to update sale cut requirements", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployNFTStorefront();
+    await deployZeedzMarketplace();
+
+    // Setup
+    const zeedzCut = await getAccountAddress("zeedzCut");
+    const offsetCut = await getAccountAddress("offsetCut");
+    const ZeedzAdmin = await getZeedzAdminAddress();
+
+    // Transaction Shall Pass
+    await shallPass(await updateSaleCutRequirements(zeedzCut, offsetCut, ZeedzAdmin));
+  });
+
+  it("shall be able to update sale cut requirements after they have been set", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployNFTStorefront();
+    await deployZeedzMarketplace();
+
+    // Setup
+    const zeedzCut = await getAccountAddress("zeedzCut");
+    const offsetCut = await getAccountAddress("offsetCut");
+    const ZeedzAdmin = await getZeedzAdminAddress();
+
+    // Transaction Shall Pass
+    await shallPass(await updateSaleCutRequirements(zeedzCut, offsetCut, ZeedzAdmin));
+
+    // Setup
+    const zeedzCutTwo = await getAccountAddress("zeedzCutTwo");
+
+    // Transaction Shall Pass
+    await shallPass(await updateSaleCutRequirements(zeedzCutTwo, offsetCut, ZeedzAdmin));
+  });
+
+  it("shall not be able to update sale cut requirements without admin rights", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployNFTStorefront();
+    await deployZeedzMarketplace();
+
+    // Setup
+    const zeedzCut = await getAccountAddress("zeedzCut");
+    const offsetCut = await getAccountAddress("offsetCut");
+    const Bob = await getAccountAddress("Bob");
+
+    // Transaction Shall Revert
+    await shallRevert(await updateSaleCutRequirements(zeedzCut, offsetCut, Bob));
   });
 });
