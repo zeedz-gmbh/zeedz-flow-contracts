@@ -26,7 +26,7 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64) {
         // We need a provider capability, but one is not provided by default so we create one if needed.
         let nftCollectionProviderPrivatePath = /private/zeedzINONFTCollectionProviderForNFTStorefront
         if !signer.getCapability<&ZeedzINO.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(nftCollectionProviderPrivatePath)!.check() {
-            signer.link<&ZeedzINO.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(nftCollectionProviderPrivatePath, target: /storage/ChainmonstersRewardCollection)
+            signer.link<&ZeedzINO.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(nftCollectionProviderPrivatePath, target: ZeedzINO.CollectionStoragePath)
         }
 
         self.flowTokenReceiver = signer.getCapability<&FlowToken.Vault{FungibleToken.Receiver}>(/public/flowTokenReceiver)!
@@ -54,7 +54,7 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64) {
 
         // Create SaleCuts
         var saleCuts: [NFTStorefront.SaleCut] = []
-        let requirements = ZeedzMarketplace.getSaleCutRequirements()
+        let requirements = ZeedzMarketplace.getAllSaleCutRequirements()
         var remainingPrice = saleItemPrice
         for requirement in requirements {
             let price = saleItemPrice * requirement.ratio

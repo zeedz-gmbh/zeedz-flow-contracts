@@ -29,6 +29,14 @@ export const updateSaleCutRequirements = async (market, offset, admin) => {
   return sendTransaction({ name, args, signers });
 };
 
+export const sellZeedzINO = async (id, price, owner) => {
+  const name = "zeedz_marketplace/sell_item";
+  const args = [id, price];
+  const signers = [owner];
+
+  return sendTransaction({ name, args, signers });
+};
+
 /*
  * Returns ZeedzMarketplace SaleCut Requrements
  * @throws Will throw an error if execution will be halted

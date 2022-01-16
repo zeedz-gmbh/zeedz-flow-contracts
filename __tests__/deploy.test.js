@@ -42,9 +42,10 @@ import {
   deployZeedzMarketplace,
   updateSaleCutRequirements,
   getSaleCutRequirements,
+  sellZeedzINO,
 } from "../src/zeedz_marketplace";
 
-import { deployNFTStorefront } from "../src/nft_storefront";
+import { deployNFTStorefront, setupNFTStorefrontOnAccount } from "../src/nft_storefront";
 
 import { deployNonFungibleToken, getZeedzAdminAddress, toUFix64 } from "../src/common";
 
@@ -550,5 +551,32 @@ describe("Zeedz Marketplace", () => {
 
     // Transaction Shall Revert
     await shallRevert(await updateSaleCutRequirements(zeedzCut, offsetCut, Bob));
+  });
+  it("shall not be able to list a ZeedzINO NFT for sale", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployNFTStorefront();
+    await deployZeedzMarketplace();
+    await deployZeedz();
+
+    // Setup
+    const Alice = await getAccountAddress("Alice");
+    await setupZeedzOnAccount(Alice);
+    await setupNFTStorefrontOnAccount("Alice");
+    const Bob = await getAccountAddress("Bob");
+    await setupZeedzOnAccount(Bob);
+    await setupNFTStorefrontOnAccount("Bob");
+    const zeedzCut = await getAccountAddress("zeedzCut");
+    const offsetCut = await getAccountAddress("offsetCut");
+    const ZeedzAdmin = await getZeedzAdminAddress();
+
+    // Mint instruction for Alice account shall be resolved
+    await shallPass(await mintZeedle(Alice, zeedleMetadataToMint));
+
+    // Transaction Shall Pass
+    await shallPass(await updateSaleCutRequirements(zeedzCut, offsetCut, ZeedzAdmin));
+
+    // Sell instruction for Alice account shall be resolved
+    await shallPass(await sellZeedzINO(0, toUFix64(20), Alice));
   });
 });
