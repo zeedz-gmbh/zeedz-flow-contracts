@@ -50,6 +50,10 @@ transaction(listingResourceID: UInt64, storefrontAddress: Address, buyPrice: UFi
     execute {
         let item <- self.listing.purchase(payment: <-self.paymentVault)
 
+        let collectionBorrow = owner.getCapability(ZeedzINO.CollectionPublicPath)!
+            .borrow<&{ZeedzINO.ZeedzCollectionPublic}>()
+            ?? panic("Could not borrow ZeedzCollectionPublic")
+
         let zeedleID = (item as ZeedzINO).id
 
            // borrow a reference to the Zeedle
