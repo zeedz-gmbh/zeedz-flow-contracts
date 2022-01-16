@@ -1,6 +1,6 @@
 import FungibleToken from "../../../contracts/FungibleToken.cdc"
 import NFTStorefront from "../../../contracts/NFTStorefront.cdc"
-import Marketplace from "../../../contracts/Marketplace.cdc"
+import ZeedzMarketplace from "../../../contracts/ZeedzMarketplace.cdc"
 // emulator FlowToken address
 import FlowToken from 0x0ae53cb6e3f42a79
 // emulator FungibleToken address
@@ -56,7 +56,7 @@ transaction(listingResourceID: UInt64, storefrontAddress: Address, buyPrice: UFi
 
         let zeedleID = (item as ZeedzINO).id
 
-           // borrow a reference to the Zeedle
+        // borrow a reference to the Zeedle
 
         self.nftCollection.deposit(token: <-item)
 
@@ -71,7 +71,7 @@ transaction(listingResourceID: UInt64, storefrontAddress: Address, buyPrice: UFi
 
         // Be kind and recycle
         self.storefront.cleanup(listingResourceID: listingResourceID)
-        Marketplace.removeListing(id: listingResourceID)
+        ZeedzMarketplace.removeListing(id: listingResourceID)
     }
 
 }

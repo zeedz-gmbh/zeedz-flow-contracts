@@ -1,6 +1,6 @@
 import NonFungibleToken from "../../../contracts/NonFungibleToken.cdc"
 import NFTStorefront from "../../../contracts/NFTStorefront.cdc"
-import Marketplace from "../../../contracts/Marketplace.cdc"
+import ZeedzMarketplace from "../../../contracts/ZeedzMarketplace.cdc"
 import ZeedzINO from "../../../contracts/NFTs/ZeedzINO.cdc"
 // emulator FlowToken address
 import FlowToken from 0x0ae53cb6e3f42a79
@@ -44,17 +44,17 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64) {
 
     execute {
         // Remove old listing
-        if let listingID = Marketplace.getListingID(nftType: Type<@ZeedzINO.NFT>(), nftID: saleItemID) {
+        if let listingID = ZeedzMarketplace.getListingID(nftType: Type<@ZeedzINO.NFT>(), nftID: saleItemID) {
             let listingIDs = self.storefront.getListingIDs()
             if listingIDs.contains(listingID) {
                 self.storefront.removeListing(listingResourceID: listingID)
             }
-            Marketplace.removeListing(id: listingID)
+            ZeedzMarketplace.removeListing(id: listingID)
         }
 
         // Create SaleCuts
         var saleCuts: [NFTStorefront.SaleCut] = []
-        let requirements = Marketplace.getSaleCutRequirements()
+        let requirements = ZeedzMarketplace.getSaleCutRequirements()
         var remainingPrice = saleItemPrice
         for requirement in requirements {
             let price = saleItemPrice * requirement.ratio
@@ -77,6 +77,6 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64) {
             salePaymentVaultType: Type<@FlowToken.Vault>(),
             saleCuts: saleCuts
         )
-        Marketplace.addListing(id: id, storefrontPublicCapability: self.storefrontPublic)
+        ZeedzMarketplace.addListing(id: id, storefrontPublicCapability: self.storefrontPublic)
     }
 }
