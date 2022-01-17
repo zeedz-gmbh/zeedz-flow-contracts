@@ -6,6 +6,8 @@ import {
   shallPass,
   shallResolve,
   shallRevert,
+  mintFlow,
+  getFlowBalance,
 } from "flow-js-testing";
 
 import {
@@ -43,6 +45,8 @@ import {
   updateSaleCutRequirements,
   getSaleCutRequirements,
   sellZeedzINO,
+  getListingIDs,
+  buyZeedzINO,
 } from "../src/zeedz_marketplace";
 
 import { deployNFTStorefront, setupNFTStorefrontOnAccount } from "../src/nft_storefront";
@@ -563,6 +567,30 @@ describe("Zeedz Marketplace", () => {
     const Alice = await getAccountAddress("Alice");
     await setupZeedzOnAccount(Alice);
     await setupNFTStorefrontOnAccount("Alice");
+    const zeedzCut = await getAccountAddress("zeedzCut");
+    const offsetCut = await getAccountAddress("offsetCut");
+    const ZeedzAdmin = await getZeedzAdminAddress();
+
+    // Mint instruction for Alice account shall be resolved
+    await shallPass(await mintZeedle(Alice, zeedleMetadataToMint));
+
+    // Transaction Shall Pass
+    await shallPass(await updateSaleCutRequirements(zeedzCut, offsetCut, ZeedzAdmin));
+
+    // Sell instruction for Alice account shall be resolved
+    await shallPass(await sellZeedzINO(0, toUFix64(20), Alice));
+  });
+  it("shall not be able to buy a listed for sale a ZeedzINO NFT", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployNFTStorefront();
+    await deployZeedzMarketplace();
+    await deployZeedz();
+
+    // Setup
+    const Alice = await getAccountAddress("Alice");
+    await setupZeedzOnAccount(Alice);
+    await setupNFTStorefrontOnAccount("Alice");
     const Bob = await getAccountAddress("Bob");
     await setupZeedzOnAccount(Bob);
     await setupNFTStorefrontOnAccount("Bob");
@@ -578,5 +606,13 @@ describe("Zeedz Marketplace", () => {
 
     // Sell instruction for Alice account shall be resolved
     await shallPass(await sellZeedzINO(0, toUFix64(20), Alice));
+
+    const [listingID] = await getListingIDs();
+
+    // Give Bob some money
+    await mintFlow(Bob, "69.5");
+
+    // Buy Item from listingId shallPass
+    await shallPass(await buyZeedzINO(Bob, Alice, parseInt(listingID), toUFix64(20)));
   });
 });

@@ -1,12 +1,12 @@
-import FungibleToken from "../../../contracts/FungibleToken.cdc"
-import NFTStorefront from "../../../contracts/NFTStorefront.cdc"
-import ZeedzMarketplace from "../../../contracts/ZeedzMarketplace.cdc"
+import NonFungibleToken from "../../contracts/NonFungibleToken.cdc"
+import NFTStorefront from "../../contracts/NFTStorefront.cdc"
+import ZeedzMarketplace from "../../contracts/ZeedzMarketplace.cdc"
+import ZeedzINO from "../../contracts/ZeedzINO.cdc"
+
 // emulator FlowToken address
 import FlowToken from 0x0ae53cb6e3f42a79
 // emulator FungibleToken address
 import FungibleToken from 0xee82856bf20e2aa6
-
-import ZeedzINO from "../../../contracts/NFTs/ZeedzINO.cdc"
 
 transaction(listingResourceID: UInt64, storefrontAddress: Address, buyPrice: UFix64) {
     let paymentVault: @FungibleToken.Vault
@@ -16,11 +16,11 @@ transaction(listingResourceID: UInt64, storefrontAddress: Address, buyPrice: UFi
 
     prepare(signer: AuthAccount) {
         // Create a collection to store the purchase if none present
-	    if signer.borrow<&ZeedzINO.Collection>(from: /storage/ZeedzINOCollection) == nil {
-		    signer.save(<-ZeedzINO.createEmptyCollection(), to: /storage/ZeedzINOCollection)
-		    signer.link<&ZeedzINO.Collection{NonFungibleToken.CollectionPublic,ZeedzINO.ZeedzINOCollectionPublic}>(
-			    /public/ZeedzINOCollection,
-			    target: /storage/ZeedzINOCollection
+	    if signer.borrow<&ZeedzINO.Collection>(from: ZeedzINO.CollectionStoragePath) == nil {
+		    signer.save(<-ZeedzINO.createEmptyCollection(), to: ZeedzINO.CollectionStoragePath)
+		    signer.link<&ZeedzINO.Collection{NonFungibleToken.CollectionPublic,ZeedzINO.ZeedzCollectionPublic}>(
+			    ZeedzINO.CollectionPublicPath,
+			    target: ZeedzINO.CollectionStoragePath
 		    )
 	    }
 
@@ -39,7 +39,7 @@ transaction(listingResourceID: UInt64, storefrontAddress: Address, buyPrice: UFi
             ?? panic("Cannot borrow FlowToken vault from signer storage")
         self.paymentVault <- flowTokenVault.withdraw(amount: price)
 
-        self.nftCollection = signer.borrow<&ZeedzINO.Collection{NonFungibleToken.Receiver}>(from: /storage/ZeedzINOCollection)
+        self.nftCollection = signer.borrow<&ZeedzINO.Collection{NonFungibleToken.Receiver}>(from: ZeedzINO.CollectionStoragePath)
             ?? panic("Cannot borrow NFT collection receiver from account")
     }
 

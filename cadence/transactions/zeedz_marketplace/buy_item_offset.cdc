@@ -67,7 +67,7 @@ transaction(listingResourceID: UInt64, storefrontAddress: Address, buyPrice: UFi
         self.adminRef= admin.getCapability(ZeedzINO.AdminPrivatePath)
             .borrow<&ZeedzINO.Administrator>()!
 
-        self.adminRef.increaseOffset(zeedleRef: self.zeedleRef, amount: amount
+        self.adminRef.increaseOffset(zeedleRef: self.zeedleRef, amount: buyPrice*420)
 
         // Be kind and recycle
         self.storefront.cleanup(listingResourceID: listingResourceID)
