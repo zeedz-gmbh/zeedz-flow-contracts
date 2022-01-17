@@ -45,6 +45,14 @@ export const buyZeedzINO = async (sender, seller, listingId, buyPrice) => {
   return sendTransaction({ name, args, signers });
 };
 
+export const buyZeedzINOIncreaseOffset = async (sender, admin, seller, listingId, buyPrice) => {
+  const name = "zeedz_marketplace/buy_item_offset";
+  const args = [listingId, seller, buyPrice];
+  const signers = [sender, admin];
+
+  return sendTransaction({ name, args, signers });
+};
+
 /*
  * Returns ZeedzMarketplace SaleCut Requrements
  * @throws Will throw an error if execution will be halted
@@ -58,6 +66,12 @@ export const getSaleCutRequirements = async () => {
 
 export const getListingIDs = async () => {
   const name = "zeedz_marketplace/get_listing_ids";
+
+  return executeScript({ name });
+};
+
+export const logMarketplace = async () => {
+  const name = "zeedz_marketplace/log_marketplace";
 
   return executeScript({ name });
 };

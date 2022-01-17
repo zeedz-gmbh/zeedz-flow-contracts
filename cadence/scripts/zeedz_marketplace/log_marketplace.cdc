@@ -1,8 +1,8 @@
-import Marketplace from "../../contracts/Marketplace.cdc"
+import Marketplace from "../../contracts/ZeedzMarketplace.cdc"
 import ZeedzINO from "../../contracts/NFTs/ZeedzINO.cdc"
 
 pub fun main() {
-    log({"saleCutRequirements": Marketplace.getSaleCutRequirements(nftType: Type<@ZeedzINO.NFT>())})
+    log({"saleCutRequirements": Marketplace.getSaleCutRequirements()})
 
     for listingID in Marketplace.getListingIDs() {
         let item = Marketplace.getListingIDItem(listingID: listingID)!
