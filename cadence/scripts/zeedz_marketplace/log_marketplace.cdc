@@ -1,5 +1,4 @@
 import Marketplace from "../../contracts/ZeedzMarketplace.cdc"
-import ZeedzINO from "../../contracts/NFTs/ZeedzINO.cdc"
 
 pub fun main() {
     log({"saleCutRequirements": Marketplace.getSaleCutRequirements()})
