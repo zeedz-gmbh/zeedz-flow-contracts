@@ -20,16 +20,19 @@ pub contract ZeedzMarketplace {
         price: UFix64
     )
 
+    //
+    // A NFT listed on the Zeedz Marketplace, contains the NFTStorefront listingID, capability, listingDetails and timestamp.
+    //
     pub struct Item {
         pub let storefrontPublicCapability: Capability<&{NFTStorefront.StorefrontPublic}>
 
-        // NFTStoreFront.Listing resource uuid
+        // NFTStorefront.Listing resource uuid
         pub let listingID: UInt64
 
         // Store listingDetails to prevent vanishing from storefrontPublicCapability
         pub let listingDetails: NFTStorefront.ListingDetails
 
-        // When to add this item to marketplace
+        // Time when the listing was added to the Zeedz Marketplace
         pub let timestamp: UFix64
 
         init(storefrontPublicCapability: Capability<&{NFTStorefront.StorefrontPublic}>, listingID: UInt64) {
@@ -45,6 +48,10 @@ pub contract ZeedzMarketplace {
         }
     }
 
+    //
+    // A Sale cut requirement for each listing to be listed on the Zeedz Marketplace, updatable by the administrator.
+    // Contains a FungibleToken reciever capability for the sale cut recieving address and a ratio which defines the percentage of the sale cut.
+    //
     pub struct SaleCutRequirement {
         pub let receiver: Capability<&{FungibleToken.Receiver}>
 
@@ -70,7 +77,7 @@ pub contract ZeedzMarketplace {
     // collection identifier => (NFT id => listingID)
     access(contract) let collectionNFTListingIDs: {String: {UInt64: UInt64}}
 
-    // arary of SaleCutRequirements
+    // array of SaleCutRequirements
     access(contract) var saleCutRequirements: [SaleCutRequirement]
 
     //
@@ -109,6 +116,25 @@ pub contract ZeedzMarketplace {
     }
 
     //
+    // Can be used by anyone to remove a listing if the listed item has been removed or purchased.
+    //
+    pub fun removeListing(id: UInt64) {
+        if let item = self.listingIDItems[id] {
+            // Skip if the listing item hasn't been purchased
+            if let storefrontPublic = item.storefrontPublicCapability.borrow() {
+                if let listingItem = storefrontPublic.borrowListing(listingResourceID: id) {
+                    let listingDetails = listingItem.getDetails()
+                    if listingDetails.purchased == false {
+                        return
+                    }
+                }
+            }
+
+            self.removeItem(item)
+        }
+    }
+
+    //
     // Returns an array of all listingsIDs currently listend on the marketplace.
     //
     pub fun getListingIDs(): [UInt64] {
@@ -137,44 +163,9 @@ pub contract ZeedzMarketplace {
         return self.saleCutRequirements
     }
 
+    // 
+    // Helper function to add an item to the marketplace
     //
-    // Can be used by anyone to remove a listing if the listed item has been removed or purchased.
-    //
-    pub fun removeListing(id: UInt64) {
-        if let item = self.listingIDItems[id] {
-            // Skip if the listing item hasn't been purchased
-            if let storefrontPublic = item.storefrontPublicCapability.borrow() {
-                if let listingItem = storefrontPublic.borrowListing(listingResourceID: id) {
-                    let listingDetails = listingItem.getDetails()
-                    if listingDetails.purchased == false {
-                        return
-                    }
-                }
-            }
-
-            self.removeItem(item)
-        }
-    }
-
-    access(contract) fun addListingWithIndex(
-        id: UInt64,
-        storefrontPublicCapability: Capability<&{NFTStorefront.StorefrontPublic}>,
-        indexToInsertListingID: Int
-    ) {
-        let item = Item(storefrontPublicCapability: storefrontPublicCapability, listingID: id)
-
-        self.checkValidIndexToInsert(
-            item: item,
-            index: indexToInsertListingID,
-            items: self.listingIDs)
-
-        self.addItem(
-            item,
-            storefrontPublicCapability: storefrontPublicCapability,
-            indexToInsertListingID: indexToInsertListingID)
-    }
-
-    // Add item and indexes.
     access(contract) fun addItem(
         _ item: Item,
         storefrontPublicCapability: Capability<&{NFTStorefront.StorefrontPublic}>,
@@ -248,7 +239,7 @@ pub contract ZeedzMarketplace {
     }
 
     //
-    // Remove item and indexes. The indexes will be found automatically.
+    // Helper function to remove item. The indexes will be found automatically.
     //
     access(contract) fun removeItem(_ item: Item) {
         let indexToRemoveListingID = self.getIndexToRemoveListingID(
@@ -261,7 +252,7 @@ pub contract ZeedzMarketplace {
     }
 
     //
-    // Remove item and indexes. The indexes should be checked before calling this func.
+    // Helper function to remove item with index. The index should be checked before calling this function.
     //
     access(contract) fun removeItemWithIndexes(_ item: Item, indexToRemoveListingID: Int?) {
         // remove from listingIDs
@@ -285,7 +276,7 @@ pub contract ZeedzMarketplace {
     }
 
     //
-    // Run reverse for loop to find out the index to insert
+    // Run reverse for loop to find out the index to insert.
     //
     access(contract) fun getIndexToAddListingID(item: Item, items: [UInt64]): Int {
         var index = items.length - 1
@@ -306,7 +297,7 @@ pub contract ZeedzMarketplace {
     }
 
     //
-    // Run binary search to find the listing ID
+    // Run binary search to find the listing ID.
     //
     access(contract) fun getIndexToRemoveListingID(item: Item, items: [UInt64]): Int? {
         var startIndex = 0
@@ -332,27 +323,6 @@ pub contract ZeedzMarketplace {
             }
         }
         return nil
-    }
-
-    access(contract) fun checkValidIndexToInsert(item: Item, index: Int, items: [UInt64]) {
-        if index > 0 {
-            let previousListingID = items[index - 1]
-            let previousItem = self.listingIDItems[previousListingID]!
-            if previousItem.timestamp > item.timestamp {
-                panic("invalid index (timestamp)")
-            } else if previousItem.timestamp == item.timestamp && previousItem.listingID >= item.listingID {
-                panic("invalid index (listingID)")
-            }
-        }
-        if index < items.length {
-            let nextListingID = items[index]
-            let nextItem = self.listingIDItems[nextListingID]!
-            if item.timestamp > nextItem.timestamp {
-                panic("invalid index (timestamp)")
-            } else if item.timestamp == nextItem.timestamp && item.listingID >= nextItem.listingID {
-                panic("invalid index (listingID)")
-            }
-        }
     }
 
     init () {
