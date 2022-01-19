@@ -73,7 +73,8 @@ pub contract ZeedzMarketplace {
     // arary of SaleCutRequirements
     access(contract) var saleCutRequirements: [SaleCutRequirement]
 
-    // Administrator
+    //
+    // Administrator resource, owner account can update the Zeedz Marketplace sale cut requirements and remove listings.
     //
     pub resource Administrator {
 
@@ -93,6 +94,9 @@ pub contract ZeedzMarketplace {
         }
     }
 
+    //
+    // Adds a listing with the specified id and storefrontPublicCapability to the marketplace.
+    //
     pub fun addListing(id: UInt64, storefrontPublicCapability: Capability<&{NFTStorefront.StorefrontPublic}>) {
         let item = Item(storefrontPublicCapability: storefrontPublicCapability, listingID: id)
 
@@ -104,24 +108,38 @@ pub contract ZeedzMarketplace {
             indexToInsertListingID: indexToInsertListingID)
     }
 
+    //
+    // Returns an array of all listingsIDs currently listend on the marketplace.
+    //
     pub fun getListingIDs(): [UInt64] {
         return self.listingIDs
     }
 
+    //
+    // Returns the item listed with the specified listingID.
+    //
     pub fun getListingIDItem(listingID: UInt64): Item? {
         return self.listingIDItems[listingID]
     }
 
+    //
+    // Returns the listingID of the item from the specified nftType and nftID.
+    //
     pub fun getListingID(nftType: Type, nftID: UInt64): UInt64? {
         let nftListingIDs = self.collectionNFTListingIDs[nftType.identifier] ?? {}
         return nftListingIDs[nftID]
     }
 
+    //
+    // Returns an array of the current marketplace SaleCutRequirements 
+    //
     pub fun getAllSaleCutRequirements(): [SaleCutRequirement] {
         return self.saleCutRequirements
     }
 
-    // Anyone can remove it if the listing item has been removed or purchased.
+    //
+    // Can be used by anyone to remove a listing if the listed item has been removed or purchased.
+    //
     pub fun removeListing(id: UInt64) {
         if let item = self.listingIDItems[id] {
             // Skip if the listing item hasn't been purchased
@@ -135,29 +153,6 @@ pub contract ZeedzMarketplace {
             }
 
             self.removeItem(item)
-        }
-    }
-
-    // Anyone can remove it if the listing item has been removed or purchased.
-    pub fun removeListingWithIndex(id: UInt64, indexToRemoveListingID: Int) {
-        pre {
-            self.listingIDs[indexToRemoveListingID] == id: "invalid indexToRemoveListingID"
-        }
-
-        if let item = self.listingIDItems[id] {
-            // Skip if the listing item hasn't been purchased
-            if let storefrontPublic = item.storefrontPublicCapability.borrow() {
-                if let listingItem = storefrontPublic.borrowListing(listingResourceID: id) {
-                    let listingDetails = listingItem.getDetails()
-                    if listingDetails.purchased == false {
-                        return
-                    }
-                }
-            }
-
-            self.removeItemWithIndexes(
-                item,
-                indexToRemoveListingID: indexToRemoveListingID)
         }
     }
 
@@ -252,7 +247,9 @@ pub contract ZeedzMarketplace {
         )
     }
 
+    //
     // Remove item and indexes. The indexes will be found automatically.
+    //
     access(contract) fun removeItem(_ item: Item) {
         let indexToRemoveListingID = self.getIndexToRemoveListingID(
             item: item,
@@ -263,7 +260,9 @@ pub contract ZeedzMarketplace {
             indexToRemoveListingID: indexToRemoveListingID)
     }
 
+    //
     // Remove item and indexes. The indexes should be checked before calling this func.
+    //
     access(contract) fun removeItemWithIndexes(_ item: Item, indexToRemoveListingID: Int?) {
         // remove from listingIDs
         if let indexToRemoveListingID = indexToRemoveListingID {
@@ -285,7 +284,9 @@ pub contract ZeedzMarketplace {
         )
     }
 
+    //
     // Run reverse for loop to find out the index to insert
+    //
     access(contract) fun getIndexToAddListingID(item: Item, items: [UInt64]): Int {
         var index = items.length - 1
         while index >= 0 {
@@ -304,7 +305,9 @@ pub contract ZeedzMarketplace {
         return index + 1
     }
 
+    //
     // Run binary search to find the listing ID
+    //
     access(contract) fun getIndexToRemoveListingID(item: Item, items: [UInt64]): Int? {
         var startIndex = 0
         var endIndex = items.length
@@ -353,7 +356,7 @@ pub contract ZeedzMarketplace {
     }
 
     init () {
-        self.ZeedzMarketplaceAdminStoragePath = /storage/BloctoBayZeedzMarketplaceAdmin
+        self.ZeedzMarketplaceAdminStoragePath = /storage/ZeedzMarketplaceAdmin
 
         self.listingIDs = []
         self.listingIDItems = {}
