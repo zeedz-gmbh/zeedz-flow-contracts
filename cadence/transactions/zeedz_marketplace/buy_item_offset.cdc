@@ -1,17 +1,14 @@
 import NonFungibleToken from "../../contracts/NonFungibleToken.cdc"
 import NFTStorefront from "../../../contracts/NFTStorefront.cdc"
 import ZeedzMarketplace from "../../../contracts/ZeedzMarketplace.cdc"
-// emulator FlowToken address
-import FlowToken from 0x0ae53cb6e3f42a79
-// emulator FungibleToken address
-import FungibleToken from 0xee82856bf20e2aa6
-
+import FlowToken from "../../../contracts/FlowToken.cdc"
+import FungibleToken from "../../../contracts/FungibleToken.cdc"
 import ZeedzINO from "../../../contracts/NFTs/ZeedzINO.cdc"
 
 transaction(listingResourceID: UInt64, storefrontAddress: Address, buyPrice: UFix64) {
     let paymentVault: @FungibleToken.Vault
-    let nftCollection: &ZeedzINO.Collection{NonFungibleToken.Receiver}
-    let collectionBorrow: &ZeedzINO.Collection{ZeedzINO.ZeedzCollectionPublic}
+    let nftReceiver: &ZeedzINO.Collection{NonFungibleToken.Receiver}
+    let nftCollection: &ZeedzINO.Collection{ZeedzINO.ZeedzCollectionPublic}
     let storefront: &NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}
     let listing: &NFTStorefront.Listing{NFTStorefront.ListingPublic}
     // local variable for storing the Admin reference
@@ -43,14 +40,14 @@ transaction(listingResourceID: UInt64, storefrontAddress: Address, buyPrice: UFi
             ?? panic("Cannot borrow FlowToken vault from signer storage")
         self.paymentVault <- flowTokenVault.withdraw(amount: price)
 
-        self.nftCollection = signer.borrow<&ZeedzINO.Collection{NonFungibleToken.Receiver}>(from: /storage/ZeedzINOCollection)
+        self.nftReceiver = signer.borrow<&ZeedzINO.Collection{NonFungibleToken.Receiver}>(from: /storage/ZeedzINOCollection)
             ?? panic("Cannot borrow NFT collection receiver from account")
 
         // borrow a reference to the Administrator resource in storage
         self.adminRef= admin.getCapability(ZeedzINO.AdminPrivatePath)
             .borrow<&ZeedzINO.Administrator>()!
 
-        self.collectionBorrow = signer.getCapability<&ZeedzINO.Collection{ZeedzINO.ZeedzCollectionPublic}>(ZeedzINO.CollectionPublicPath)
+        self.nftCollection = signer.getCapability<&ZeedzINO.Collection{ZeedzINO.ZeedzCollectionPublic}>(ZeedzINO.CollectionPublicPath)
             .borrow()
             ?? panic("Could not borrow ZeedzCollectionPublic")
     }
@@ -62,9 +59,9 @@ transaction(listingResourceID: UInt64, storefrontAddress: Address, buyPrice: UFi
         
         // borrow a reference to the Zeedle
 
-        self.nftCollection.deposit(token: <-item)
+        self.nftReceiver.deposit(token: <-item)
 
-        let zeedleRef = self.collectionBorrow.borrowZeedle(id: zeedleID)
+        let zeedleRef = self.nftCollection.borrowZeedle(id: zeedleID)
             ?? panic("No such zeedleID in that collection")
 
         self.adminRef.increaseOffset(zeedleRef: zeedleRef, amount: UInt64(Int(buyPrice) * 420))

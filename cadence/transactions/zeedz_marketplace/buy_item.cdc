@@ -10,7 +10,7 @@ import FungibleToken from 0xee82856bf20e2aa6
 
 transaction(listingResourceID: UInt64, storefrontAddress: Address, buyPrice: UFix64) {
     let paymentVault: @FungibleToken.Vault
-    let nftCollection: &ZeedzINO.Collection{NonFungibleToken.Receiver}
+    let nftReceiver: &ZeedzINO.Collection{NonFungibleToken.Receiver}
     let storefront: &NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}
     let listing: &NFTStorefront.Listing{NFTStorefront.ListingPublic}
 
@@ -39,14 +39,14 @@ transaction(listingResourceID: UInt64, storefrontAddress: Address, buyPrice: UFi
             ?? panic("Cannot borrow FlowToken vault from signer storage")
         self.paymentVault <- flowTokenVault.withdraw(amount: price)
 
-        self.nftCollection = signer.borrow<&ZeedzINO.Collection{NonFungibleToken.Receiver}>(from: ZeedzINO.CollectionStoragePath)
+        self.nftReceiver = signer.borrow<&ZeedzINO.Collection{NonFungibleToken.Receiver}>(from: ZeedzINO.CollectionStoragePath)
             ?? panic("Cannot borrow NFT collection receiver from account")
     }
 
     execute {
         let item <- self.listing.purchase(payment: <-self.paymentVault)
 
-        self.nftCollection.deposit(token: <-item)
+        self.nftReceiver.deposit(token: <-item)
 
         // Be kind and recycle
         self.storefront.cleanup(listingResourceID: listingResourceID)
