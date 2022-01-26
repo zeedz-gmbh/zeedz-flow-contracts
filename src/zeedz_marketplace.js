@@ -30,7 +30,7 @@ export const updateSaleCutRequirements = async (market, offset, admin) => {
 };
 
 export const sellZeedzINO = async (id, price, owner) => {
-  const name = "zeedz_marketplace/sell_item";
+  const name = "zeedz_marketplace/sell_item_FLOW";
   const args = [id, price];
   const signers = [owner];
 
@@ -38,7 +38,7 @@ export const sellZeedzINO = async (id, price, owner) => {
 };
 
 export const buyZeedzINO = async (sender, seller, listingId, buyPrice) => {
-  const name = "zeedz_marketplace/buy_item";
+  const name = "zeedz_marketplace/buy_item_FLOW";
   const args = [listingId, seller, buyPrice];
   const signers = [sender];
 
@@ -46,7 +46,7 @@ export const buyZeedzINO = async (sender, seller, listingId, buyPrice) => {
 };
 
 export const buyZeedzINOIncreaseOffset = async (sender, admin, seller, listingId, buyPrice) => {
-  const name = "zeedz_marketplace/buy_item_offset";
+  const name = "zeedz_marketplace/buy_item_offset_FLOW";
   const args = [listingId, seller, buyPrice];
   const signers = [sender, admin];
 
@@ -74,4 +74,18 @@ export const logMarketplace = async () => {
   const name = "zeedz_marketplace/log_marketplace";
 
   return executeScript({ name });
+};
+
+export const forceRemoveListing = async (admin, listingID) => {
+  const name = "zeedz_marketplace/admin_remove_listing";
+  const args = [listingID];
+  const signers = [admin];
+
+  return sendTransaction({ name, args, signers });
+};
+
+export const removeListing = async (listingID) => {
+  const name = "zeedz_marketplace/remove_listing";
+  const args = [listingID];
+  return executeScript({ name, args });
 };

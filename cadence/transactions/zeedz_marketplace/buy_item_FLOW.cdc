@@ -2,11 +2,8 @@ import NonFungibleToken from "../../contracts/NonFungibleToken.cdc"
 import NFTStorefront from "../../contracts/NFTStorefront.cdc"
 import ZeedzMarketplace from "../../contracts/ZeedzMarketplace.cdc"
 import ZeedzINO from "../../contracts/ZeedzINO.cdc"
-
-// emulator FlowToken address
-import FlowToken from 0x0ae53cb6e3f42a79
-// emulator FungibleToken address
-import FungibleToken from 0xee82856bf20e2aa6
+import FlowToken from "../../../contracts/FlowToken.cdc"
+import FungibleToken from "../../../contracts/FungibleToken.cdc"
 
 transaction(listingResourceID: UInt64, storefrontAddress: Address, buyPrice: UFix64) {
     let paymentVault: @FungibleToken.Vault

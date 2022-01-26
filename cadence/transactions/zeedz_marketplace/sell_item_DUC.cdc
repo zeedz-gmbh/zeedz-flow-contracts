@@ -2,13 +2,11 @@ import NonFungibleToken from "../../contracts/NonFungibleToken.cdc"
 import NFTStorefront from "../../contracts/NFTStorefront.cdc"
 import ZeedzMarketplace from "../../contracts/ZeedzMarketplace.cdc"
 import ZeedzINO from "../../contracts/ZeedzINO.cdc"
-// emulator FlowToken address
-import FlowToken from 0x0ae53cb6e3f42a79
-// emulator FungibleToken address
-import FungibleToken from 0xee82856bf20e2aa6
+import DapperUtilityCoin from "../../contracts/DapperUtilityCoin.cdc"
+import FungibleToken from "../../contracts/FungibleToken.cdc"
 
 transaction(saleItemID: UInt64, saleItemPrice: UFix64) {
-    let flowTokenReceiver: Capability<&FlowToken.Vault{FungibleToken.Receiver}>
+    let ducReceiver: Capability<&DapperUtilityCoin.Vault{FungibleToken.Receiver}>
     let nftProvider: Capability<&ZeedzINO.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>
     let storefront: &NFTStorefront.Storefront
     let storefrontPublic: Capability<&NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}>
@@ -29,8 +27,8 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64) {
             signer.link<&ZeedzINO.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(nftCollectionProviderPrivatePath, target: ZeedzINO.CollectionStoragePath)
         }
 
-        self.flowTokenReceiver = signer.getCapability<&FlowToken.Vault{FungibleToken.Receiver}>(/public/flowTokenReceiver)!
-        assert(self.flowTokenReceiver.borrow() != nil, message: "Missing or mis-typed FlowToken receiver")
+        self.ducReceiver = acct.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)!
+        assert(self.ducReceiver.borrow() != nil, message: "Missing or mis-typed DUC receiver")
 
         self.nftProvider = signer.getCapability<&ZeedzINO.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(nftCollectionProviderPrivatePath)!
         assert(self.nftProvider.borrow() != nil, message: "Missing or mis-typed ZeedzINO.Collection provider")
@@ -74,7 +72,7 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64) {
             nftProviderCapability: self.nftProvider,
             nftType: Type<@ZeedzINO.NFT>(),
             nftID: saleItemID,
-            salePaymentVaultType: Type<@FlowToken.Vault>(),
+            salePaymentVaultType: Type<@DapperUtilityCoin.Vault>(),
             saleCuts: saleCuts
         )
         ZeedzMarketplace.addListing(id: id, storefrontPublicCapability: self.storefrontPublic)

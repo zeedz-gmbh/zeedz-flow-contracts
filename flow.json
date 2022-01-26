@@ -21,6 +21,12 @@
       "aliases": {
         "emulator": "0x0ae53cb6e3f42a79"
       }
+    },
+    "TokenForwarding": {
+      "source": "./cadence/contracts/TokenForwarding.cdc"
+    },
+    "DapperUtilityCoin": {
+      "source": "./cadence/contracts/DapperUtilityCoin.cdc"
     }
   },
   "networks": {

@@ -48,6 +48,8 @@ import {
   getListingIDs,
   buyZeedzINO,
   buyZeedzINOIncreaseOffset,
+  forceRemoveListing,
+  removeListing,
 } from "../src/zeedz_marketplace";
 
 import { deployNFTStorefront, setupNFTStorefrontOnAccount } from "../src/nft_storefront";
@@ -658,5 +660,53 @@ describe("Zeedz Marketplace", () => {
     await shallResolve(async () => {
       expect(offset).toBe(20 * 420);
     });
+  });
+  it("admin shall be able to forecfully delist an NFT from the marketplace", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployNFTStorefront();
+    await deployZeedzMarketplace();
+    await deployZeedz();
+
+    // Setup
+    const Alice = await getAccountAddress("Alice");
+    await setupZeedzOnAccount(Alice);
+    await setupNFTStorefrontOnAccount("Alice");
+    const ZeedzAdmin = await getZeedzAdminAddress();
+
+    // Mint instruction for Alice account shall be resolved
+    await shallPass(await mintZeedle(Alice, zeedleMetadataToMint));
+
+    // Sell instruction for Alice account shall be resolved
+    await shallPass(await sellZeedzINO(0, toUFix64(20), Alice));
+
+    const [listingID] = await getListingIDs();
+
+    // Forceremove instruction for Admin account shall be resolved
+    await shallPass(await forceRemoveListing(ZeedzAdmin, parseInt(listingID)));
+  });
+  it("anyone shall not be able to delist an NFT from the marketplace if it hasn't been purchased or delisted", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployNFTStorefront();
+    await deployZeedzMarketplace();
+    await deployZeedz();
+
+    // Setup
+    const Alice = await getAccountAddress("Alice");
+    await setupZeedzOnAccount(Alice);
+    await setupNFTStorefrontOnAccount("Alice");
+    const ZeedzAdmin = await getZeedzAdminAddress();
+
+    // Mint instruction for Alice account shall be resolved
+    await shallPass(await mintZeedle(Alice, zeedleMetadataToMint));
+
+    // Sell instruction for Alice account shall be resolved
+    await shallPass(await sellZeedzINO(0, toUFix64(20), Alice));
+
+    const [listingID] = await getListingIDs();
+
+    // Forceremove instruction for Admin account shall be resolved
+    await shallRevert(await removeListing(parseInt(listingID)));
   });
 });

@@ -1,9 +1,6 @@
 import ZeedzMarketplace from "../../contracts/ZeedzMarketplace.cdc"
-
-// emulator FlowToken address
-import FlowToken from 0x0ae53cb6e3f42a79
-// emulator FungibleToken address
-import FungibleToken from 0xee82856bf20e2aa6
+import FlowToken from "../../contracts/FlowToken.cdc"
+import FungibleToken from "../../contracts/FungibleToken.cdc"
 
 // This transaction creates SaleCutRequirements of ZeedzMarketplace for NFT & Zeedz
 transaction(marketCut: Address, offsetCut: Address) {
