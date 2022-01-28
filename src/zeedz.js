@@ -227,3 +227,16 @@ export const getZeedleOffset = async (account, zeedleID) => {
 
   return executeScript({ name, args });
 };
+
+/*
+ * Setups ZeedzItems & ZeedzINO collections on account and exposes public capabilites.
+ * @param {string} account - account address
+ * @throws Will throw an error if transaction is reverted.
+ * @returns {Promise<*>}
+ * */
+export const setupZeedzItemsAndZeedzINOOnAccount = async (account) => {
+  const name = "shared/setup_account_all";
+  const signers = [account];
+
+  return sendTransaction({ name, signers });
+};
