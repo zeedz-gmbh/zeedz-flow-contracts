@@ -25,6 +25,7 @@ import {
   getZeedzMintedPerType,
   getZeedleOffset,
   increaseOffset,
+  setupZeedzItemsAndZeedzINOOnAccount,
 } from "../src/zeedz";
 
 import {
@@ -104,10 +105,6 @@ describe("Zeedz INO", () => {
 
     // Mint instruction for Alice account shall be resolved
     await shallPass(await batchMintZeedle(Alice, zeedleMetadataToMint4));
-
-    const [metadata] = await getZeedleMetadata(Alice, 0);
-
-    console.log(metadata);
   });
 
   it("shall be able to create a new empty ZeedzINO NFT Collection", async () => {
@@ -474,5 +471,31 @@ describe("Zeedz Items", () => {
 
     // Burn transaction shall fail for non-existent item
     await shallRevert(burnZeedzItem(Bob, 0));
+  });
+});
+
+describe("Shared", () => {
+  // Instantiate emulator and path to Cadence files
+  beforeEach(async () => {
+    const basePath = path.resolve(__dirname, "../cadence");
+    const port = 8080;
+    await init(basePath);
+    await emulator.start(port, false);
+  });
+
+  // Stop emulator, so it could be restarted
+  afterEach(async () => {
+    await emulator.stop();
+  });
+
+  it("shall be able to initialize both ZeedzINO and ZeedzItems on an account", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployZeedz();
+    await deployZeedzItems();
+
+    // Setup
+    const ZeedzAdmin = await getZeedzAdminAddress();
+    await shallPass(await setupZeedzItemsAndZeedzINOOnAccount(ZeedzAdmin));
   });
 });
