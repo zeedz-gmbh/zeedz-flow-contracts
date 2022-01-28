@@ -17,7 +17,7 @@ transaction(storefrontAddress: Address, listingResourceID: UInt64, expectedPrice
 
     // The Dapper Wallet admin Flow account will provide the authorizing signature,
     // which allows Dapper to purhase the NFT with DUC on behalf of the buyer
-    prepare(dapper: AuthAccount, signer: AuthAccount, admin: AuthAccount) {
+    prepare(signer: AuthAccount, admin: AuthAccount, dapper: AuthAccount) {
         self.storefront = getAccount(storefrontAddress)
             .getCapability<&NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}>(
                 NFTStorefront.StorefrontPublicPath
