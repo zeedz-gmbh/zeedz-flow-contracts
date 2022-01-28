@@ -15,11 +15,13 @@ import {
   getZeedleMetadata,
   getZeedzSupply,
   mintZeedle,
+  batchMintZeedle,
   setupZeedzOnAccount,
   transferZeedle,
   zeedleMetadataToMint,
   zeedleMetadataToMint2,
   zeedleMetadataToMint3,
+  zeedleMetadataToMint4,
   getZeedzMintedPerType,
   getZeedleOffset,
   increaseOffset,
@@ -89,6 +91,23 @@ describe("Zeedz INO", () => {
 
     // Mint instruction for Alice account shall be resolved
     await shallPass(await mintZeedle(Alice, zeedleMetadataToMint));
+  });
+
+  it("admin shall be able to batch mint a Zeedle", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployZeedz();
+
+    // Setup
+    const Alice = await getAccountAddress("Alice");
+    await setupZeedzOnAccount(Alice);
+
+    // Mint instruction for Alice account shall be resolved
+    await shallPass(await batchMintZeedle(Alice, zeedleMetadataToMint4));
+
+    const [metadata] = await getZeedleMetadata(Alice, 0);
+
+    console.log(metadata);
   });
 
   it("shall be able to create a new empty ZeedzINO NFT Collection", async () => {
