@@ -25,6 +25,7 @@ import {
   getZeedzMintedPerType,
   getZeedleOffset,
   increaseOffset,
+  claimZeedles,
   setupZeedzItemsAndZeedzINOOnAccount,
 } from "../src/zeedz";
 
@@ -497,5 +498,46 @@ describe("Shared", () => {
     // Setup
     const ZeedzAdmin = await getZeedzAdminAddress();
     await shallPass(await setupZeedzItemsAndZeedzINOOnAccount(ZeedzAdmin));
+  });
+
+  it("shall be able to claim NFTs from an admin account", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployZeedz();
+    await deployZeedzItems();
+
+    // Setup
+    const ZeedzAdmin = await getZeedzAdminAddress();
+    await setupZeedzOnAccount(ZeedzAdmin);
+    const Alice = await getAccountAddress("Alice");
+    await setupZeedzOnAccount(Alice);
+
+    // Mint instruction for Alice account shall be resolved
+    await shallPass(await mintZeedle(ZeedzAdmin, zeedleMetadataToMint));
+    await shallPass(await mintZeedle(ZeedzAdmin, zeedleMetadataToMint2));
+    await shallPass(await mintZeedle(ZeedzAdmin, zeedleMetadataToMint3));
+
+    // Claim instruction for Alice account shall be resolved
+    await shallPass(await claimZeedles(Alice, ZeedzAdmin, [0, 1, 2]));
+  });
+  it("shall not be able to claim NFTs from an admin account without admin cosign", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployZeedz();
+    await deployZeedzItems();
+
+    // Setup
+    const ZeedzAdmin = await getZeedzAdminAddress();
+    await setupZeedzOnAccount(ZeedzAdmin);
+    const Alice = await getAccountAddress("Alice");
+    await setupZeedzOnAccount(Alice);
+
+    // Mint instruction for Alice account shall be resolved
+    await shallPass(await mintZeedle(ZeedzAdmin, zeedleMetadataToMint));
+    await shallPass(await mintZeedle(ZeedzAdmin, zeedleMetadataToMint2));
+    await shallPass(await mintZeedle(ZeedzAdmin, zeedleMetadataToMint3));
+
+    // Claim instruction for Alice account shall revert
+    await shallRevert(await claimZeedles(Alice, Alice, [0, 1, 2]));
   });
 });
