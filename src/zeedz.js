@@ -240,3 +240,11 @@ export const setupZeedzItemsAndZeedzINOOnAccount = async (account) => {
 
   return sendTransaction({ name, signers });
 };
+
+export const claimZeedles = async (signer, admin, claimIDs) => {
+  const name = "zeedz/claim";
+  const args = [claimIDs];
+  const signers = [signer, admin];
+
+  return sendTransaction({ name, args, signers });
+};
