@@ -87,7 +87,7 @@ pub contract ZeedzINO: NonFungibleToken {
         }
 
         pub fun getMetadata(): {String: AnyStruct} {
-            return {"name": self.name, "description": self.description, "typeID": self.typeID, "serialNumber": self.serialNumber, "edition": self.edition, "editionCap": self.editionCap, "evolutionStage": self.evolutionStage, "rarity": self.rarity, "imageURI": self.imageURI}
+            return {"name": self.name, "description": self.description, "typeID": self.typeID, "serialNumber": self.serialNumber, "edition": self.edition, "editionCap": self.editionCap, "evolutionStage": self.evolutionStage, "rarity": self.rarity, "imageURI": self.imageURI, "carbonOffset": self.carbonOffset}
         }
 
         access(contract) fun increaseOffset(amount: UInt64) {
