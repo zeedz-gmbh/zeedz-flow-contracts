@@ -248,3 +248,10 @@ export const claimZeedles = async (signer, admin, claimIDs) => {
 
   return sendTransaction({ name, args, signers });
 };
+
+export const getCollectionMetadata = async (account) => {
+  const name = "zeedz/get_collection_metadata";
+  const args = [account];
+
+  return executeScript({ name, args });
+};
