@@ -18,6 +18,7 @@ pub contract ZeedzMarketplace {
         nftID: UInt64,
         ftVaultType: Type,
         price: UFix64
+        purchased: Bool
     )
 
     //
@@ -271,7 +272,8 @@ pub contract ZeedzMarketplace {
             nftType: item.listingDetails.nftType,
             nftID: item.listingDetails.nftID,
             ftVaultType: item.listingDetails.salePaymentVaultType,
-            price: item.listingDetails.salePrice
+            price: item.listingDetails.salePrice,
+            purchased: item.listingDetails.purchased
         )
     }
 
