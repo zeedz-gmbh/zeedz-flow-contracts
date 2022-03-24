@@ -15,14 +15,44 @@ export const deployZeedzMarketplace = async () => {
 };
 
 /**
- * Updates the SaleCut Reqirements on the ZeedzMarketplace
+ * Updates the FLOW SaleCut Reqirements on the ZeedzMarketplace
  * @param {account} market market address
  * @param {account} offset offset address
  * @param {account} admin admin
  * @returns
  */
-export const updateSaleCutRequirements = async (market, offset, admin) => {
-  const name = "zeedz_marketplace/update_sale_cut";
+export const updateSaleCutRequirementsFLOW = async (market, offset, admin) => {
+  const name = "zeedz_marketplace/update_sale_cut_FLOW";
+  const args = [market, offset];
+  const signers = [admin];
+
+  return sendTransaction({ name, args, signers });
+};
+
+/**
+ * Updates the FUSD SaleCut Reqirements on the ZeedzMarketplace
+ * @param {account} market market address
+ * @param {account} offset offset address
+ * @param {account} admin admin
+ * @returns
+ */
+export const updateSaleCutRequirementsFUSD = async (market, offset, admin) => {
+  const name = "zeedz_marketplace/update_sale_cut_FUSD";
+  const args = [market, offset];
+  const signers = [admin];
+
+  return sendTransaction({ name, args, signers });
+};
+
+/**
+ * Updates the USDC SaleCut Reqirements on the ZeedzMarketplace
+ * @param {account} market market address
+ * @param {account} offset offset address
+ * @param {account} admin admin
+ * @returns
+ */
+export const updateSaleCutRequirementsUSDC = async (market, offset, admin) => {
+  const name = "zeedz_marketplace/update_sale_cut_USDC";
   const args = [market, offset];
   const signers = [admin];
 
@@ -87,5 +117,11 @@ export const forceRemoveListing = async (admin, listingID) => {
 export const removeListing = async (listingID) => {
   const name = "zeedz_marketplace/remove_listing";
   const args = [listingID];
+  return executeScript({ name, args });
+};
+
+export const getListings = async (offset, limit) => {
+  const name = "zeedz_marketplace/get_listings";
+  const args = [offset, limit];
   return executeScript({ name, args });
 };
