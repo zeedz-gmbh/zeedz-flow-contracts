@@ -2,11 +2,11 @@ import NonFungibleToken from "../../contracts/NonFungibleToken.cdc"
 import NFTStorefront from "../../contracts/NFTStorefront.cdc"
 import ZeedzMarketplace from "../../contracts/ZeedzMarketplace.cdc"
 import ZeedzINO from "../../contracts/ZeedzINO.cdc"
-import FlowToken from "../../contracts/FlowToken.cdc"
+import FiatToken from "../../contracts/FiatToken.cdc"
 import FungibleToken from "../../contracts/FungibleToken.cdc"
 
 transaction(saleItemID: UInt64, saleItemPrice: UFix64) {
-    let flowTokenReceiver: Capability<&FlowToken.Vault{FungibleToken.Receiver}>
+    let fiatTokenReceiver: Capability<&FiatToken.Vault{FungibleToken.Receiver}>
     let nftProvider: Capability<&ZeedzINO.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>
     let storefront: &NFTStorefront.Storefront
     let storefrontPublic: Capability<&NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}>
@@ -27,8 +27,8 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64) {
             signer.link<&ZeedzINO.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(nftCollectionProviderPrivatePath, target: ZeedzINO.CollectionStoragePath)
         }
 
-        self.flowTokenReceiver = signer.getCapability<&FlowToken.Vault{FungibleToken.Receiver}>(/public/flowTokenReceiver)!
-        assert(self.flowTokenReceiver.borrow() != nil, message: "Missing or mis-typed FlowToken receiver")
+        self.fiatTokenReceiver = signer.getCapability<&FiatToken.Vault{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)!
+        assert(self.fiatTokenReceiver.borrow() != nil, message: "Missing or mis-typed FiatToken receiver")
 
         self.nftProvider = signer.getCapability<&ZeedzINO.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(nftCollectionProviderPrivatePath)!
         assert(self.nftProvider.borrow() != nil, message: "Missing or mis-typed ZeedzINO.Collection provider")
@@ -53,7 +53,7 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64) {
         // Create SaleCuts
         var saleCuts: [NFTStorefront.SaleCut] = []
         var remainingPrice = saleItemPrice
-        if let requirements = ZeedzMarketplace.getVaultTypeSaleCutRequirements(vaultType: Type<@FlowToken.Vault>()) {
+        if let requirements = ZeedzMarketplace.getVaultTypeSaleCutRequirements(vaultType: Type<@FiatToken.Vault>()) {
             for requirement in requirements {
                 let price = saleItemPrice * requirement.ratio
                 saleCuts.append(NFTStorefront.SaleCut(
@@ -64,7 +64,7 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64) {
             }
         }
         saleCuts.append(NFTStorefront.SaleCut(
-            receiver: self.flowTokenReceiver,
+            receiver: self.fiatTokenReceiver,
             amount: remainingPrice
         ))
 
@@ -73,7 +73,7 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64) {
             nftProviderCapability: self.nftProvider,
             nftType: Type<@ZeedzINO.NFT>(),
             nftID: saleItemID,
-            salePaymentVaultType: Type<@FlowToken.Vault>(),
+            salePaymentVaultType: Type<@FiatToken.Vault>(),
             saleCuts: saleCuts
         )
         ZeedzMarketplace.addListing(id: id, storefrontPublicCapability: self.storefrontPublic)

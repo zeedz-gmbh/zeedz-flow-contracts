@@ -78,21 +78,21 @@ pub contract ZeedzMarketplace {
     // collection identifier => (NFT id => listingID)
     access(contract) let collectionNFTListingIDs: {String: {UInt64: UInt64}}
 
-    // array of SaleCutRequirements
-    access(contract) var saleCutRequirements: [SaleCutRequirement]
+    // {Type of the FungibleToken => array of SaleCutRequirements}
+    access(contract) var saleCutRequirements: {String : [SaleCutRequirement]}
 
     //
     // Administrator resource, owner account can update the Zeedz Marketplace sale cut requirements and remove listings.
     //
     pub resource Administrator {
 
-        pub fun updateSaleCutRequirement(_ requirements: [SaleCutRequirement]) {
+        pub fun updateSaleCutRequirement(requirements: [SaleCutRequirement], vaultType: Type) {
             var totalRatio: UFix64 = 0.0
             for requirement in requirements {
                 totalRatio = totalRatio + requirement.ratio
             }
             assert(totalRatio <= 1.0, message: "total ratio must be less than or equal to 1.0")
-            ZeedzMarketplace.saleCutRequirements = requirements
+            ZeedzMarketplace.saleCutRequirements[vaultType.identifier] = requirements
         }
 
         pub fun forceRemoveListing(id: UInt64) {
@@ -160,8 +160,15 @@ pub contract ZeedzMarketplace {
     //
     // Returns an array of the current marketplace SaleCutRequirements 
     //
-    pub fun getAllSaleCutRequirements(): [SaleCutRequirement] {
+    pub fun getAllSaleCutRequirements(): {String: [SaleCutRequirement]} {
         return self.saleCutRequirements
+    }
+
+    //
+    // Returns an array of the current marketplace SaleCutRequirements for the specified VaultType
+    //
+    pub fun getVaultTypeSaleCutRequirements(vaultType: Type): [SaleCutRequirement]? {
+        return self.saleCutRequirements[vaultType.identifier]
     }
 
     // 
@@ -191,25 +198,25 @@ pub contract ZeedzMarketplace {
                 }
             }
         }
-
+        
         // check sale cut
-        let requirements = self.saleCutRequirements
+        if let requirements = self.saleCutRequirements[item.listingDetails.salePaymentVaultType.identifier] {
+            for requirement in requirements {
+                let saleCutAmount = item.listingDetails.salePrice * requirement.ratio
 
-        for requirement in requirements {
-            let saleCutAmount = item.listingDetails.salePrice * requirement.ratio
-
-            var match = false
-            for saleCut in item.listingDetails.saleCuts {
-                if saleCut.receiver.address == requirement.receiver.address &&
-                   saleCut.receiver.borrow()! == requirement.receiver.borrow()! {
-                    if saleCut.amount >= saleCutAmount {
-                        match = true
+                var match = false
+                for saleCut in item.listingDetails.saleCuts {
+                    if saleCut.receiver.address == requirement.receiver.address &&
+                    saleCut.receiver.borrow()! == requirement.receiver.borrow()! {
+                        if saleCut.amount >= saleCutAmount {
+                            match = true
+                        }
+                        break
                     }
-                    break
                 }
-            }
 
-            assert(match == true, message: "saleCut must follow SaleCutRequirements")
+                assert(match == true, message: "saleCut must follow SaleCutRequirements")
+            }
         }
 
         // all by time
@@ -333,7 +340,7 @@ pub contract ZeedzMarketplace {
         self.listingIDs = []
         self.listingIDItems = {}
         self.collectionNFTListingIDs = {}
-        self.saleCutRequirements = []
+        self.saleCutRequirements = {}
 
         let admin <- create Administrator()
         self.account.save(<-admin, to: self.ZeedzMarketplaceAdminStoragePath)
