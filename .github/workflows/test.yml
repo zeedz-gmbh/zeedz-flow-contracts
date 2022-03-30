@@ -8,6 +8,6 @@ jobs:
       - name: test
         run: |
           wget https://storage.googleapis.com/flow-cli/install.sh
-          sh ./install.sh
+          sh ./install.sh -- v0.30.2
           npm install
           npm test
