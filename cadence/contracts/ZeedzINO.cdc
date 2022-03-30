@@ -119,6 +119,7 @@ pub contract ZeedzINO: NonFungibleToken {
     // 
     pub resource interface ZeedzCollectionPrivate {
         pub fun burn(burnID: UInt64)
+        pub fun redeem(redeemID: UInt64, message: String)
     }
 
     //
