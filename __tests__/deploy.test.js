@@ -29,21 +29,7 @@ import {
   increaseOffset,
   claimZeedles,
   getCollectionMetadata,
-  setupZeedzItemsAndZeedzINOOnAccount,
 } from "../src/zeedz";
-
-import {
-  deployZeedzItems,
-  getZeedzItemMetadata,
-  getZeedzItemCount,
-  getZeedzItemSupply,
-  itemMetadataToMint1,
-  mintZeedzItem,
-  setupZeedzItemsOnAccount,
-  transferZeedzItem,
-  typeID1,
-  burnZeedzItem,
-} from "../src/zeedz_items";
 
 import {
   deployZeedzMarketplace,
@@ -352,280 +338,20 @@ describe("Zeedz INO", () => {
   });
 });
 
-describe("Zeedz Items", () => {
-  // Instantiate emulator and path to Cadence files
-  beforeEach(async () => {
-    const basePath = path.resolve(__dirname, "../cadence");
-    const port = 8080;
-    await init(basePath);
-    await emulator.start(port, false);
-  });
-
-  // Stop emulator, so it could be restarted
-  afterEach(async () => {
-    await emulator.stop();
-  });
-
-  it("shall deploy Zeedz Items contract", async () => {
-    // Deploy
-    await deployNonFungibleToken();
-    await shallPass(await deployZeedzItems());
-  });
-  it("supply shall be 0 after contract is deployed", async () => {
-    // Deploy
-    await deployNonFungibleToken();
-    await deployZeedzItems();
-
-    // Setup
-    const ZeedzAdmin = await getZeedzAdminAddress();
-    await shallPass(setupZeedzItemsOnAccount(ZeedzAdmin));
-
-    // Test
-    await shallResolve(async () => {
-      const [supply] = await getZeedzItemSupply();
-      expect(supply).toBe(0);
-    });
-  });
-  it("shall be able to mint a ZeedzItems", async () => {
-    // Deploy
-    await deployNonFungibleToken();
-    await deployZeedzItems();
-
-    // Setup
-    const Alice = await getAccountAddress("Alice");
-    await setupZeedzItemsOnAccount(Alice);
-
-    const itemTypeID = typeID1;
-    const itemMetadataToMint = itemMetadataToMint1;
-
-    // Mint instruction for Alice account shall be resolved
-    await shallPass(mintZeedzItem(itemTypeID, Alice, itemMetadataToMint));
-  });
-
-  it("shall be able to create a new empty NFT Collection", async () => {
-    // Deploy
-    await deployNonFungibleToken();
-    await deployZeedzItems();
-
-    // Setup
-    const Bob = await getAccountAddress("Bob");
-    await setupZeedzItemsOnAccount(Bob);
-
-    // shall be able te read Bob's collection and ensure it's empty
-    await shallResolve(async () => {
-      const [itemCount] = await getZeedzItemCount(Bob);
-      expect(itemCount).toBe(0);
-    });
-  });
-
-  it("shall be able to read NFT metadata from an accounts collection", async () => {
-    // Deploy
-    await deployNonFungibleToken();
-    await deployZeedzItems();
-
-    // Setup
-    const Bob = await getAccountAddress("Bob");
-    await setupZeedzItemsOnAccount(Bob);
-
-    // Mint instruction for Bob account shall be resolved
-    await shallPass(mintZeedzItem(typeID1, Bob, itemMetadataToMint1));
-
-    const [metadata] = await getZeedzItemMetadata(Bob, 0);
-
-    // Test
-    await shallResolve(async () => {
-      expect(metadata.Name).toBe(itemMetadataToMint1.Name);
-    });
-  });
-
-  it("shall not be able to withdraw an NFT that doesn't exist in a collection", async () => {
-    // Deploy
-    await deployNonFungibleToken();
-    await deployZeedzItems();
-
-    // Setup
-    const Alice = await getAccountAddress("Alice");
-    const Bob = await getAccountAddress("Bob");
-    await setupZeedzItemsOnAccount(Alice);
-    await setupZeedzItemsOnAccount(Bob);
-
-    // Transfer transaction shall fail for non-existent item
-    await shallRevert(transferZeedzItem(Alice, Bob, 1337));
-  });
-
-  it("shall be able to withdraw an NFT and deposit to another accounts collection", async () => {
-    // Deploy
-    await deployNonFungibleToken();
-    await deployZeedzItems();
-
-    // Setup
-    const Alice = await getAccountAddress("Alice");
-    const Bob = await getAccountAddress("Bob");
-    await setupZeedzItemsOnAccount(Alice);
-    await setupZeedzItemsOnAccount(Bob);
-
-    // Mint instruction for Alice account shall be resolved
-    await shallPass(mintZeedzItem(typeID1, Alice, itemMetadataToMint1));
-
-    // Transfer transaction shall pass
-    await shallPass(transferZeedzItem(Alice, Bob, 0));
-  });
-
-  it("shall be able to burn an NFT from an accounts collection", async () => {
-    // Deploy
-    await deployNonFungibleToken();
-    await deployZeedzItems();
-
-    // Setup
-    const Bob = await getAccountAddress("Bob");
-    await setupZeedzItemsOnAccount(Bob);
-
-    // Mint instruction for Bob account shall be resolved
-    await shallPass(mintZeedzItem(typeID1, Bob, itemMetadataToMint1));
-
-    // Burn transaction shall pass
-    await shallPass(burnZeedzItem(Bob, 0));
-  });
-
-  it("shall not be able to burn an NFT that doesn't exist in a collection", async () => {
-    // Deploy
-    await deployNonFungibleToken();
-    await deployZeedzItems();
-
-    // Setup
-    const Bob = await getAccountAddress("Bob");
-    await setupZeedzItemsOnAccount(Bob);
-
-    // Burn transaction shall fail for non-existent item
-    await shallRevert(burnZeedzItem(Bob, 0));
-  });
-});
-
-describe("Shared", () => {
-  // Instantiate emulator and path to Cadence files
-  beforeEach(async () => {
-    const basePath = path.resolve(__dirname, "../cadence");
-    const port = 8080;
-    await init(basePath);
-    await emulator.start(port, false);
-  });
-
-  // Stop emulator, so it could be restarted
-  afterEach(async () => {
-    await emulator.stop();
-  });
-    it("shall be able to initialize both ZeedzINO and ZeedzItems on an account", async () => {
-    // Deploy
-    await deployNonFungibleToken();
-    await deployZeedz();
-    await deployZeedzItems();
-
-    // Setup
-    const ZeedzAdmin = await getZeedzAdminAddress();
-    await shallPass(await setupZeedzItemsAndZeedzINOOnAccount(ZeedzAdmin));
-  });
-
-  it("shall be able to claim NFTs from an admin account", async () => {
-    // Deploy
-    await deployNonFungibleToken();
-    await deployZeedz();
-    await deployZeedzItems();
-
-    // Setup
-    const ZeedzAdmin = await getZeedzAdminAddress();
-    await setupZeedzOnAccount(ZeedzAdmin);
-    const Alice = await getAccountAddress("Alice");
-    await setupZeedzOnAccount(Alice);
-
-    // Mint instruction for Alice account shall be resolved
-    await shallPass(await mintZeedle(ZeedzAdmin, zeedleMetadataToMint));
-    await shallPass(await mintZeedle(ZeedzAdmin, zeedleMetadataToMint2));
-    await shallPass(await mintZeedle(ZeedzAdmin, zeedleMetadataToMint3));
-
-    // Claim instruction for Alice account shall be resolved
-    await shallPass(await claimZeedles(Alice, ZeedzAdmin, [0, 1, 2]));
-  });
-  it("shall not be able to claim NFTs from an admin account without admin cosign", async () => {
-    // Deploy
-    await deployNonFungibleToken();
-    await deployZeedz();
-    await deployZeedzItems();
-
-    // Setup
-    const ZeedzAdmin = await getZeedzAdminAddress();
-    await setupZeedzOnAccount(ZeedzAdmin);
-    const Alice = await getAccountAddress("Alice");
-    await setupZeedzOnAccount(Alice);
-
-    // Mint instruction for Alice account shall be resolved
-    await shallPass(await mintZeedle(Alice, zeedleMetadataToMint));
-    await shallPass(await mintZeedle(Alice, zeedleMetadataToMint2));
-    await shallPass(await mintZeedle(Alice, zeedleMetadataToMint3));
-
-    // Claim instruction for Alice account shall revert
-    await shallRevert(await claimZeedles(Alice, Alice, [0, 1, 2]));
-  });
-  it("shall be able to get a collection's metdata", async () => {
-    // Deploy
-    await deployNonFungibleToken();
-    await deployZeedz();
-    await deployZeedzItems();
-
-    // Setup
-    const ZeedzAdmin = await getZeedzAdminAddress();
-    await setupZeedzOnAccount(ZeedzAdmin);
-
-    // Mint instruction for Admin account shall be resolved
-    await shallPass(await mintZeedle(ZeedzAdmin, zeedleMetadataToMint));
-    await shallPass(await mintZeedle(ZeedzAdmin, zeedleMetadataToMint2));
-    await shallPass(await mintZeedle(ZeedzAdmin, zeedleMetadataToMint3));
-
-    // Get collection metadata shall pass
-    await shallResolve(async () => {
-      const [metadata] = await getCollectionMetadata(ZeedzAdmin);
-      expect(metadata.toString()).toBe(
-        [
-          {
-            name: "Ginger Zeedle",
-            description: "A wild ginger with a wild imagination",
-            typeID: 1,
-            serialNumber: "Test123",
-            edition: 1,
-            editionCap: 3000,
-            evolutionStage: 2,
-            rarity: "RARE",
-            imageURI: "https://zeedlz.io/images/ino/zeedle123.jpg",
-            carbonOffset: 0,
-          },
-          {
-            name: "Mint Zeedle",
-            description: "A wild mint with a wild imagination",
-            typeID: 2,
-            serialNumber: "Test323",
-            edition: 1,
-            editionCap: 1000,
-            evolutionStage: 2,
-            rarity: "RARE",
-            imageURI: "https://zeedlz.io/images/ino/zeedle223.jpg",
-            carbonOffset: 0,
-          },
-          {
-            name: "Aloe Zeedle",
-            description: "A wild aloe with a wild imagination",
-            typeID: 3,
-            serialNumber: "Test423",
-            edition: 1,
-            editionCap: 2000,
-            evolutionStage: 2,
-            rarity: "LEGENDARY",
-            imageURI: "https://zeedlz.io/images/ino/zeedle323.jpg",
-            carbonOffset: 0,
-          },
-        ].toString(),
-      );
-    });
-
 describe("Zeedz Marketplace", () => {
+  // Instantiate emulator and path to Cadence files
+  beforeEach(async () => {
+    const basePath = path.resolve(__dirname, "../cadence");
+    const port = 8080;
+    await init(basePath);
+    await emulator.start(port, false);
+  });
+
+  // Stop emulator, so it could be restarted
+  afterEach(async () => {
+    await emulator.stop();
+  });
+
   it("shall deploy the ZeedzMarketplace contract", async () => {
     // Deploy
     await deployNonFungibleToken();
@@ -914,5 +640,120 @@ describe("Zeedz Marketplace", () => {
     await shallPass(await sellZeedzINO(0, toUFix64(20), Alice));
 
     const [listings] = await getListings(0, 10);
+  });
+});
+
+describe("Shared", () => {
+  // Instantiate emulator and path to Cadence files
+  beforeEach(async () => {
+    const basePath = path.resolve(__dirname, "../cadence");
+    const port = 8080;
+    await init(basePath);
+    await emulator.start(port, false);
+  });
+
+  // Stop emulator, so it could be restarted
+  afterEach(async () => {
+    await emulator.stop();
+  });
+
+  it("shall be able to claim NFTs from an admin account", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployZeedz();
+
+    // Setup
+    const ZeedzAdmin = await getZeedzAdminAddress();
+    await setupZeedzOnAccount(ZeedzAdmin);
+    const Alice = await getAccountAddress("Alice");
+    await setupZeedzOnAccount(Alice);
+
+    // Mint instruction for Alice account shall be resolved
+    await shallPass(await mintZeedle(ZeedzAdmin, zeedleMetadataToMint));
+    await shallPass(await mintZeedle(ZeedzAdmin, zeedleMetadataToMint2));
+    await shallPass(await mintZeedle(ZeedzAdmin, zeedleMetadataToMint3));
+
+    // Claim instruction for Alice account shall be resolved
+    await shallPass(await claimZeedles(Alice, ZeedzAdmin, [0, 1, 2]));
+  });
+
+  it("shall not be able to claim NFTs from an admin account without admin cosign", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployZeedz();
+
+    // Setup
+    const ZeedzAdmin = await getZeedzAdminAddress();
+    await setupZeedzOnAccount(ZeedzAdmin);
+    const Alice = await getAccountAddress("Alice");
+    await setupZeedzOnAccount(Alice);
+
+    // Mint instruction for Alice account shall be resolved
+    await shallPass(await mintZeedle(Alice, zeedleMetadataToMint));
+    await shallPass(await mintZeedle(Alice, zeedleMetadataToMint2));
+    await shallPass(await mintZeedle(Alice, zeedleMetadataToMint3));
+
+    // Claim instruction for Alice account shall revert
+    await shallRevert(await claimZeedles(Alice, Alice, [0, 1, 2]));
+  });
+
+  it("shall be able to get a collection's metdata", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployZeedz();
+
+    // Setup
+    const ZeedzAdmin = await getZeedzAdminAddress();
+    await setupZeedzOnAccount(ZeedzAdmin);
+
+    // Mint instruction for Admin account shall be resolved
+    await shallPass(await mintZeedle(ZeedzAdmin, zeedleMetadataToMint));
+    await shallPass(await mintZeedle(ZeedzAdmin, zeedleMetadataToMint2));
+    await shallPass(await mintZeedle(ZeedzAdmin, zeedleMetadataToMint3));
+
+    // Get collection metadata shall pass
+    await shallResolve(async () => {
+      const [metadata] = await getCollectionMetadata(ZeedzAdmin);
+      expect(metadata.toString()).toBe(
+        [
+          {
+            name: "Ginger Zeedle",
+            description: "A wild ginger with a wild imagination",
+            typeID: 1,
+            serialNumber: "Test123",
+            edition: 1,
+            editionCap: 3000,
+            evolutionStage: 2,
+            rarity: "RARE",
+            imageURI: "https://zeedlz.io/images/ino/zeedle123.jpg",
+            carbonOffset: 0,
+          },
+          {
+            name: "Mint Zeedle",
+            description: "A wild mint with a wild imagination",
+            typeID: 2,
+            serialNumber: "Test323",
+            edition: 1,
+            editionCap: 1000,
+            evolutionStage: 2,
+            rarity: "RARE",
+            imageURI: "https://zeedlz.io/images/ino/zeedle223.jpg",
+            carbonOffset: 0,
+          },
+          {
+            name: "Aloe Zeedle",
+            description: "A wild aloe with a wild imagination",
+            typeID: 3,
+            serialNumber: "Test423",
+            edition: 1,
+            editionCap: 2000,
+            evolutionStage: 2,
+            rarity: "LEGENDARY",
+            imageURI: "https://zeedlz.io/images/ino/zeedle323.jpg",
+            carbonOffset: 0,
+          },
+        ].toString(),
+      );
+    });
   });
 });
