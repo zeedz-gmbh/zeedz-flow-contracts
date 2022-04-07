@@ -426,7 +426,6 @@ describe("Zeedz Marketplace", () => {
     // Transaction Shall Pass
     await shallPass(await updateSaleCutRequirementsFLOW(zeedzCut, offsetCut, ZeedzAdmin));
     const [requirements] = await getSaleCutRequirements();
-    console.log(requirements);
   });
 
   it("shall be able to update sale cut requirements after they have been set", async () => {
