@@ -8,7 +8,26 @@
   "contracts": {
     "ZeedzINO": "./cadence/contracts/ZeedzINO.cdc",
     "ZeedzItems": "./cadence/contracts/ZeedzItems.cdc",
-    "NonFungibleToken": "./cadence/contracts/NonFungibleToken.cdc"
+    "NonFungibleToken": "./cadence/contracts/NonFungibleToken.cdc",
+    "FungibleToken": {
+      "source": "./cadence/contracts/FungibleToken.cdc",
+      "aliases": {
+        "testnet": "9a0766d93b6608b7",
+        "emulator": "ee82856bf20e2aa6"
+      }
+    },
+    "FlowToken": {
+      "source": "./cadence/contracts/FlowToken.cdc",
+      "aliases": {
+        "emulator": "0x0ae53cb6e3f42a79"
+      }
+    },
+    "TokenForwarding": {
+      "source": "./cadence/contracts/TokenForwarding.cdc"
+    },
+    "DapperUtilityCoin": {
+      "source": "./cadence/contracts/DapperUtilityCoin.cdc"
+    }
   },
   "networks": {
     "emulator": "127.0.0.1:3569",
