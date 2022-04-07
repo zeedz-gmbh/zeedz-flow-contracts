@@ -38,6 +38,18 @@ export const zeedleMetadataToMint3 = {
   imageURI: "https://zeedlz.io/images/ino/zeedle323.jpg",
 };
 
+export const zeedleMetadataToMint4 = {
+  name: "Aloe Zeedle",
+  description: "A wild aloe with a wild imagination",
+  typeID: "3",
+  serialNumber: "Test423",
+  edition: "100",
+  editionCap: "2000",
+  evolutionStage: "20",
+  rarity: "LEGENDARY",
+  imageURI: "https://zeedlz.io/images/ino/zeedle323.jpg",
+};
+
 export const zeedleTypeIDToMint = 1;
 
 /*
@@ -98,6 +110,22 @@ export const mintZeedle = async (recipient, metadata) => {
     metadata.rarity,
     metadata.imageURI,
   ];
+  const signers = [ZeedzAdmin];
+
+  return sendTransaction({ name, args, signers });
+};
+
+/*
+ * Mints a Zeedle and sends it to **recipient**.
+ * @param {string} recipient - recipient account address
+ * @throws Will throw an error if execution will be halted
+ * @returns {Promise<*>}
+ * */
+export const batchMintZeedle = async (recipient, metadata) => {
+  const ZeedzAdmin = await getZeedzAdminAddress();
+
+  const name = "zeedz/batch_mint_zeedles";
+  const args = [recipient, [metadata]];
   const signers = [ZeedzAdmin];
 
   return sendTransaction({ name, args, signers });
@@ -196,6 +224,34 @@ export const increaseOffset = async (owner, admin, zeedleId, amount) => {
 export const getZeedleOffset = async (account, zeedleID) => {
   const name = "zeedz/get_zeedle_offset";
   const args = [account, zeedleID];
+
+  return executeScript({ name, args });
+};
+
+/*
+ * Setups ZeedzItems & ZeedzINO collections on account and exposes public capabilites.
+ * @param {string} account - account address
+ * @throws Will throw an error if transaction is reverted.
+ * @returns {Promise<*>}
+ * */
+export const setupZeedzItemsAndZeedzINOOnAccount = async (account) => {
+  const name = "shared/setup_account_all";
+  const signers = [account];
+
+  return sendTransaction({ name, signers });
+};
+
+export const claimZeedles = async (signer, admin, claimIDs) => {
+  const name = "zeedz/claim";
+  const args = [claimIDs];
+  const signers = [signer, admin];
+
+  return sendTransaction({ name, args, signers });
+};
+
+export const getCollectionMetadata = async (account) => {
+  const name = "zeedz/get_collection_metadata";
+  const args = [account];
 
   return executeScript({ name, args });
 };
