@@ -1,6 +1,6 @@
 # Zeedz
 
-This repository contains the Cadence contracts & flow-js test cases for the ZeedzINO NFT Contract and the ZeedzItem contract.
+This repository contains the Cadence contracts & their respective flow-js test cases.
 
 ## What is Zeedz
 
