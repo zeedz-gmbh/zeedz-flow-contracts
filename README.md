@@ -27,13 +27,6 @@ Each batch-minting of Zeedles is resembled by an edition number, with the commun
 
 Many of the in-game purchases lead to real-world donations to NGOs focused on climate action. The carbonOffset attribute of a Zeedle proves the impact the in-game purchases related to this Zeedle have already made with regards to reducing greenhouse gases. This value is computed by taking the current dollar-value of each purchase at the time of the purchase, and applying the dollar-to-CO2-offset formular of the current climate action partner.
 
-## What are ZeedzItems?
-
-The main heros of Zeedz are Zeedles - cute little nature-inspired monsters that grow
-with the real world weather. But there are manifold items that users can pick up
-along their journey, from Early Access keys to Zeedle wearables. These items are
-so called ZeedzItems.
-
 ## Scripts
 
 ### Testing
@@ -47,12 +40,13 @@ so called ZeedzItems.
     .
     ├── __tests__          # Jest tests
     ├── cadence            # Cadence files
-    │   ├── contracts      # ZeedzINO, ZeedzItems & NonFungibleToken cadence contracts
+    │   ├── contracts      # Cadence smart contracts
     │   ├── scripts        # Scripts used to interact with the smart contracts
-    │   └── transactions   # ZeedzINO & ZeedzItems transactions
+    │   └── transactions   # Transactions used to intreact with their respective contracts
     ├── src                # Flow-js-testing functions used to test the smart conract
     │   ├── common.js      # Commonly used flow-js-testing functions
-    │   ├── zeedz_items.js # Functions used to test ZeedzItems
-    │   └── zeedz.js       # Functions for testing the ZeedzINO contract
+    │   ├── zeedz.js       # Functions for testing the ZeedzINO contract
+    │   └── ...            # Functions for testing other contracts from this repo
+    |   
     ├── README.md          # Repository description
     └── ...
