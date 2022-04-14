@@ -37,6 +37,7 @@ import {
   updateSaleCutRequirementsFUSD,
   getSaleCutRequirements,
   sellZeedzINO,
+  sellZeedzINOFUSD,
   getListingIDs,
   buyZeedzINO,
   buyZeedzINOIncreaseOffset,
@@ -486,6 +487,33 @@ describe("Zeedz Marketplace", () => {
 
     // Sell instruction for Alice account shall be resolved
     await shallPass(await sellZeedzINO(0, toUFix64(20), Alice));
+  });
+  it("shall be able to list a ZeedzINO NFT for sale for FUSD without initializing vault", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployNFTStorefront();
+    await deployZeedzMarketplace();
+    await deployFUSD();
+    await deployZeedz();
+
+    // Setup
+    const Alice = await getAccountAddress("Alice");
+    await setupZeedzOnAccount(Alice);
+    await setupNFTStorefrontOnAccount("Alice");
+    const zeedzCut = await getAccountAddress("zeedzCut");
+    const offsetCut = await getAccountAddress("offsetCut");
+    const ZeedzAdmin = await getZeedzAdminAddress();
+    await shallPass(await setupFUSDOnAccount(offsetCut));
+    await shallPass(await setupFUSDOnAccount(zeedzCut));
+
+    // Transaction Shall Pass
+    await shallPass(await updateSaleCutRequirementsFUSD(zeedzCut, offsetCut, ZeedzAdmin));
+
+    // Mint instruction for Alice account shall be resolved
+    await shallPass(await mintZeedle(Alice, zeedleMetadataToMint));
+
+    // Sell instruction for Alice account shall be resolved
+    await shallPass(await sellZeedzINOFUSD(0, toUFix64(20), Alice));
   });
   it("shall be able to buy a listed for sale a ZeedzINO NFT", async () => {
     // Deploy
