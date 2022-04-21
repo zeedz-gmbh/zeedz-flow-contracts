@@ -67,6 +67,14 @@ export const sellZeedzINO = async (id, price, owner) => {
   return sendTransaction({ name, args, signers });
 };
 
+export const sellZeedzINOFUSD = async (id, price, owner) => {
+  const name = "zeedz_marketplace/sell_item_FUSD_and_init";
+  const args = [id, price];
+  const signers = [owner];
+
+  return sendTransaction({ name, args, signers });
+};
+
 export const buyZeedzINO = async (sender, seller, listingId, buyPrice) => {
   const name = "zeedz_marketplace/buy_item_FLOW";
   const args = [listingId, seller, buyPrice];
