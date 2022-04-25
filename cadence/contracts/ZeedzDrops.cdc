@@ -28,7 +28,6 @@ pub contract ZeedzDrops {
 
     pub resource interface PackPublic {
         pub fun purchase(payment: @FungibleToken.Vault)
-        pub fun getDetails(packID: UInt64): PackDetails
         pub fun getSaleEnabledStatus(): Bool 
         pub fun getDetails(): PackDetails
         pub fun getStartTime(): UFix64 
