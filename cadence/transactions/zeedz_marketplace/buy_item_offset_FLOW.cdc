@@ -8,17 +8,15 @@ import ZeedzINO from "../../../contracts/NFTs/ZeedzINO.cdc"
 transaction(listingResourceID: UInt64, storefrontAddress: Address, buyPrice: UFix64) {
     let paymentVault: @FungibleToken.Vault
     let nftReceiver: &ZeedzINO.Collection{NonFungibleToken.Receiver}
-    let nftCollection: &ZeedzINO.Collection{ZeedzINO.ZeedzCollectionPublic}
+    let nftCollection: &AnyResource{ZeedzINO.ZeedzCollectionPublic}
     let storefront: &NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}
     let listing: &NFTStorefront.Listing{NFTStorefront.ListingPublic}
-    // local variable for storing the Admin reference
     let adminRef: &ZeedzINO.Administrator
-    // local variable for storing the Zeedle reference
 
     prepare(signer: AuthAccount, admin: AuthAccount) {
-        // Create a collection to store the purchase if none present
 	    if signer.borrow<&ZeedzINO.Collection>(from: /storage/ZeedzINOCollection) == nil {
 		    signer.save(<-ZeedzINO.createEmptyCollection(), to: /storage/ZeedzINOCollection)
+            signer.unlink(ZeedzINO.CollectionPublicPath)
 		    signer.link<&ZeedzINO.Collection{NonFungibleToken.CollectionPublic,ZeedzINO.ZeedzCollectionPublic}>(
 			    /public/ZeedzINOCollection,
 			    target: /storage/ZeedzINOCollection
@@ -43,12 +41,10 @@ transaction(listingResourceID: UInt64, storefrontAddress: Address, buyPrice: UFi
         self.nftReceiver = signer.borrow<&ZeedzINO.Collection{NonFungibleToken.Receiver}>(from: /storage/ZeedzINOCollection)
             ?? panic("Cannot borrow NFT collection receiver from account")
 
-        // borrow a reference to the Administrator resource in storage
         self.adminRef= admin.getCapability(ZeedzINO.AdminPrivatePath)
             .borrow<&ZeedzINO.Administrator>()!
 
-        self.nftCollection = signer.getCapability<&ZeedzINO.Collection{ZeedzINO.ZeedzCollectionPublic}>(ZeedzINO.CollectionPublicPath)
-            .borrow()
+        self.nftCollection = signer.getCapability(ZeedzINO.CollectionPublicPath).borrow<&{ZeedzINO.ZeedzCollectionPublic}>() 
             ?? panic("Could not borrow ZeedzCollectionPublic")
     }
 
@@ -56,8 +52,6 @@ transaction(listingResourceID: UInt64, storefrontAddress: Address, buyPrice: UFi
         let item <- self.listing.purchase(payment: <-self.paymentVault)
 
         let zeedleID = item.id
-        
-        // borrow a reference to the Zeedle
 
         self.nftReceiver.deposit(token: <-item)
 
