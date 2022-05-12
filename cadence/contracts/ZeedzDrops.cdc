@@ -266,7 +266,10 @@ pub contract ZeedzDrops {
         }
 
         pub fun reserve(packID: UInt64, packID: UInt64, amount: UInt64){
-            let pack = self.borrowPack(packID) ?? panic("not able to find specified pack")
+            pre {
+                self.packs[packID] != nil: "could not find pack with given id"
+            }
+            let pack = self.borrowPack(packID) ?? panic("not able to borrow specified pack")
             pack.reserve(amount: amount)
             emit PacksReserved(packID: packID, amount: amount)
 
@@ -275,29 +278,40 @@ pub contract ZeedzDrops {
             pre {
                 self.packs[packID] != nil: "could not find pack with given id"
             }
-
             let pack <- self.packs.remove(key: packID)!
             destroy pack
             emit PackRemoved(packID: packID)
         }
 
         pub fun setSaleEnabledStatus(status: Bool, packID: UInt64){
-            let pack = self.borrowPack(packID) ?? panic("not able to find specified pack")
+            pre {
+                self.packs[packID] != nil: "could not find pack with given id"
+            }
+            let pack = self.borrowPack(packID) ?? panic("not able to borrow specified pack")
             pack.setSaleEnabledStatus(status: status)
         }
 
         pub fun setStartTime(startTime: UFix64, packID: UInt64){
-            let pack = self.borrowPack(packID) ?? panic("not able to find specified pack")
+            pre {
+                self.packs[packID] != nil: "could not find pack with given id"
+            }
+            let pack = self.borrowPack(packID) ?? panic("not able to borrow specified pack")
             pack.setStartTime(startTime: startTime)
         }
 
         pub fun setEndTime(endTime: UFix64, packID: UInt64){
-            let pack = self.borrowPack(packID) ?? panic("not able to find specified pack")
+            pre {
+                self.packs[packID] != nil: "could not find pack with given id"
+            }
+            let pack = self.borrowPack(packID) ?? panic("not able to borrow specified pack")
             pack.setEndTime(endTime: endTime)
         }
 
         pub fun purchaseWithDiscount(packID: UInt64, payment: @FungibleToken.Vault, discount: UFix64, packID: UInt64, valutType: Type){
-            let pack = self.borrowPack(packID) ?? panic("not able to find specified pack")
+            pre {
+                self.packs[packID] != nil: "could not find pack with given id"
+            }
+            let pack = self.borrowPack(packID) ?? panic("not able to borrow specified pack")
             pack.purchaseWithDiscount(payment, discount, packID, vaultType: vaultType)
         }
 
