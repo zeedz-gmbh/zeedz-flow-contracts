@@ -170,7 +170,7 @@ pub contract ZeedzDrops {
             emit PackPurchased(packID: self.uuid, details: self.details, currency: valutType.identifier, userID: userID)
         }
 
-        acess(contract) fun purchaseWithDiscount(payment: @FungibleToken.Vault, discount: UFix64, packID: UInt64, valutType: Type, userID: String){
+        access(contract) fun purchaseWithDiscount(payment: @FungibleToken.Vault, discount: UFix64, packID: UInt64, valutType: Type, userID: String){
              pre {
                 discount < 1: "discount cannot be higher than 100%"
                 self.details.saleEnabled == true: "the sale of this pack is disabled"
