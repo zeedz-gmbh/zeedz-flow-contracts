@@ -320,7 +320,6 @@ pub contract ZeedzDrops {
         return self.packs.keys
     }
 
-
     pub fun borrowPack(id: UInt64): &Pack? {
         if self.packs[id] != nil {
             return &self.packs[id] as! &Pack
