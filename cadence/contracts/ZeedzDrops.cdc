@@ -101,7 +101,7 @@ pub contract ZeedzDrops {
 
 
     pub interface PackPublic {
-        pub fun purchase(payment: @FungibleToken.Vault, )
+        pub fun purchase(payment: @FungibleToken.Vault, valutType: Type, userID: String)
         pub fun getDetails(): PackDetails
     }
 
@@ -141,12 +141,12 @@ pub contract ZeedzDrops {
 
         pub fun purchase(payment: @FungibleToken.Vault, valutType: Type, userID: String) {
             pre {
-                self.saleEnabled == true: "the sale of this pack is disabled"
-                (self.details.total - self.sold) > 0: "these packs are sold out"
+                self.details.saleEnabled == true: "the sale of this pack is disabled"
+                (self.details.total - self.details.sold) > 0: "these packs are sold out"
                 payment.isInstance(valutType): "payment vault is not requested fungible token type"
                 payment.balance == self.details.prices[valutType.identifier]: "payment vault does not contain requested price"
-                getCurrentBlock().timestamp > self.timeStart: "the sale of this pack has not started yet"
-                getCurrentBlock().timestamp < self.timeEnd: "the sale of this pack has ended"
+                getCurrentBlock().timestamp > self.details.timeStart: "the sale of this pack has not started yet"
+                getCurrentBlock().timestamp < self.details.timeEnd: "the sale of this pack has ended"
                 self.saleCutRequirements[vaultType.identifier] != nil: "sale cuts not set for requested fungible token"
             }
 
@@ -168,18 +168,18 @@ pub contract ZeedzDrops {
 
             self.details.setSoldAfterPurchase()
 
-            emit PackPurchased(packID: self.uuid, details: self.details, currency: valutType.identifier, userId: String)
+            emit PackPurchased(packID: self.uuid, details: self.details, currency: valutType.identifier, userID: userID)
         }
 
-        acess(contract) fun purchaseWithDiscount(payment: @FungibleToken.Vault, discount: UFix64, packID: UInt64, valutType: Type){
+        acess(contract) fun purchaseWithDiscount(payment: @FungibleToken.Vault, discount: UFix64, packID: UInt64, valutType: Type, userID: String){
              pre {
-                self.discount < 1: "discount cannot be higher than 100%"
-                self.saleEnabled == true: "the sale of this pack is disabled"
-                (self.details.total - self.sold) > 0: "these packs are sold out"
+                discount < 1: "discount cannot be higher than 100%"
+                self.details.saleEnabled == true: "the sale of this pack is disabled"
+                (self.details.total - self.details.sold) > 0: "these packs are sold out"
                 payment.isInstance(valutType): "payment vault is not requested fungible token type"
                 (payment.balance*discount) == self.details.prices[valutType.identifier]: "payment vault does not contain requested price"
-                getCurrentBlock().timestamp > self.timeStart: "the sale of this pack has not started yet"
-                getCurrentBlock().timestamp < self.timeEnd: "the sale of this pack has ended"
+                getCurrentBlock().timestamp > self.details.timeStart: "the sale of this pack has not started yet"
+                getCurrentBlock().timestamp < self.details.timeEnd: "the sale of this pack has ended"
                 self.saleCutRequirements[vaultType.identifier] != nil: "sale cuts not set for requested fungible token"
             }
 
@@ -201,7 +201,7 @@ pub contract ZeedzDrops {
 
             self.details.setSoldAfterPurchase()
 
-            emit PackPurchased(packID: self.uuid, details: self.details, currency: valutType.identifier, userId: String)
+            emit PackPurchased(packID: self.uuid, details: self.details, currency: valutType.identifier, userID: userID)
         }
 
         destroy () {
@@ -295,9 +295,9 @@ pub contract ZeedzDrops {
             pack.setEndTime(endTime: endTime)
         }
 
-        pub fun purchaseWithDiscount(packID: UInt64, payment: @FungibleToken.Vault, discount: UFix64, packID: UInt64, valutType: Type){
+        pub fun purchaseWithDiscount(packID: UInt64, payment: @FungibleToken.Vault, discount: UFix64, packID: UInt64, valutType: Type, userID: String){
             let pack = self.borrowPack(packID) ?? panic("not able to borrow specified pack")
-            pack.purchaseWithDiscount(payment, discount, packID, vaultType: vaultType)
+            pack.purchaseWithDiscount(payment, discount, packID, vaultType: vaultType, userID: userID)
         }
 
         pub fun updateSaleCutRequirement(requirements: [SaleCutRequirement], vaultType: Type) {
@@ -317,6 +317,11 @@ pub contract ZeedzDrops {
     pub fun getAllSaleCutRequirements(): {String: [SaleCutRequirement]} {
         return self.saleCutRequirements
     }
+
+    pub fun getPackIDs(): [UInt64] {
+        return self.packs.keys
+    }
+
 
     pub fun borrowPack(id: UInt64): &Pack? {
         if self.packs[id] != nil {
