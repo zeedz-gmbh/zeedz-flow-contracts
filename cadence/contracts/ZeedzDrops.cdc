@@ -99,12 +99,12 @@ pub contract ZeedzDrops {
     }
 
 
-    pub interface PackPublic {
+    pub resource interface PackPublic {
         pub fun purchase(payment: @FungibleToken.Vault, valutType: Type, userID: String)
         pub fun getDetails(): PackDetails
     }
 
-    pub resource interface PacksManage {
+    pub resource interface PacksManager {
         pub fun setSaleEnabledStatus(status: Bool)
         pub fun setStartTime(startTime: UFix64)
         pub fun setEndTime(endTime: UFix64)
@@ -126,7 +126,7 @@ pub contract ZeedzDrops {
             prices: {String : UFix64})
     }
 
-    pub resource interface DropsManage {
+    pub resource interface DropsManager {
         pub fun updateSaleCutRequirement(requirements: [SaleCutRequirement], vaultType: Type)
     }
 
@@ -231,7 +231,7 @@ pub contract ZeedzDrops {
         }
     }
 
-    pub resource Administrator: PacksManage, DropsManage {
+    pub resource Administrator: PacksManager, DropsManager {
         pub fun addPack(
             name: String, 
             description: String, 
