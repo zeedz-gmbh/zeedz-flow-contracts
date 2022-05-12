@@ -276,7 +276,6 @@ pub contract ZeedzDrops {
             }
             let pack <- self.packs.remove(key: packID)!
             destroy pack
-            emit PackRemoved(packID: packID)
         }
 
         pub fun setSaleEnabledStatus(status: Bool, packID: UInt64){
