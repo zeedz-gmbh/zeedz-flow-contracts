@@ -110,7 +110,11 @@ pub contract ZeedzDrops {
         pub fun setEndTime(endTime: UFix64)
         pub fun reserve(packID: UInt64, amount: UInt64)
         pub fun removePack(packID: UInt64)
-        pub fun purchaseWithDiscount(packID: UInt64, payment: @FungibleToken.Vault, discount: UFix64, valutType: vaultType)
+        pub fun purchaseWithDiscount(
+            packID: UInt64,
+            payment: @FungibleToken.Vault,
+            discount: UFix64,
+            valutType: vaultType)
         pub fun addPack(
             name: String, 
             description: String, 
