@@ -90,11 +90,11 @@ pub contract ZeedzDrops {
         }
 
         access(contract) fun setSoldAfterPurchase(){
-            self.sold = self.sold - 1
+            self.sold = self.sold + 1
         }
 
         access(contract) fun reserve(amount: UInt64){
-            self.sold = self.sold - amount
+            self.sold = self.sold + amount
         }
     }
 
