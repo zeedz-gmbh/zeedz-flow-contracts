@@ -195,15 +195,6 @@ pub contract ZeedzDrops {
             emit PackPurchased(packID: self.uuid, details: self.details, currency: valutType.identifier, userId: String)
         }
 
-        pub fun borrowPack(id: UInt64): &Pack? {
-            if self.ownedNFTs[id] != nil {
-                let ref = &self.ownedNFTs[id] as auth &NonFungibleToken.NFT
-                return ref as! &ZeedzINO.NFT
-            } else {
-                return nil
-            }
-        }
-
         destroy () {
             emit PackRemoved(
                 packID: self.uuid,
