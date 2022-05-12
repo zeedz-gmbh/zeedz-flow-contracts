@@ -96,7 +96,6 @@ pub contract ZeedzDrops {
         access(contract) fun reserve(amount: UInt64){
             self.sold = self.sold - amount
         }
-        acess(contract)
     }
 
 
