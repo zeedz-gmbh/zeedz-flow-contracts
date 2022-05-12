@@ -123,7 +123,7 @@ pub contract ZeedzDrops {
             saleEnabled: Bool, 
             timeStart: UFix64, 
             timeEnd: UFix64, 
-            prices: {String : UFix64})
+            prices: {String : UFix64}): UInt64
     }
 
     pub resource interface DropsManager {
