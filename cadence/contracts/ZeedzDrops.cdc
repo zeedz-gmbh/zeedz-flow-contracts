@@ -48,6 +48,9 @@ pub contract ZeedzDrops {
         // total packs sold
         pub var sold: UInt64
 
+        // total packs reserved
+        pub var reserved: UInt64
+
         // if true, the pack is buyable
         pub var saleEnabled: Bool
 
@@ -71,6 +74,7 @@ pub contract ZeedzDrops {
             self.id = id
             self.total = total
             self.sold = 0
+            self.reserved = 0
             self.timeStart = timeStart
             self.timeEnd = timeEnd
             self.prices = prices
@@ -95,6 +99,7 @@ pub contract ZeedzDrops {
 
         access(contract) fun reserve(amount: UInt64){
             self.sold = self.sold + amount
+            self.reserved = self.reserved + amount
         }
 
         access(contract) fun setPrices(prices: {String : UFix64}){
