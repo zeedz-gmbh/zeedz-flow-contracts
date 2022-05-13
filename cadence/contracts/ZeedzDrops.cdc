@@ -1,18 +1,18 @@
 pub contract ZeedzDrops {
 
-    pub event ProductPurchased(packID: UInt64, details: ProductDetails, currency: String, userID: String)
+    pub event ProductPurchased(productID: UInt64, details: ProductDetails, currency: String, userID: String)
 
-    pub event ProductAdded(packID: UInt64, packDetails: ProductDetails)
+    pub event ProductAdded(productID: UInt64, productDetails: ProductDetails)
 
-    pub event ProductsReserved(packID: UInt64, amount: UInt64)
+    pub event ProductsReserved(productID: UInt64, amount: UInt64)
 
-    pub event ProductRemoved(packID: UInt64)
+    pub event ProductRemoved(productID: UInt64)
 
     pub let ZeedzDropsAdminStoragePath: StoragePath
 
     access(contract) var saleCutRequirements: {String : [SaleCutRequirement]}
 
-    access(contract) var packs: @{UInt64: Product}
+    access(contract) var products: @{UInt64: Product}
 
     pub struct SaleCutRequirement {
         pub let receiver: Capability<&{FungibleToken.Receiver}>
@@ -30,7 +30,7 @@ pub contract ZeedzDrops {
     }
 
     pub struct ProductDetails {
-        // pack name
+        // product name
         pub let name: String
 
         // description
@@ -39,25 +39,25 @@ pub contract ZeedzDrops {
         // product id
         pub let id: UInt64
 
-        // total pack item quantity
+        // total product item quantity
         pub let total: UInt64
 
         // {Type of the FungibleToken => price}
         access(contract) var prices: {String : UFix64}
 
-        // total packs sold
+        // total products sold
         pub var sold: UInt64
 
-        // total packs reserved
+        // total products reserved
         pub var reserved: UInt64
 
-        // if true, the pack is buyable
+        // if true, the product is buyable
         pub var saleEnabled: Bool
 
-        // pack sale start timestamp
+        // product sale start timestamp
         pub var timeStart: UFix64
 
-        // pack sale start timestamp
+        // product sale start timestamp
         pub var timeEnd: UFix64
 
         init (
@@ -118,13 +118,13 @@ pub contract ZeedzDrops {
     }
 
     pub resource interface ProductsManager {
-        pub fun setSaleEnabledStatus(packID: UInt64, status: Bool)
-        pub fun setStartTime(packID: UInt64, startTime: UFix64)
-        pub fun setEndTime(packID: UInt64, endTime: UFix64)
-        pub fun reserve(packID: UInt64, amount: UInt64)
-        pub fun removeProduct(packID: UInt64)
+        pub fun setSaleEnabledStatus(productID: UInt64, status: Bool)
+        pub fun setStartTime(productID: UInt64, startTime: UFix64)
+        pub fun setEndTime(productID: UInt64, endTime: UFix64)
+        pub fun reserve(productID: UInt64, amount: UInt64)
+        pub fun removeProduct(productID: UInt64)
         pub fun purchaseWithDiscount(
-            packID: UInt64,
+            productID: UInt64,
             payment: @FungibleToken.Vault,
             discount: UFix64,
             vaultType: vaultType)
@@ -137,7 +137,7 @@ pub contract ZeedzDrops {
             timeStart: UFix64, 
             timeEnd: UFix64, 
             prices: {String : UFix64}): UInt64
-        pub fun setPrices(packID: UInt64, prices: {String : UFix64})
+        pub fun setPrices(productID: UInt64, prices: {String : UFix64})
     }
 
     pub resource interface DropsManager {
@@ -154,12 +154,12 @@ pub contract ZeedzDrops {
 
         pub fun purchase(payment: @FungibleToken.Vault, vaultType: Type, userID: String) {
             pre {
-                self.details.saleEnabled == true: "the sale of this pack is disabled"
-                (self.details.total - self.details.sold) > 0: "these packs are sold out"
+                self.details.saleEnabled == true: "the sale of this product is disabled"
+                (self.details.total - self.details.sold) > 0: "these products are sold out"
                 payment.isInstance(vaultType): "payment vault is not requested fungible token type"
                 payment.balance == self.details.prices[vaultType.identifier]: "payment vault does not contain requested price"
-                getCurrentBlock().timestamp > self.details.timeStart: "the sale of this pack has not started yet"
-                getCurrentBlock().timestamp < self.details.timeEnd: "the sale of this pack has ended"
+                getCurrentBlock().timestamp > self.details.timeStart: "the sale of this product has not started yet"
+                getCurrentBlock().timestamp < self.details.timeEnd: "the sale of this product has ended"
                 self.saleCutRequirements[vaultType.identifier] != nil: "sale cuts not set for requested fungible token"
             }
 
@@ -181,18 +181,18 @@ pub contract ZeedzDrops {
 
             self.details.setSoldAfterPurchase()
 
-            emit ProductPurchased(packID: self.uuid, details: self.details, currency: vaultType.identifier, userID: userID)
+            emit ProductPurchased(productID: self.uuid, details: self.details, currency: vaultType.identifier, userID: userID)
         }
 
-        access(contract) fun purchaseWithDiscount(payment: @FungibleToken.Vault, discount: UFix64, packID: UInt64, vaultType: Type, userID: String){
+        access(contract) fun purchaseWithDiscount(payment: @FungibleToken.Vault, discount: UFix64, productID: UInt64, vaultType: Type, userID: String){
              pre {
                 discount < 1: "discount cannot be higher than 100%"
-                self.details.saleEnabled == true: "the sale of this pack is disabled"
-                (self.details.total - self.details.sold) > 0: "these packs are sold out"
+                self.details.saleEnabled == true: "the sale of this product is disabled"
+                (self.details.total - self.details.sold) > 0: "these products are sold out"
                 payment.isInstance(vaultType): "payment vault is not requested fungible token type"
                 (payment.balance*discount) == self.details.prices[vaultType.identifier]: "payment vault does not contain requested price"
-                getCurrentBlock().timestamp > self.details.timeStart: "the sale of this pack has not started yet"
-                getCurrentBlock().timestamp < self.details.timeEnd: "the sale of this pack has ended"
+                getCurrentBlock().timestamp > self.details.timeStart: "the sale of this product has not started yet"
+                getCurrentBlock().timestamp < self.details.timeEnd: "the sale of this product has ended"
                 self.saleCutRequirements[vaultType.identifier] != nil: "sale cuts not set for requested fungible token"
             }
 
@@ -214,12 +214,12 @@ pub contract ZeedzDrops {
 
             self.details.setSoldAfterPurchase()
 
-            emit ProductPurchased(packID: self.uuid, details: self.details, currency: vaultType.identifier, userID: userID)
+            emit ProductPurchased(productID: self.uuid, details: self.details, currency: vaultType.identifier, userID: userID)
         }
 
         destroy () {
             emit ProductRemoved(
-                packID: self.uuid,
+                productID: self.uuid,
             )
         }
 
@@ -255,7 +255,7 @@ pub contract ZeedzDrops {
             timeStart: UFix64, 
             timeEnd: UFix64, 
             prices: {String : UFix64}): UInt64{
-            let pack <- create Product(
+            let product <- create Product(
                         name: name, 
                         description: description, 
                         id: id,
@@ -266,50 +266,50 @@ pub contract ZeedzDrops {
                         prices: prices
                     )
 
-            let packID = pack.uuid
+            let productID = product.uuid
 
-            let details = pack.getDetails()
+            let details = product.getDetails()
 
             emit ProductAdded(
-                packID: packID,
-                packDetails: details
+                productID: productID,
+                productDetails: details
             )
 
-            return packID
+            return productID
         }
 
-        pub fun reserve(packID: UInt64, packID: UInt64, amount: UInt64){
-            let pack = self.borrowProduct(packID) ?? panic("not able to borrow specified pack")
-            pack.reserve(amount: amount)
-            emit ProductsReserved(packID: packID, amount: amount)
+        pub fun reserve(productID: UInt64, productID: UInt64, amount: UInt64){
+            let product = self.borrowProduct(productID) ?? panic("not able to borrow specified product")
+            product.reserve(amount: amount)
+            emit ProductsReserved(productID: productID, amount: amount)
 
         }
-        pub fun removeProduct(packID: UInt64){
+        pub fun removeProduct(productID: UInt64){
             pre {
-                self.packs[packID] != nil: "could not find pack with given id"
+                self.products[productID] != nil: "could not find product with given id"
             }
-            let pack <- self.packs.remove(key: packID)!
-            destroy pack
+            let product <- self.products.remove(key: productID)!
+            destroy product
         }
 
-        pub fun setSaleEnabledStatus(packID: UInt64, status: Bool){
-            let pack = self.borrowProduct(packID) ?? panic("not able to borrow specified pack")
-            pack.setSaleEnabledStatus(status: status)
+        pub fun setSaleEnabledStatus(productID: UInt64, status: Bool){
+            let product = self.borrowProduct(productID) ?? panic("not able to borrow specified product")
+            product.setSaleEnabledStatus(status: status)
         }
 
-        pub fun setStartTime(packID: UInt64, startTime: UFix64,){
-            let pack = self.borrowProduct(packID) ?? panic("not able to borrow specified pack")
-            pack.setStartTime(startTime: startTime)
+        pub fun setStartTime(productID: UInt64, startTime: UFix64,){
+            let product = self.borrowProduct(productID) ?? panic("not able to borrow specified product")
+            product.setStartTime(startTime: startTime)
         }
 
-        pub fun setEndTime(packID: UInt64, endTime: UFix64){
-            let pack = self.borrowProduct(packID) ?? panic("not able to borrow specified pack")
-            pack.setEndTime(endTime: endTime)
+        pub fun setEndTime(productID: UInt64, endTime: UFix64){
+            let product = self.borrowProduct(productID) ?? panic("not able to borrow specified product")
+            product.setEndTime(endTime: endTime)
         }
 
-        pub fun purchaseWithDiscount(packID: UInt64, payment: @FungibleToken.Vault, discount: UFix64, packID: UInt64, vaultType: Type, userID: String){
-            let pack = self.borrowProduct(packID) ?? panic("not able to borrow specified pack")
-            pack.purchaseWithDiscount(payment, discount, packID, vaultType: vaultType, userID: userID)
+        pub fun purchaseWithDiscount(productID: UInt64, payment: @FungibleToken.Vault, discount: UFix64, productID: UInt64, vaultType: Type, userID: String){
+            let product = self.borrowProduct(productID) ?? panic("not able to borrow specified product")
+            product.purchaseWithDiscount(payment, discount, productID, vaultType: vaultType, userID: userID)
         }
 
         pub fun updateSaleCutRequirement(requirements: [SaleCutRequirement], vaultType: Type) {
@@ -321,13 +321,13 @@ pub contract ZeedzDrops {
             self..saleCutRequirements[vaultType.identifier] = requirements
         }
 
-        pub fun setPrices(packID: UInt64, prices: {String : UFix64}){
-             let pack = self.borrowProduct(packID) ?? panic("not able to borrow specified pack")
-            pack.setPrices(prices: prices)
+        pub fun setPrices(productID: UInt64, prices: {String : UFix64}){
+             let product = self.borrowProduct(productID) ?? panic("not able to borrow specified product")
+            product.setPrices(prices: prices)
         }
 
         init(){
-             self.packs <- {}
+             self.products <- {}
         }
     }
 
@@ -336,12 +336,12 @@ pub contract ZeedzDrops {
     }
 
     pub fun getProductIDs(): [UInt64] {
-        return self.packs.keys
+        return self.products.keys
     }
 
     pub fun borrowProduct(id: UInt64): &Product? {
-        if self.packs[id] != nil {
-            return &self.packs[id] as! &Product
+        if self.products[id] != nil {
+            return &self.products[id] as! &Product
         } else {
             return nil
         }
