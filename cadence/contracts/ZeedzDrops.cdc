@@ -43,7 +43,7 @@ pub contract ZeedzDrops {
         pub let total: UInt64
 
         // {Type of the FungibleToken => price}
-        access(contract) prices: {String : UFix64}
+        access(contract) var prices: {String : UFix64}
 
         // total packs sold
         pub var sold: UInt64
