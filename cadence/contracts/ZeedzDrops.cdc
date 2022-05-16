@@ -373,7 +373,7 @@ pub contract ZeedzDrops {
         return drops.getProductIDs()
     }
 
-    pub fun fetch(id: UInt64): &Product? {
+    pub fun getProduct(id: UInt64): &Product? {
         let drops = self.account.getCapability<&ZeedzDrops.Drops{ZeedzDrops.DropsPublic}>(ZeedzDrops.ZeedzDropsPublicPath)
             .borrow() 
             ?? panic("Could not borrow public drops capability")
