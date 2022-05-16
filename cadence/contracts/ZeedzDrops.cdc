@@ -84,23 +84,23 @@ pub contract ZeedzDrops {
             self.saleEnabled = saleEnabled
         }
 
-        access(contract) fun setSaleEnabledStatus(status: Bool){
+        access(contract) fun setSaleEnabledStatus(status: Bool) {
             self.saleEnabled = status
         }
 
-        access(contract) fun setStartTime(startTime: UFix64){
+        access(contract) fun setStartTime(startTime: UFix64) {
             self.timeStart = startTime
         }
 
-        access(contract) fun setEndTime(endTime: UFix64){
+        access(contract) fun setEndTime(endTime: UFix64) {
             self.timeEnd = endTime
         }
 
-        access(contract) fun setSoldAfterPurchase(){
+        access(contract) fun setSoldAfterPurchase() {
             self.sold = self.sold + 1
         }
 
-        access(contract) fun reserve(amount: UInt64){
+        access(contract) fun reserve(amount: UInt64) {
             self.sold = self.sold + amount
             self.reserved = self.reserved + amount
         }
@@ -193,7 +193,7 @@ pub contract ZeedzDrops {
             emit ProductPurchased(productID: self.uuid, details: self.details, currency: vaultType.identifier, userID: userID)
         }
 
-        access(contract) fun purchaseWithDiscount(payment: @FungibleToken.Vault, discount: UFix64, productID: UInt64, vaultType: Type, userID: String){
+        access(contract) fun purchaseWithDiscount(payment: @FungibleToken.Vault, discount: UFix64, productID: UInt64, vaultType: Type, userID: String) {
              pre {
                 discount < 1.0: "discount cannot be higher than 100%"
                 self.details.saleEnabled == true: "the sale of this product is disabled"
@@ -263,7 +263,8 @@ pub contract ZeedzDrops {
             saleEnabled: Bool, 
             timeStart: UFix64, 
             timeEnd: UFix64, 
-            prices: {String : UFix64}): UInt64{
+            prices: {String : UFix64}
+            ): UInt64 {
             let product <- create Product(
                         name: name, 
                         description: description, 
@@ -293,13 +294,13 @@ pub contract ZeedzDrops {
 
         access(contract) var products: @{UInt64: Product}
 
-        pub fun reserve(productID: UInt64, amount: UInt64){
+        pub fun reserve(productID: UInt64, amount: UInt64) {
             let product = self.borrowProduct(id: productID) ?? panic("not able to borrow specified product")
             product.details.reserve(amount: amount)
             emit ProductsReserved(productID: productID, amount: amount)
 
         }
-        pub fun removeProduct(productID: UInt64){
+        pub fun removeProduct(productID: UInt64) {
             pre {
                 self.products[productID] != nil: "could not find product with given id"
             }
@@ -307,22 +308,22 @@ pub contract ZeedzDrops {
             destroy product
         }
 
-        pub fun setSaleEnabledStatus(productID: UInt64, status: Bool){
+        pub fun setSaleEnabledStatus(productID: UInt64, status: Bool) {
             let product = self.borrowProduct(id: productID) ?? panic("not able to borrow specified product")
             product.details.setSaleEnabledStatus(status: status)
         }
 
-        pub fun setStartTime(productID: UInt64, startTime: UFix64,){
+        pub fun setStartTime(productID: UInt64, startTime: UFix64,) {
             let product = self.borrowProduct(id :productID) ?? panic("not able to borrow specified product")
             product.details.setStartTime(startTime: startTime)
         }
 
-        pub fun setEndTime(productID: UInt64, endTime: UFix64){
+        pub fun setEndTime(productID: UInt64, endTime: UFix64) {
             let product = self.borrowProduct(id :productID) ?? panic("not able to borrow specified product")
             product.details.setEndTime(endTime: endTime)
         }
 
-        pub fun purchaseWithDiscount(productID: UInt64, payment: @FungibleToken.Vault, discount: UFix64, vaultType: Type, userID: String){
+        pub fun purchaseWithDiscount(productID: UInt64, payment: @FungibleToken.Vault, discount: UFix64, vaultType: Type, userID: String) {
             let product = self.borrowProduct(id: productID) ?? panic("not able to borrow specified product")
             product.purchaseWithDiscount(payment: <- payment, discount: discount, productID: productID, vaultType: vaultType, userID: userID)
         }
@@ -336,7 +337,7 @@ pub contract ZeedzDrops {
             ZeedzDrops.saleCutRequirements[vaultType.identifier] = requirements
         }
 
-        pub fun setPrices(productID: UInt64, prices: {String : UFix64}){
+        pub fun setPrices(productID: UInt64, prices: {String : UFix64}) {
             let product = self.borrowProduct(id: productID) ?? panic("not able to borrow specified product")
             product.details.setPrices(prices: prices)
         }

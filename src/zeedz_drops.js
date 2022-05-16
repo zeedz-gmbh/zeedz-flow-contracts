@@ -23,3 +23,21 @@ export const getAllProductIds = async () => {
   const name = "zeedz_drops/get_all_product_ids";
   return executeScript({ name });
 };
+
+export const addProduct = async (
+  productName,
+  description,
+  id,
+  total,
+  saleEnabled,
+  timeStart,
+  timeEnd,
+  prices,
+  admin,
+) => {
+  const name = "zeedz_drops/create_product";
+  const args = [productName, description, id, total, saleEnabled, timeStart, timeEnd, prices];
+  const signers = [admin];
+
+  return sendTransaction({ name, args, signers });
+};
