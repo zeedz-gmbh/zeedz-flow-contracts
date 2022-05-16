@@ -3,7 +3,7 @@ pub contract ZeedzSettings {
     pub let ZeedzSettingsAdminStoragePath: StoragePath
 
     // Setting name => AnyStruct
-    access(contract) let settings: {String: AnyStruct}
+    access(contract) var settings: {String: AnyStruct}
 
     //
     // Administrator resource, owner account can update the Zeedz settings.

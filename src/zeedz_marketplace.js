@@ -2,11 +2,6 @@ import { deployContractByName, executeScript, mintFlow, sendTransaction } from "
 
 import { getZeedzAdminAddress } from "./common";
 
-/*
- * Deploys NonFungibleToken, NFTStorefront and ZeedzMarketplace contracts to ZeedzAdmin.
- * @throws Will throw an error if transaction is reverted.
- * @returns {Promise<*>}
- * */
 export const deployZeedzMarketplace = async () => {
   const ZeedzAdmin = await getZeedzAdminAddress();
   await mintFlow(ZeedzAdmin, "10.0");
@@ -14,13 +9,6 @@ export const deployZeedzMarketplace = async () => {
   return deployContractByName({ to: ZeedzAdmin, name: "ZeedzMarketplace", addressMap });
 };
 
-/**
- * Updates the FLOW SaleCut Reqirements on the ZeedzMarketplace
- * @param {account} market market address
- * @param {account} offset offset address
- * @param {account} admin admin
- * @returns
- */
 export const updateSaleCutRequirementsFLOW = async (market, offset, admin) => {
   const name = "zeedz_marketplace/update_sale_cut_FLOW";
   const args = [market, offset];
@@ -29,13 +17,6 @@ export const updateSaleCutRequirementsFLOW = async (market, offset, admin) => {
   return sendTransaction({ name, args, signers });
 };
 
-/**
- * Updates the FUSD SaleCut Reqirements on the ZeedzMarketplace
- * @param {account} market market address
- * @param {account} offset offset address
- * @param {account} admin admin
- * @returns
- */
 export const updateSaleCutRequirementsFUSD = async (market, offset, admin) => {
   const name = "zeedz_marketplace/update_sale_cut_FUSD";
   const args = [market, offset];
@@ -44,13 +25,6 @@ export const updateSaleCutRequirementsFUSD = async (market, offset, admin) => {
   return sendTransaction({ name, args, signers });
 };
 
-/**
- * Updates the USDC SaleCut Reqirements on the ZeedzMarketplace
- * @param {account} market market address
- * @param {account} offset offset address
- * @param {account} admin admin
- * @returns
- */
 export const updateSaleCutRequirementsUSDC = async (market, offset, admin) => {
   const name = "zeedz_marketplace/update_sale_cut_USDC";
   const args = [market, offset];
@@ -91,11 +65,6 @@ export const buyZeedzINOIncreaseOffset = async (sender, admin, seller, listingId
   return sendTransaction({ name, args, signers });
 };
 
-/*
- * Returns ZeedzMarketplace SaleCut Requrements
- * @throws Will throw an error if execution will be halted
- * @returns {[SaleCutRequirements]} - array of SaleCut Requirements
- * */
 export const getSaleCutRequirements = async () => {
   const name = "zeedz_marketplace/get_sale_cut_requirements";
 
