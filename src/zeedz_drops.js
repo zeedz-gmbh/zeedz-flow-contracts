@@ -24,6 +24,12 @@ export const getAllProductIds = async () => {
   return executeScript({ name });
 };
 
+export const getProductDetails = async (id) => {
+  const name = "zeedz_drops/get_product_details";
+  const args = [id];
+  return executeScript({ name, args });
+};
+
 export const addProduct = async (
   productName,
   description,

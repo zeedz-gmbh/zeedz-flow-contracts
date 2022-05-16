@@ -13,6 +13,7 @@ import {
   getSaleCutRequirements,
   getAllProductIds,
   addProduct,
+  getProductDetails,
 } from "../src/zeedz_drops";
 
 import { getZeedzAdminAddress } from "../src/common";
@@ -111,5 +112,57 @@ describe("Zeedz Drops", () => {
     await shallRevert(
       await addProduct(name, description, id, total, saleEnabled, timeStart, timeEnd, prices, Bob),
     );
+  });
+  it("anyone shall be able to get product details", async () => {
+    // Deploy
+    await deployZeedzDrops();
+
+    // Setup
+    const ZeedzAdmin = await getZeedzAdminAddress();
+
+    // Transaction Shall Pass
+    const { name, description, id, total, saleEnabled, timeStart, timeEnd, prices } = testProduct;
+
+    await shallPass(
+      await addProduct(
+        name,
+        description,
+        id,
+        total,
+        saleEnabled,
+        timeStart,
+        timeEnd,
+        prices,
+        ZeedzAdmin,
+      ),
+    );
+
+    await shallPass(await getProductDetails(21));
+  });
+  it("anyone shall not be able to get product details of a prodact that doesn't exist", async () => {
+    // Deploy
+    await deployZeedzDrops();
+
+    // Setup
+    const ZeedzAdmin = await getZeedzAdminAddress();
+
+    // Transaction Shall Pass
+    const { name, description, id, total, saleEnabled, timeStart, timeEnd, prices } = testProduct;
+
+    await shallPass(
+      await addProduct(
+        name,
+        description,
+        id,
+        total,
+        saleEnabled,
+        timeStart,
+        timeEnd,
+        prices,
+        ZeedzAdmin,
+      ),
+    );
+
+    await shallRevert(await getProductDetails(0));
   });
 });
