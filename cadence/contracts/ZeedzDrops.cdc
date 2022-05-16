@@ -1,3 +1,5 @@
+import FungibleToken from "./FungibleToken.cdc"
+
 pub contract ZeedzDrops {
 
     pub event ProductPurchased(productID: UInt64, details: ProductDetails, currency: String, userID: String)
@@ -8,11 +10,9 @@ pub contract ZeedzDrops {
 
     pub event ProductRemoved(productID: UInt64)
 
-    pub let ZeedzDropsAdminStoragePath: StoragePath
+    pub let ZeedzDropsStoragePath: StoragePath
 
     access(contract) var saleCutRequirements: {String : [SaleCutRequirement]}
-
-    access(contract) var products: @{UInt64: Product}
 
     pub struct SaleCutRequirement {
         pub let receiver: Capability<&{FungibleToken.Receiver}>
@@ -22,7 +22,7 @@ pub contract ZeedzDrops {
         init(receiver: Capability<&{FungibleToken.Receiver}>, ratio: UFix64) {
             pre {
                 ratio <= 1.0: "ratio must be less than or equal to 1.0"
-                reciever.borrow() != nil: "invalid reciever capability"
+                receiver.borrow() != nil: "invalid reciever capability"
             }
             self.receiver = receiver
             self.ratio = ratio
@@ -61,14 +61,15 @@ pub contract ZeedzDrops {
         pub var timeEnd: UFix64
 
         init (
-            name: String, 
-            description: String, 
-            id: UInt64, 
-            total: UInt64, 
-            saleEnabled: Bool, 
-            timeStart: UFix64, 
-            timeEnd: UFix64, 
-            prices: {String : UFix64}) {
+            name: String,
+            description: String,
+            id: UInt64,
+            total: UInt64
+            saleEnabled: Bool,
+            timeStart: UFix64,
+            timeEnd: UFix64,
+            prices: {String: UFix64},
+        ) {
             self.name = name
             self.description = description
             self.id = id
@@ -89,7 +90,7 @@ pub contract ZeedzDrops {
             self.timeStart = startTime
         }
 
-        access(contract) fun setEndTime(startTime: UFix64){
+        access(contract) fun setEndTime(endTime: UFix64){
             self.timeEnd = endTime
         }
 
@@ -127,7 +128,8 @@ pub contract ZeedzDrops {
             productID: UInt64,
             payment: @FungibleToken.Vault,
             discount: UFix64,
-            vaultType: vaultType)
+            vaultType: Type,
+            userID: String)
         pub fun addProduct(
             name: String, 
             description: String, 
@@ -144,9 +146,14 @@ pub contract ZeedzDrops {
         pub fun updateSaleCutRequirement(requirements: [SaleCutRequirement], vaultType: Type)
     }
 
+    pub resource interface DropsPublic {
+        pub fun getProductIDs(): [UInt64]
+        pub fun borrowProduct(id: UInt64): &Product?
+    }
+
     pub resource Product: ProductPublic {
   
-        access(self) let details: ProductDetails
+        access(contract) let details: ProductDetails
 
         pub fun getDetails(): ProductDetails {
             return self.details
@@ -160,14 +167,14 @@ pub contract ZeedzDrops {
                 payment.balance == self.details.prices[vaultType.identifier]: "payment vault does not contain requested price"
                 getCurrentBlock().timestamp > self.details.timeStart: "the sale of this product has not started yet"
                 getCurrentBlock().timestamp < self.details.timeEnd: "the sale of this product has ended"
-                self.saleCutRequirements[vaultType.identifier] != nil: "sale cuts not set for requested fungible token"
+                ZeedzDrops.saleCutRequirements[vaultType.identifier] != nil: "sale cuts not set for requested fungible token"
             }
 
             var residualReceiver: &{FungibleToken.Receiver}? = nil
 
-            for cut in self.saleCutRequirements[vaultType.identifier] {
+            for cut in ZeedzDrops.saleCutRequirements[vaultType.identifier]! {
                 if let receiver = cut.receiver.borrow() {
-                   let paymentCut <- payment.withdraw(amount: cut.ratio * self.details.prices[vaultType.identifier])
+                   let paymentCut <- payment.withdraw(amount: cut.ratio * self.details.prices[vaultType.identifier]!)
                     receiver.deposit(from: <-paymentCut)
                     if (residualReceiver == nil) {
                         residualReceiver = receiver
@@ -186,21 +193,21 @@ pub contract ZeedzDrops {
 
         access(contract) fun purchaseWithDiscount(payment: @FungibleToken.Vault, discount: UFix64, productID: UInt64, vaultType: Type, userID: String){
              pre {
-                discount < 1: "discount cannot be higher than 100%"
+                discount < 1.0: "discount cannot be higher than 100%"
                 self.details.saleEnabled == true: "the sale of this product is disabled"
                 (self.details.total - self.details.sold) > 0: "these products are sold out"
                 payment.isInstance(vaultType): "payment vault is not requested fungible token type"
                 (payment.balance*discount) == self.details.prices[vaultType.identifier]: "payment vault does not contain requested price"
                 getCurrentBlock().timestamp > self.details.timeStart: "the sale of this product has not started yet"
                 getCurrentBlock().timestamp < self.details.timeEnd: "the sale of this product has ended"
-                self.saleCutRequirements[vaultType.identifier] != nil: "sale cuts not set for requested fungible token"
+                ZeedzDrops.saleCutRequirements[vaultType.identifier] != nil: "sale cuts not set for requested fungible token"
             }
 
             var residualReceiver: &{FungibleToken.Receiver}? = nil
 
-            for cut in self.saleCutRequirements[vaultType.identifier] {
+            for cut in ZeedzDrops.saleCutRequirements[vaultType.identifier]! {
                 if let receiver = cut.receiver.borrow() {
-                   let paymentCut <- payment.withdraw(amount: cut.ratio * self.details.prices[vaultType.identifier]*discount)
+                   let paymentCut <- payment.withdraw(amount: cut.ratio * self.details.prices[vaultType.identifier]!*discount)
                     receiver.deposit(from: <-paymentCut)
                     if (residualReceiver == nil) {
                         residualReceiver = receiver
@@ -233,19 +240,19 @@ pub contract ZeedzDrops {
             timeEnd: UFix64, 
             prices: {String : UFix64}) {
             self.details = ProductDetails(
-              name: String, 
-              description: String, 
-              id: UInt64, 
-              total: UInt64, 
-              saleEnabled: Bool, 
-              timeStart: UFix64, 
-              timeEnd: UFix64, 
-              prices: {String : UFix64}
-            )
+                name: name, 
+                description: description, 
+                id: id, 
+                total: total, 
+                saleEnabled: saleEnabled, 
+                timeStart: timeStart, 
+                timeEnd: timeEnd, 
+                prices: prices
+                )
         }
     }
 
-    pub resource Administrator: ProductsManager, DropsManager {
+    pub resource Drops: ProductsManager, DropsManager, DropsPublic {
         pub fun addProduct(
             name: String, 
             description: String, 
@@ -269,6 +276,10 @@ pub contract ZeedzDrops {
             let productID = product.uuid
 
             let details = product.getDetails()
+            
+            let oldProduct <- self.products[productID] <- product
+            // Note that oldProduct will always be nil, but we have to handle it.
+            destroy oldProduct
 
             emit ProductAdded(
                 productID: productID,
@@ -278,9 +289,11 @@ pub contract ZeedzDrops {
             return productID
         }
 
-        pub fun reserve(productID: UInt64, productID: UInt64, amount: UInt64){
-            let product = self.borrowProduct(productID) ?? panic("not able to borrow specified product")
-            product.reserve(amount: amount)
+        access(contract) var products: @{UInt64: Product}
+
+        pub fun reserve(productID: UInt64, amount: UInt64){
+            let product = self.borrowProduct(id: productID) ?? panic("not able to borrow specified product")
+            product.details.reserve(amount: amount)
             emit ProductsReserved(productID: productID, amount: amount)
 
         }
@@ -293,23 +306,23 @@ pub contract ZeedzDrops {
         }
 
         pub fun setSaleEnabledStatus(productID: UInt64, status: Bool){
-            let product = self.borrowProduct(productID) ?? panic("not able to borrow specified product")
-            product.setSaleEnabledStatus(status: status)
+            let product = self.borrowProduct(id: productID) ?? panic("not able to borrow specified product")
+            product.details.setSaleEnabledStatus(status: status)
         }
 
         pub fun setStartTime(productID: UInt64, startTime: UFix64,){
-            let product = self.borrowProduct(productID) ?? panic("not able to borrow specified product")
-            product.setStartTime(startTime: startTime)
+            let product = self.borrowProduct(id :productID) ?? panic("not able to borrow specified product")
+            product.details.setStartTime(startTime: startTime)
         }
 
         pub fun setEndTime(productID: UInt64, endTime: UFix64){
-            let product = self.borrowProduct(productID) ?? panic("not able to borrow specified product")
-            product.setEndTime(endTime: endTime)
+            let product = self.borrowProduct(id :productID) ?? panic("not able to borrow specified product")
+            product.details.setEndTime(endTime: endTime)
         }
 
-        pub fun purchaseWithDiscount(productID: UInt64, payment: @FungibleToken.Vault, discount: UFix64, productID: UInt64, vaultType: Type, userID: String){
-            let product = self.borrowProduct(productID) ?? panic("not able to borrow specified product")
-            product.purchaseWithDiscount(payment, discount, productID, vaultType: vaultType, userID: userID)
+        pub fun purchaseWithDiscount(productID: UInt64, payment: @FungibleToken.Vault, discount: UFix64, vaultType: Type, userID: String){
+            let product = self.borrowProduct(id: productID) ?? panic("not able to borrow specified product")
+            product.purchaseWithDiscount(payment: <- payment, discount: discount, productID: productID, vaultType: vaultType, userID: userID)
         }
 
         pub fun updateSaleCutRequirement(requirements: [SaleCutRequirement], vaultType: Type) {
@@ -318,16 +331,31 @@ pub contract ZeedzDrops {
                 totalRatio = totalRatio + requirement.ratio
             }
             assert(totalRatio <= 1.0, message: "total ratio must be less than or equal to 1.0")
-            self..saleCutRequirements[vaultType.identifier] = requirements
+            ZeedzDrops.saleCutRequirements[vaultType.identifier] = requirements
         }
 
         pub fun setPrices(productID: UInt64, prices: {String : UFix64}){
-             let product = self.borrowProduct(productID) ?? panic("not able to borrow specified product")
-            product.setPrices(prices: prices)
+            let product = self.borrowProduct(id: productID) ?? panic("not able to borrow specified product")
+            product.details.setPrices(prices: prices)
+        }
+
+        pub fun getProductIDs(): [UInt64] {
+            return self.products.keys
+        }
+
+        pub fun borrowProduct(id: UInt64): &Product? {
+            if self.products[id] != nil {
+                return &self.products[id] as! &Product
+            } else {
+                return nil
+            }
         }
 
         init(){
              self.products <- {}
+        }
+        destroy () {
+            destroy self.products
         }
     }
 
@@ -335,23 +363,11 @@ pub contract ZeedzDrops {
         return self.saleCutRequirements
     }
 
-    pub fun getProductIDs(): [UInt64] {
-        return self.products.keys
-    }
-
-    pub fun borrowProduct(id: UInt64): &Product? {
-        if self.products[id] != nil {
-            return &self.products[id] as! &Product
-        } else {
-            return nil
-        }
-    }
-
     init () {
-        self.ZeedzDropsAdminStoragePath = /storage/ZeedzDropsAdmin
+        self.ZeedzDropsStoragePath = /storage/ZeedzDrops
         self.saleCutRequirements = {}
 
-        let admin <- create Administrator()
-        self.account.save(<-admin, to: self.ZeedzDropsAdminStoragePath)
+        let drops <- create Drops()
+        self.account.save(<-drops, to: self.ZeedzDropsStoragePath)
     }
 }
