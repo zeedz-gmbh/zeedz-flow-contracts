@@ -13,3 +13,13 @@ export const deployZeedzDrops = async () => {
   };
   return deployContractByName({ to: ZeedzAdmin, name: "ZeedzDrops", addressMap });
 };
+
+export const getSaleCutRequirements = async () => {
+  const name = "zeedz_drops/get_sale_cut_requirements";
+  return executeScript({ name });
+};
+
+export const getAllProductIds = async () => {
+  const name = "zeedz_drops/get_all_product_ids";
+  return executeScript({ name });
+};

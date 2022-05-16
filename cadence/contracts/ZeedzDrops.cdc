@@ -365,6 +365,20 @@ pub contract ZeedzDrops {
         return self.saleCutRequirements
     }
 
+    pub fun getAllProductIDs(): [UInt64] {
+        let drops = self.account.getCapability<&ZeedzDrops.Drops{ZeedzDrops.DropsPublic}>(ZeedzDrops.ZeedzDropsPublicPath)
+            .borrow() 
+            ?? panic("Could not borrow public drops capability")
+        return drops.getProductIDs()
+    }
+
+    pub fun fetch(id: UInt64): &Product? {
+        let drops = self.account.getCapability<&ZeedzDrops.Drops{ZeedzDrops.DropsPublic}>(ZeedzDrops.ZeedzDropsPublicPath)
+            .borrow() 
+            ?? panic("Could not borrow public drops capability")
+        return drops.borrowProduct(id: id)
+    }
+
     init () {
         self.ZeedzDropsStoragePath = /storage/ZeedzDrops
         self.ZeedzDropsPublicPath= /public/ZeedzDrops
