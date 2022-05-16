@@ -12,6 +12,8 @@ pub contract ZeedzDrops {
 
     pub let ZeedzDropsStoragePath: StoragePath
 
+    pub let ZeedzDropsPublicPath: PublicPath
+
     access(contract) var saleCutRequirements: {String : [SaleCutRequirement]}
 
     pub struct SaleCutRequirement {
@@ -365,9 +367,11 @@ pub contract ZeedzDrops {
 
     init () {
         self.ZeedzDropsStoragePath = /storage/ZeedzDrops
+        self.ZeedzDropsPublicPath= /public/ZeedzDrops
         self.saleCutRequirements = {}
 
         let drops <- create Drops()
         self.account.save(<-drops, to: self.ZeedzDropsStoragePath)
+        self.account.link<&ZeedzDrops.Drops{ZeedzDrops.DropsPublic}>(self.ZeedzDropsPublicPath, target: self.ZeedzDropsStoragePath)
     }
 }
