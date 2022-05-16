@@ -6,6 +6,7 @@ import {
   shallResolve,
   getAccountAddress,
   shallRevert,
+  mintFlow,
 } from "flow-js-testing";
 
 import {
@@ -14,6 +15,8 @@ import {
   getAllProductIds,
   addProduct,
   getProductDetails,
+  addProductTest,
+  buyProductFlow,
 } from "../src/zeedz_drops";
 
 import { getZeedzAdminAddress } from "../src/common";
@@ -24,10 +27,12 @@ let testProduct = {
   id: 123,
   total: 99,
   saleEnabled: true,
-  timeStart: "54525.000",
-  timeEnd: "545750.000",
-  prices: { FlowToken: "33.0" },
+  timeStart: "1652722543.00000000",
+  timeEnd: "1652922543.00000000",
+  prices: { "A.0ae53cb6e3f42a79.FlowToken.Vault": "33.0" },
 };
+
+let testCognitoID = "test-1233-cognito-aws";
 
 // We need to set timeout for a higher number, because some transactions might take up some time
 jest.setTimeout(50000);
@@ -99,6 +104,7 @@ describe("Zeedz Drops", () => {
       ),
     );
   });
+
   it("non-admin shall not be able to create a product", async () => {
     // Deploy
     await deployZeedzDrops();
@@ -113,6 +119,7 @@ describe("Zeedz Drops", () => {
       await addProduct(name, description, id, total, saleEnabled, timeStart, timeEnd, prices, Bob),
     );
   });
+
   it("anyone shall be able to get product details", async () => {
     // Deploy
     await deployZeedzDrops();
@@ -137,8 +144,13 @@ describe("Zeedz Drops", () => {
       ),
     );
 
-    await shallPass(await getProductDetails(21));
+    const [details] = await getProductDetails(21);
+
+    await shallResolve(async () => {
+      expect(details.name).toBe(testProduct.name);
+    });
   });
+
   it("anyone shall not be able to get product details of a prodact that doesn't exist", async () => {
     // Deploy
     await deployZeedzDrops();
@@ -164,5 +176,24 @@ describe("Zeedz Drops", () => {
     );
 
     await shallRevert(await getProductDetails(0));
+  });
+
+  it("anyone shall not be able to buy a product without the salecuts being set", async () => {
+    // Deploy
+    await deployZeedzDrops();
+
+    // Setup
+    const ZeedzAdmin = await getZeedzAdminAddress();
+    const Bob = await getAccountAddress("Bob");
+
+    // Give Bob some money
+    await mintFlow(Bob, "69.5");
+
+    // Transaction Shall Pass
+    const { name, description, id, total, saleEnabled } = testProduct;
+
+    await shallPass(await addProductTest(name, description, id, total, saleEnabled, ZeedzAdmin));
+
+    console.log(await buyProductFlow(26, testCognitoID, Bob));
   });
 });

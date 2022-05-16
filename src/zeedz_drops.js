@@ -47,3 +47,19 @@ export const addProduct = async (
 
   return sendTransaction({ name, args, signers });
 };
+
+export const addProductTest = async (productName, description, id, total, saleEnabled, admin) => {
+  const name = "zeedz_drops/create_product_test";
+  const args = [productName, description, id, total, saleEnabled];
+  const signers = [admin];
+
+  return sendTransaction({ name, args, signers });
+};
+
+export const buyProductFlow = async (id, cognito, user) => {
+  const name = "zeedz_drops/buy_product_FLOW";
+  const args = [id, cognito];
+  const signers = [user];
+
+  return sendTransaction({ name, args, signers });
+};
