@@ -63,3 +63,11 @@ export const buyProductFlow = async (id, cognito, user) => {
 
   return sendTransaction({ name, args, signers });
 };
+
+export const updateSaleCutRequirementsFLOW = async (market, offset, admin) => {
+  const name = "zeedz_drops/update_sale_cut_FLOW";
+  const args = [market, offset];
+  const signers = [admin];
+
+  return sendTransaction({ name, args, signers });
+};

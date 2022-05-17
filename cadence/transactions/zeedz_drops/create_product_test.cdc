@@ -15,6 +15,6 @@ transaction(name: String, description: String, id: UInt64, total: UInt64, saleEn
 
     execute {
         let prices = { self.vaultType.identifier : 33.0}
-        self.dropsAdmin.addProduct(name: name, description: description, id: id, total: total, saleEnabled: saleEnabled, timeStart: getCurrentBlock().timestamp, timeEnd: getCurrentBlock().timestamp+(60.0*10.0), prices: prices)
+        self.dropsAdmin.addProduct(name: name, description: description, id: id, total: total, saleEnabled: saleEnabled, timeStart: getCurrentBlock().timestamp, timeEnd: getCurrentBlock().timestamp+(600.0*10.0), prices: prices)
     }
 }

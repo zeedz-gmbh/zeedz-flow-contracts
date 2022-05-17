@@ -17,6 +17,7 @@ import {
   getProductDetails,
   addProductTest,
   buyProductFlow,
+  updateSaleCutRequirementsFLOW,
 } from "../src/zeedz_drops";
 
 import { getZeedzAdminAddress } from "../src/common";
@@ -144,7 +145,9 @@ describe("Zeedz Drops", () => {
       ),
     );
 
-    const [details] = await getProductDetails(21);
+    const [products] = await getAllProductIds();
+
+    const [details] = await getProductDetails(products[0]);
 
     await shallResolve(async () => {
       expect(details.name).toBe(testProduct.name);
@@ -175,7 +178,22 @@ describe("Zeedz Drops", () => {
       ),
     );
 
-    await shallRevert(await getProductDetails(0));
+    const [products] = await getAllProductIds();
+
+    await shallRevert(await getProductDetails(products[0]));
+  });
+
+  it("admin shall be able to update FLOW sale cut requirements", async () => {
+    // Deploy
+    await deployZeedzDrops();
+
+    // Setup
+    const zeedzCut = await getAccountAddress("zeedzCut");
+    const offsetCut = await getAccountAddress("offsetCut");
+    const ZeedzAdmin = await getZeedzAdminAddress();
+
+    // Transaction Shall Pass
+    await shallPass(await updateSaleCutRequirementsFLOW(zeedzCut, offsetCut, ZeedzAdmin));
   });
 
   it("anyone shall not be able to buy a product without the salecuts being set", async () => {
@@ -194,6 +212,32 @@ describe("Zeedz Drops", () => {
 
     await shallPass(await addProductTest(name, description, id, total, saleEnabled, ZeedzAdmin));
 
-    console.log(await buyProductFlow(26, testCognitoID, Bob));
+    const [products] = await getAllProductIds();
+
+    await shallRevert(await buyProductFlow(products[0], testCognitoID, Bob));
+  });
+
+  it("anyone shall be able to buy a product with the salecuts being set and start & end time set", async () => {
+    // Deploy
+    await deployZeedzDrops();
+
+    // Setup
+    const ZeedzAdmin = await getZeedzAdminAddress();
+    const zeedzCut = await getAccountAddress("zeedzCut");
+    const offsetCut = await getAccountAddress("offsetCut");
+    const Bob = await getAccountAddress("Bob");
+
+    // Give Bob some money
+    await mintFlow(Bob, "69.5");
+
+    const { name, description, id, total, saleEnabled } = testProduct;
+
+    // Transaction Shall Pass
+    await shallPass(await addProductTest(name, description, id, total, saleEnabled, ZeedzAdmin));
+    await shallPass(await updateSaleCutRequirementsFLOW(zeedzCut, offsetCut, ZeedzAdmin));
+
+    const [products] = await getAllProductIds();
+
+    await shallPass(await buyProductFlow(products[0], testCognitoID, Bob));
   });
 });
