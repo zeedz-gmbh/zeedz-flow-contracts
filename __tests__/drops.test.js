@@ -240,4 +240,27 @@ describe("Zeedz Drops", () => {
 
     await shallPass(await buyProductFlow(products[0], testCognitoID, Bob));
   });
+  it("anyone shall not be able to buy a product with less than enough money", async () => {
+    // Deploy
+    await deployZeedzDrops();
+
+    // Setup
+    const ZeedzAdmin = await getZeedzAdminAddress();
+    const zeedzCut = await getAccountAddress("zeedzCut");
+    const offsetCut = await getAccountAddress("offsetCut");
+    const Bob = await getAccountAddress("Bob");
+
+    // Give Bob some money
+    await mintFlow(Bob, "19.5");
+
+    const { name, description, id, total, saleEnabled } = testProduct;
+
+    // Transaction Shall Pass
+    await shallPass(await addProductTest(name, description, id, total, saleEnabled, ZeedzAdmin));
+    await shallPass(await updateSaleCutRequirementsFLOW(zeedzCut, offsetCut, ZeedzAdmin));
+
+    const [products] = await getAllProductIds();
+
+    await shallRevert(await buyProductFlow(products[0], testCognitoID, Bob));
+  });
 });
