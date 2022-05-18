@@ -254,7 +254,7 @@ pub contract ZeedzDrops {
         }
     }
 
-    pub resource Drops: ProductsManager, DropsManager, DropsPublic {
+    pub resource DropsAdmin: ProductsManager, DropsManager, DropsPublic {
         pub fun addProduct(
             name: String, 
             description: String, 
@@ -367,14 +367,14 @@ pub contract ZeedzDrops {
     }
 
     pub fun getAllProductIDs(): [UInt64] {
-        let drops = self.account.getCapability<&ZeedzDrops.Drops{ZeedzDrops.DropsPublic}>(ZeedzDrops.ZeedzDropsPublicPath)
+        let drops = self.account.getCapability<&ZeedzDrops.DropsAdmin{ZeedzDrops.DropsPublic}>(ZeedzDrops.ZeedzDropsPublicPath)
             .borrow() 
             ?? panic("Could not borrow public drops capability")
         return drops.getProductIDs()
     }
 
     pub fun getProduct(id: UInt64): &Product? {
-        let drops = self.account.getCapability<&ZeedzDrops.Drops{ZeedzDrops.DropsPublic}>(ZeedzDrops.ZeedzDropsPublicPath)
+        let drops = self.account.getCapability<&ZeedzDrops.DropsAdmin{ZeedzDrops.DropsPublic}>(ZeedzDrops.ZeedzDropsPublicPath)
             .borrow() 
             ?? panic("Could not borrow public drops capability")
         return drops.borrowProduct(id: id)
@@ -385,8 +385,8 @@ pub contract ZeedzDrops {
         self.ZeedzDropsPublicPath= /public/ZeedzDrops
         self.saleCutRequirements = {}
 
-        let drops <- create Drops()
-        self.account.save(<-drops, to: self.ZeedzDropsStoragePath)
-        self.account.link<&ZeedzDrops.Drops{ZeedzDrops.DropsPublic}>(self.ZeedzDropsPublicPath, target: self.ZeedzDropsStoragePath)
+        let admin <- create DropsAdmin()
+        self.account.save(<-admin, to: self.ZeedzDropsStoragePath)
+        self.account.link<&ZeedzDrops.DropsAdmin{ZeedzDrops.DropsPublic}>(self.ZeedzDropsPublicPath, target: self.ZeedzDropsStoragePath)
     }
 }

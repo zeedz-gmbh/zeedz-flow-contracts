@@ -12,7 +12,7 @@ transaction(marketCut: Address, offsetCut: Address) {
 
         assert(offsetRatio + marketRatio <= 1.0, message: "total of ratio must be less than or equal to 1.0")
 
-        let adminRef = signer.borrow<&ZeedzDrops.Drops>(from: ZeedzDrops.ZeedzDropsStoragePath)
+        let adminRef = signer.borrow<&ZeedzDrops.DropsAdmin>(from: ZeedzDrops.ZeedzDropsStoragePath)
             ?? panic("Cannot borrow drops admin")
 
         let requirements: [ZeedzDrops.SaleCutRequirement] = []

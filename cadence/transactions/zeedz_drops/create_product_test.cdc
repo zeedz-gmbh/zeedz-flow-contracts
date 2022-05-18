@@ -4,11 +4,11 @@ import FlowToken from "../contracts/FlowToken.cdc"
 // sets buy and sale time from now to 10 min from now, valutType is Flow Token
 transaction(name: String, description: String, id: UInt64, total: UInt64, saleEnabled: Bool) {
 
-    let dropsAdmin: &ZeedzDrops.Drops{ZeedzDrops.ProductsManager}
+    let dropsAdmin: &ZeedzDrops.DropsAdmin{ZeedzDrops.ProductsManager}
     let vaultType: Type
 
     prepare(acct: AuthAccount) {
-        self.dropsAdmin = acct.borrow<&ZeedzDrops.Drops{ZeedzDrops.ProductsManager}>(from: ZeedzDrops.ZeedzDropsStoragePath)
+        self.dropsAdmin = acct.borrow<&ZeedzDrops.DropsAdmin{ZeedzDrops.ProductsManager}>(from: ZeedzDrops.ZeedzDropsStoragePath)
             ?? panic("Missing or mis-typed NFTStorefront.Storefront")
         self.vaultType = Type<@FlowToken.Vault>()
     }
