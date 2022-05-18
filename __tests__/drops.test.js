@@ -547,7 +547,7 @@ describe("Zeedz Drops", () => {
 
     const discount = 0.2;
 
-    console.log(
+    await shallPass(
       await buyProductWithDiscountFlow(products[0], testCognitoID, discount, Bob, ZeedzAdmin),
     );
 
