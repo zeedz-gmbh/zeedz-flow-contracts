@@ -89,10 +89,12 @@ pub contract ZeedzDrops {
         }
 
         access(contract) fun setStartTime(startTime: UFix64) {
+            assert(self.timeEnd > startTime, message: "startTime should be lesser than endTime")
             self.timeStart = startTime
         }
 
         access(contract) fun setEndTime(endTime: UFix64) {
+            assert(endTime > self.timeStart, message: "endTime should be grater than startTime")
             self.timeEnd = endTime
         }
 
@@ -199,7 +201,7 @@ pub contract ZeedzDrops {
                 self.details.saleEnabled == true: "the sale of this product is disabled"
                 (self.details.total - self.details.sold) > 0: "these products are sold out"
                 payment.isInstance(vaultType): "payment vault is not requested fungible token type"
-                (payment.balance*discount) == self.details.prices[vaultType.identifier]: "payment vault does not contain requested price"
+                (payment.balance) == self.details.prices[vaultType.identifier]!*(1.0-discount): "payment vault does not contain requested price"
                 getCurrentBlock().timestamp > self.details.timeStart: "the sale of this product has not started yet"
                 getCurrentBlock().timestamp < self.details.timeEnd: "the sale of this product has ended"
                 ZeedzDrops.saleCutRequirements[vaultType.identifier] != nil: "sale cuts not set for requested fungible token"
@@ -209,7 +211,7 @@ pub contract ZeedzDrops {
 
             for cut in ZeedzDrops.saleCutRequirements[vaultType.identifier]! {
                 if let receiver = cut.receiver.borrow() {
-                   let paymentCut <- payment.withdraw(amount: cut.ratio * self.details.prices[vaultType.identifier]!*discount)
+                   let paymentCut <- payment.withdraw(amount: cut.ratio * self.details.prices[vaultType.identifier]!*(1.0-discount))
                     receiver.deposit(from: <-paymentCut)
                     if (residualReceiver == nil) {
                         residualReceiver = receiver
@@ -296,6 +298,7 @@ pub contract ZeedzDrops {
 
         pub fun reserve(productID: UInt64, amount: UInt64) {
             let product = self.borrowProduct(id: productID) ?? panic("not able to borrow specified product")
+            assert(product.details.total - product.details.sold >= amount, message: "reserve amount can't be higher than available pack amount")
             product.details.reserve(amount: amount)
             emit ProductsReserved(productID: productID, amount: amount)
 

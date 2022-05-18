@@ -1,6 +1,6 @@
 import ZeedzDrops from "../contracts/ZeedzDrops.cdc"
 
-transaction(name: String, description: String, id: UInt64, total: UInt64, saleEnabled: Bool, timeStart: UFix64, timeEnd: UFix64, prices: {String : UFix64}) {
+transaction(productID: UInt64, prices: {String: UFix64}) {
 
     let dropsAdmin: &ZeedzDrops.DropsAdmin{ZeedzDrops.ProductsManager}
 
@@ -10,6 +10,6 @@ transaction(name: String, description: String, id: UInt64, total: UInt64, saleEn
     }
 
     execute {
-        self.dropsAdmin.addProduct(name: name, description: description, id: id, total: total, saleEnabled: saleEnabled, timeStart: timeStart, timeEnd: timeEnd, prices: prices)
+        self.dropsAdmin.setPrices(productID: productID, prices: prices)
     }
 }

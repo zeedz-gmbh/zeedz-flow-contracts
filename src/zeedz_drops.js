@@ -71,3 +71,59 @@ export const updateSaleCutRequirementsFLOW = async (market, offset, admin) => {
 
   return sendTransaction({ name, args, signers });
 };
+
+export const removeProduct = async (id, admin) => {
+  const name = "zeedz_drops/remove_product";
+  const args = [id];
+  const signers = [admin];
+
+  return sendTransaction({ name, args, signers });
+};
+
+export const reserveProduct = async (id, amount, admin) => {
+  const name = "zeedz_drops/reserve_product";
+  const args = [id, amount];
+  const signers = [admin];
+
+  return sendTransaction({ name, args, signers });
+};
+
+export const setSaleEnabledStatus = async (id, status, admin) => {
+  const name = "zeedz_drops/set_sale_enabled_status";
+  const args = [id, status];
+  const signers = [admin];
+
+  return sendTransaction({ name, args, signers });
+};
+
+export const setPrices = async (id, prices, admin) => {
+  const name = "zeedz_drops/set_prices";
+  const args = [id, prices];
+  const signers = [admin];
+
+  return sendTransaction({ name, args, signers });
+};
+
+export const setStartTime = async (id, startTime, admin) => {
+  const name = "zeedz_drops/set_start_time";
+  const args = [id, startTime];
+  const signers = [admin];
+
+  return sendTransaction({ name, args, signers });
+};
+
+export const setEndTime = async (id, endTime, admin) => {
+  const name = "zeedz_drops/set_end_time";
+  const args = [id, endTime];
+  const signers = [admin];
+
+  return sendTransaction({ name, args, signers });
+};
+
+export const buyProductWithDiscountFlow = async (id, cognito, discount, user, admin) => {
+  const name = "zeedz_drops/buy_product_discount_FLOW";
+  const args = [id, cognito, discount];
+  const signers = [user, admin];
+
+  return sendTransaction({ name, args, signers });
+};

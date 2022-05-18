@@ -9,7 +9,7 @@ transaction(name: String, description: String, id: UInt64, total: UInt64, saleEn
 
     prepare(acct: AuthAccount) {
         self.dropsAdmin = acct.borrow<&ZeedzDrops.DropsAdmin{ZeedzDrops.ProductsManager}>(from: ZeedzDrops.ZeedzDropsStoragePath)
-            ?? panic("Missing or mis-typed NFTStorefront.Storefront")
+            ?? panic("Missing or mis-typed admin resource")
         self.vaultType = Type<@FlowToken.Vault>()
     }
 
