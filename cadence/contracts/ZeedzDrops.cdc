@@ -118,7 +118,6 @@ pub contract ZeedzDrops {
 
 
     pub resource interface ProductPublic {
-        pub fun purchase(payment: @FungibleToken.Vault, vaultType: Type, userID: String)
         pub fun getDetails(): ProductDetails
     }
 
@@ -128,6 +127,7 @@ pub contract ZeedzDrops {
         pub fun setEndTime(productID: UInt64, endTime: UFix64)
         pub fun reserve(productID: UInt64, amount: UInt64)
         pub fun removeProduct(productID: UInt64)
+        pub fun purchase(productID: UInt64, payment: @FungibleToken.Vault, vaultType: Type, userID: String)
         pub fun purchaseWithDiscount(
             productID: UInt64,
             payment: @FungibleToken.Vault,
@@ -163,7 +163,7 @@ pub contract ZeedzDrops {
             return self.details
         }
 
-        pub fun purchase(payment: @FungibleToken.Vault, vaultType: Type, userID: String) {
+        access(contract) fun purchase(payment: @FungibleToken.Vault, vaultType: Type, userID: String) {
             pre {
                 self.details.saleEnabled == true: "the sale of this product is disabled"
                 (self.details.total - self.details.sold) > 0: "these products are sold out"
@@ -324,6 +324,11 @@ pub contract ZeedzDrops {
         pub fun setEndTime(productID: UInt64, endTime: UFix64) {
             let product = self.borrowProduct(id :productID) ?? panic("not able to borrow specified product")
             product.details.setEndTime(endTime: endTime)
+        }
+
+        pub fun purchase(productID: UInt64, payment: @FungibleToken.Vault, vaultType: Type, userID: String) {
+            let product = self.borrowProduct(id: productID) ?? panic("not able to borrow specified product")
+            product.purchase(payment: <- payment, vaultType: vaultType, userID: userID)
         }
 
         pub fun purchaseWithDiscount(productID: UInt64, payment: @FungibleToken.Vault, discount: UFix64, vaultType: Type, userID: String) {

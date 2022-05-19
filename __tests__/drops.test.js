@@ -221,10 +221,10 @@ describe("Zeedz Drops", () => {
 
     const [products] = await getAllProductIds();
 
-    await shallRevert(await buyProductFlow(products[0], testCognitoID, Bob));
+    await shallRevert(await buyProductFlow(products[0], testCognitoID, Bob, ZeedzAdmin));
   });
 
-  it("anyone shall be able to buy a product with the salecuts being set and start & end time set", async () => {
+  it("anyone shall be able to buy a product with admin cosign the salecuts being set and start & end time set", async () => {
     // Deploy
     await deployZeedzDrops();
 
@@ -244,10 +244,10 @@ describe("Zeedz Drops", () => {
 
     const [products] = await getAllProductIds();
 
-    await shallPass(await buyProductFlow(products[0], testCognitoID, Bob));
+    await shallPass(await buyProductFlow(products[0], testCognitoID, Bob, ZeedzAdmin));
   });
 
-  it("anyone shall not be able to buy a product with less than enough money", async () => {
+  it("anyone shall not be able to buy a product with less than enough money and admin cosign", async () => {
     // Deploy
     await deployZeedzDrops();
 
@@ -267,7 +267,7 @@ describe("Zeedz Drops", () => {
 
     const [products] = await getAllProductIds();
 
-    await shallRevert(await buyProductFlow(products[0], testCognitoID, Bob));
+    await shallRevert(await buyProductFlow(products[0], testCognitoID, Bob, ZeedzAdmin));
   });
 
   it("admin shall be able to remove a product", async () => {
