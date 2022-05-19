@@ -524,7 +524,7 @@ describe("Zeedz Drops", () => {
     });
   });
 
-  it("anyone shall be able to buy a with discount with an admin cosign", async () => {
+  it("anyone shall be able to buy a product with discount with an admin cosign", async () => {
     // Deploy
     await deployZeedzDrops();
 
