@@ -197,11 +197,10 @@ describe("Zeedz Drops", () => {
 
     // Setup
     const zeedzCut = await getAccountAddress("zeedzCut");
-    const offsetCut = await getAccountAddress("offsetCut");
     const ZeedzAdmin = await getZeedzAdminAddress();
 
     // Transaction Shall Pass
-    await shallPass(await updateSaleCutRequirementsFLOW(zeedzCut, offsetCut, ZeedzAdmin));
+    await shallPass(await updateSaleCutRequirementsFLOW(zeedzCut, ZeedzAdmin));
   });
 
   it("anyone shall not be able to buy a product without the salecuts being set", async () => {
@@ -232,7 +231,6 @@ describe("Zeedz Drops", () => {
     // Setup
     const ZeedzAdmin = await getZeedzAdminAddress();
     const zeedzCut = await getAccountAddress("zeedzCut");
-    const offsetCut = await getAccountAddress("offsetCut");
     const Bob = await getAccountAddress("Bob");
 
     // Give Bob some money
@@ -242,7 +240,7 @@ describe("Zeedz Drops", () => {
 
     // Transaction Shall Pass
     await shallPass(await addProductTest(name, description, id, total, saleEnabled, ZeedzAdmin));
-    await shallPass(await updateSaleCutRequirementsFLOW(zeedzCut, offsetCut, ZeedzAdmin));
+    await shallPass(await updateSaleCutRequirementsFLOW(zeedzCut, ZeedzAdmin));
 
     const [products] = await getAllProductIds();
 
@@ -256,7 +254,6 @@ describe("Zeedz Drops", () => {
     // Setup
     const ZeedzAdmin = await getZeedzAdminAddress();
     const zeedzCut = await getAccountAddress("zeedzCut");
-    const offsetCut = await getAccountAddress("offsetCut");
     const Bob = await getAccountAddress("Bob");
 
     // Give Bob some money
@@ -266,7 +263,7 @@ describe("Zeedz Drops", () => {
 
     // Transaction Shall Pass
     await shallPass(await addProductTest(name, description, id, total, saleEnabled, ZeedzAdmin));
-    await shallPass(await updateSaleCutRequirementsFLOW(zeedzCut, offsetCut, ZeedzAdmin));
+    await shallPass(await updateSaleCutRequirementsFLOW(zeedzCut, ZeedzAdmin));
 
     const [products] = await getAllProductIds();
 
@@ -330,7 +327,6 @@ describe("Zeedz Drops", () => {
     // Setup
     const ZeedzAdmin = await getZeedzAdminAddress();
     const zeedzCut = await getAccountAddress("zeedzCut");
-    const offsetCut = await getAccountAddress("offsetCut");
     const Bob = await getAccountAddress("Bob");
 
     // Give Bob some money
@@ -355,7 +351,7 @@ describe("Zeedz Drops", () => {
     });
 
     // Transaction Shall Pass
-    await shallPass(await updateSaleCutRequirementsFLOW(zeedzCut, offsetCut, ZeedzAdmin));
+    await shallPass(await updateSaleCutRequirementsFLOW(zeedzCut, ZeedzAdmin));
 
     await shallRevert(await buyProductFlow(products[0], testCognitoID, Bob));
   });
@@ -393,7 +389,6 @@ describe("Zeedz Drops", () => {
     // Setup
     const ZeedzAdmin = await getZeedzAdminAddress();
     const zeedzCut = await getAccountAddress("zeedzCut");
-    const offsetCut = await getAccountAddress("offsetCut");
     const Bob = await getAccountAddress("Bob");
 
     // Give Bob some money
@@ -418,7 +413,7 @@ describe("Zeedz Drops", () => {
     });
 
     // Transaction Shall Pass
-    await shallPass(await updateSaleCutRequirementsFLOW(zeedzCut, offsetCut, ZeedzAdmin));
+    await shallPass(await updateSaleCutRequirementsFLOW(zeedzCut, ZeedzAdmin));
 
     await shallRevert(await buyProductFlow(products[0], testCognitoID, Bob));
   });
@@ -531,7 +526,6 @@ describe("Zeedz Drops", () => {
     // Setup
     const ZeedzAdmin = await getZeedzAdminAddress();
     const zeedzCut = await getAccountAddress("zeedzCut");
-    const offsetCut = await getAccountAddress("offsetCut");
     const Bob = await getAccountAddress("Bob");
 
     // Give Bob some money
@@ -541,7 +535,7 @@ describe("Zeedz Drops", () => {
 
     // Transaction Shall Pass
     await shallPass(await addProductTest(name, description, id, total, saleEnabled, ZeedzAdmin));
-    await shallPass(await updateSaleCutRequirementsFLOW(zeedzCut, offsetCut, ZeedzAdmin));
+    await shallPass(await updateSaleCutRequirementsFLOW(zeedzCut, ZeedzAdmin));
 
     const [products] = await getAllProductIds();
 

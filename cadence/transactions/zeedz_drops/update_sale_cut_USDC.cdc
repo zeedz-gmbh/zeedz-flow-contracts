@@ -1,5 +1,5 @@
 import ZeedzDrops from "../../contracts/ZeedzDrops.cdc"
-import FlowToken from "../../contracts/FlowToken.cdc"
+import FiatToken from "../../contracts/FiatToken.cdc"
 import FungibleToken from "../../contracts/FungibleToken.cdc"
 
 transaction(marketCut: Address) {
@@ -17,11 +17,11 @@ transaction(marketCut: Address) {
 
         // market SaleCut
         if marketRatio > 0.0 {
-            let marketFlowTokenReceiver = getAccount(marketCut).getCapability<&FlowToken.Vault{FungibleToken.Receiver}>(/public/flowTokenReceiver)
-            assert(marketFlowTokenReceiver.borrow() != nil, message: "Missing or mis-typed market FlowToken receiver")
-            requirements.append(ZeedzDrops.SaleCutRequirement(receiver: marketFlowTokenReceiver, ratio: marketRatio))
+            let marketFiatTokenReceiver = getAccount(marketCut).getCapability<&FiatToken.Vault{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
+            assert(marketFiatTokenReceiver.borrow() != nil, message: "Missing or mis-typed market FiatToken receiver")
+            requirements.append(ZeedzDrops.SaleCutRequirement(receiver: marketFiatTokenReceiver, ratio: marketRatio))
         }
 
-        adminRef.updateSaleCutRequirement(requirements: requirements, vaultType: Type<@FlowToken.Vault>())
+        adminRef.updateSaleCutRequirement(requirements: requirements, vaultType: Type<@FiatToken.Vault>())
     }
 }

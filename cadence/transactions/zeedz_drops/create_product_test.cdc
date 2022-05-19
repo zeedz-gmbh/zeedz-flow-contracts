@@ -1,7 +1,6 @@
 import ZeedzDrops from "../contracts/ZeedzDrops.cdc"
 import FlowToken from "../contracts/FlowToken.cdc"
 
-// sets buy and sale time from now to 10 min from now, valutType is Flow Token
 transaction(name: String, description: String, id: UInt64, total: UInt64, saleEnabled: Bool) {
 
     let dropsAdmin: &ZeedzDrops.DropsAdmin{ZeedzDrops.ProductsManager}
