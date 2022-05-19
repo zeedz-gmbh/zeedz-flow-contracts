@@ -32,15 +32,8 @@ export const deployUSDC = async () => {
   return deployContractByName({ to: ZeedzAdmin, name: "FiatToken", addressMap });
 };
 
-/*
- * Setups a FUSD vault on account and exposes public capability.
- * @param {string} account - account address
- * @throws Will throw an error if transaction is reverted.
- * @returns {Promise<*>}
- * */
 export const setupFUSDOnAccount = async (account) => {
   const name = "fusd/setup_account";
   const signers = [account];
-
   return sendTransaction({ name, signers });
 };
