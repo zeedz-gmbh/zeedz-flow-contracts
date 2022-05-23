@@ -1,6 +1,6 @@
-import ZeedzDrops from "../contracts/ZeedzDrops.cdc"
+import ZeedzDrops from "../../contracts/ZeedzDrops.cdc"
 
-transaction(name: String, description: String, id: UInt64, total: UInt64, saleEnabled: Bool, timeStart: UFix64, timeEnd: UFix64, prices: {String : UFix64}) {
+transaction(name: String, description: String, id: String, total: UInt64, saleEnabled: Bool, timeStart: UFix64, timeEnd: UFix64, prices: {String : UFix64}) {
 
     let dropsAdmin: &ZeedzDrops.DropsAdmin{ZeedzDrops.ProductsManager}
 

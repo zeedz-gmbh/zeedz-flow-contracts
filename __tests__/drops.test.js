@@ -33,7 +33,7 @@ import { getZeedzAdminAddress } from "../src/common";
 let testProduct = {
   name: "test",
   description: "test description",
-  id: 123,
+  id: "123-object-id",
   total: 2,
   saleEnabled: true,
   timeStart: "1652722543.00000000",

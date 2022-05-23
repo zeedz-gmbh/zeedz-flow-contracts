@@ -39,7 +39,7 @@ pub contract ZeedzDrops {
         pub let description: String
 
         // product id
-        pub let id: UInt64
+        pub let id: String
 
         // total product item quantity
         pub let total: UInt64
@@ -65,7 +65,7 @@ pub contract ZeedzDrops {
         init (
             name: String,
             description: String,
-            id: UInt64,
+            id: String,
             total: UInt64
             saleEnabled: Bool,
             timeStart: UFix64,
@@ -137,7 +137,7 @@ pub contract ZeedzDrops {
         pub fun addProduct(
             name: String, 
             description: String, 
-            id: UInt64, 
+            id: String, 
             total: UInt64, 
             saleEnabled: Bool, 
             timeStart: UFix64, 
@@ -237,7 +237,7 @@ pub contract ZeedzDrops {
         init (
             name: String, 
             description: String, 
-            id: UInt64, 
+            id: String, 
             total: UInt64, 
             saleEnabled: Bool, 
             timeStart: UFix64, 
@@ -260,7 +260,7 @@ pub contract ZeedzDrops {
         pub fun addProduct(
             name: String, 
             description: String, 
-            id: UInt64, 
+            id: String, 
             total: UInt64, 
             saleEnabled: Bool, 
             timeStart: UFix64, 

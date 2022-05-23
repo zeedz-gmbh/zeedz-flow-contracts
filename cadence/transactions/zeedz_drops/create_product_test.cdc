@@ -1,7 +1,7 @@
-import ZeedzDrops from "../contracts/ZeedzDrops.cdc"
-import FlowToken from "../contracts/FlowToken.cdc"
+import ZeedzDrops from "../../contracts/ZeedzDrops.cdc"
+import FlowToken from "../../contracts/FlowToken.cdc"
 
-transaction(name: String, description: String, id: UInt64, total: UInt64, saleEnabled: Bool) {
+transaction(name: String, description: String, id: String, total: UInt64, saleEnabled: Bool) {
 
     let dropsAdmin: &ZeedzDrops.DropsAdmin{ZeedzDrops.ProductsManager}
     let vaultType: Type
