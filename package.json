@@ -19,6 +19,7 @@
     "tabWidth": 2
   },
   "dependencies": {
+    "@fast-csv/format": "^4.3.5",
     "@onflow/config": "^0.0.2",
     "@onflow/fcl": "^0.0.77",
     "@onflow/fcl-config": "^0.0.1",
