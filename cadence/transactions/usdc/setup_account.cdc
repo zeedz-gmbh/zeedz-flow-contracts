@@ -9,9 +9,9 @@
 // 
 // Therefore if multisig is required for the vault, the account itself should have the same key weight
 // distribution as it does for the Vault.
-import FungibleToken from "../../contracts/FungibleToken.cdc"
-import FiatToken from "../../contracts/FiatToken.cdc"
-import OnChainMultiSig from "../../contracts/OnChainMultiSig.cdc"
+import FungibleToken from 0xFUNGIBLE_TOKEN
+import FiatToken from 0xFIAT_TOKEN
+import OnChainMultiSig from 0xONCHAIN_MULTISIG
 
 transaction() {
 

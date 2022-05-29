@@ -26,9 +26,9 @@ import {
   setStartTime,
   setEndTime,
   buyProductWithDiscountFlow,
-} from "../src/zeedz_drops";
+} from "./src/zeedz_drops";
 
-import { getZeedzAdminAddress } from "../src/common";
+import { getZeedzAdminAddress } from "./src/common";
 
 let testProduct = {
   name: "test",
@@ -72,9 +72,7 @@ describe("Zeedz Drops", () => {
     const [requirements] = await getSaleCutRequirements();
 
     // Check Result
-    await shallResolve(async () => {
-      expect(requirements).toStrictEqual({});
-    });
+    expect(requirements).toStrictEqual({});
   });
 
   it("product ids shall be emtpy after contract is deployed", async () => {
@@ -84,9 +82,7 @@ describe("Zeedz Drops", () => {
     const [products] = await getAllProductIds();
 
     // Check Result
-    await shallResolve(async () => {
-      expect(products).toStrictEqual([]);
-    });
+    expect(products).toStrictEqual([]);
   });
 
   it("admin shall be able to create a product", async () => {
@@ -157,9 +153,7 @@ describe("Zeedz Drops", () => {
 
     const [details] = await getProductDetails(products[0]);
 
-    await shallResolve(async () => {
-      expect(details.name).toBe(testProduct.name);
-    });
+    expect(details.name).toBe(testProduct.name);
   });
 
   it("anyone shall not be able to get product details of a prodact that doesn't exist", async () => {
@@ -188,7 +182,7 @@ describe("Zeedz Drops", () => {
 
     const [products] = await getAllProductIds();
 
-    await shallRevert(await getProductDetails(products[0]));
+    await shallRevert(await getProductDetails(products[323]));
   });
 
   it("admin shall be able to update FLOW sale cut requirements", async () => {
@@ -289,9 +283,7 @@ describe("Zeedz Drops", () => {
     const [newProducts] = await getAllProductIds();
 
     // Check Result
-    await shallResolve(async () => {
-      expect(newProducts).toStrictEqual([]);
-    });
+    expect(newProducts).toStrictEqual([]);
   });
 
   it("admin shall be able to reserve a product", async () => {
@@ -315,9 +307,7 @@ describe("Zeedz Drops", () => {
     const [details] = await getProductDetails(products[0]);
 
     // Check Result
-    await shallResolve(async () => {
-      expect(details.reserved).toStrictEqual(reserveAmount);
-    });
+    expect(details.reserved).toStrictEqual(reserveAmount);
   });
 
   it("anyone shall not be able to buy a sold out product", async () => {
@@ -346,9 +336,7 @@ describe("Zeedz Drops", () => {
     const [details] = await getProductDetails(products[0]);
 
     // Check Result
-    await shallResolve(async () => {
-      expect(details.reserved).toStrictEqual(reserveAmount);
-    });
+    expect(details.reserved).toStrictEqual(reserveAmount);
 
     // Transaction Shall Pass
     await shallPass(await updateSaleCutRequirementsFLOW(zeedzCut, ZeedzAdmin));
@@ -377,9 +365,7 @@ describe("Zeedz Drops", () => {
     const [details] = await getProductDetails(products[0]);
 
     // Check Result
-    await shallResolve(async () => {
-      expect(details.saleEnabled).toStrictEqual(newStatus);
-    });
+    expect(details.saleEnabled).toStrictEqual(newStatus);
   });
 
   it("anyone shall not be able to buy product with saleEnabled set as false", async () => {
@@ -408,9 +394,7 @@ describe("Zeedz Drops", () => {
     const [details] = await getProductDetails(products[0]);
 
     // Check Result
-    await shallResolve(async () => {
-      expect(details.saleEnabled).toStrictEqual(newStatus);
-    });
+    expect(details.saleEnabled).toStrictEqual(newStatus);
 
     // Transaction Shall Pass
     await shallPass(await updateSaleCutRequirementsFLOW(zeedzCut, ZeedzAdmin));
@@ -439,9 +423,7 @@ describe("Zeedz Drops", () => {
     const [details] = await getProductDetails(products[0]);
 
     // Check Result
-    await shallResolve(async () => {
-      expect(details.prices).toStrictEqual(newPrices);
-    });
+    expect(details.prices).toStrictEqual(newPrices);
   });
 
   it("admin shall be able to set the startTime of a product if it is less than the current endTime", async () => {
@@ -465,9 +447,7 @@ describe("Zeedz Drops", () => {
     const [details] = await getProductDetails(products[0]);
 
     // Check Result
-    await shallResolve(async () => {
-      expect(details.timeStart).toStrictEqual(newStartTime);
-    });
+    expect(details.timeStart).toStrictEqual(newStartTime);
   });
 
   it("admin shall not be able to set the endTime of a product if the given endTime is less than the current startTime", async () => {
@@ -486,7 +466,7 @@ describe("Zeedz Drops", () => {
 
     const [products] = await getAllProductIds();
 
-    await shallRevert(await setStartTime(products[0], newEndTime, ZeedzAdmin));
+    await shallRevert(await setEndTime(products[0], newEndTime, ZeedzAdmin));
   });
 
   it("admin shall be able to set the endTime of a product if it is greater than the current startTime", async () => {
@@ -514,9 +494,7 @@ describe("Zeedz Drops", () => {
     const [details] = await getProductDetails(products[0]);
 
     // Check Result
-    await shallResolve(async () => {
-      expect(details.timeEnd).toStrictEqual(newEndTime);
-    });
+    expect(details.timeEnd).toStrictEqual(newEndTime);
   });
 
   it("anyone shall be able to buy a product with discount with an admin cosign", async () => {
@@ -549,9 +527,7 @@ describe("Zeedz Drops", () => {
 
     const [details] = await getProductDetails(products[0]);
 
-    await shallResolve(async () => {
-      expect(balance).toStrictEqual("43.10100000"); // 69.5 - (1.0 - discount) * 33.0;
-      expect(details.sold).toStrictEqual(1);
-    });
+    expect(balance).toStrictEqual("43.10100000"); // 69.5 - (1.0 - discount) * 33.0;
+    expect(details.sold).toStrictEqual(1);
   });
 });

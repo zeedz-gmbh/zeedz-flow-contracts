@@ -1,4 +1,4 @@
-import NonFungibleToken from "./NonFungibleToken.cdc"
+import NonFungibleToken from 0xNON_FUNGIBLE_TOKEN
 
 /*
     Description: Central Smart Contract for the first generation of Zeedle NFTs
@@ -104,7 +104,7 @@ pub contract ZeedzINO: NonFungibleToken {
     pub resource interface ZeedzCollectionPublic {
         pub fun deposit(token: @NonFungibleToken.NFT)
         pub fun getIDs(): [UInt64]
-        pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
+        pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT?
         pub fun borrowZeedle(id: UInt64): &ZeedzINO.NFT? {
             post {
                 (result == nil) || (result?.id == id):
@@ -177,8 +177,8 @@ pub contract ZeedzINO: NonFungibleToken {
         //  Gets a reference to an NFT in the collection
         //  so that the caller can read its metadata and call its methods.
         //
-        pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
-            return &self.ownedNFTs[id] as &NonFungibleToken.NFT
+        pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT? {
+            return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
         }
 
         //
@@ -188,19 +188,19 @@ pub contract ZeedzINO: NonFungibleToken {
         //
         pub fun borrowZeedle(id: UInt64): &ZeedzINO.NFT? {
             if self.ownedNFTs[id] != nil {
-                let ref = &self.ownedNFTs[id] as auth &NonFungibleToken.NFT
+                let ref = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
                 return ref as! &ZeedzINO.NFT
             } else {
                 return nil
             }
         }
 
-        destroy() {
-            destroy self.ownedNFTs
-        }
-
         init () {
             self.ownedNFTs <- {}
+        }
+
+        destroy() {
+            destroy self.ownedNFTs
         }
     }
 
@@ -250,11 +250,13 @@ pub contract ZeedzINO: NonFungibleToken {
     //  If it has a collection and that collection contains the zeedleId, return a reference to that.
     //
     pub fun fetch(_ from: Address, zeedleID: UInt64): &ZeedzINO.NFT? {
-        let collection = getAccount(from)
-            .getCapability(ZeedzINO.CollectionPublicPath)!
-            .borrow<&ZeedzINO.Collection{ZeedzINO.ZeedzCollectionPublic}>()
-            ?? panic("Couldn't get collection")
-        return collection.borrowZeedle(id: zeedleID)
+        let capability = getAccount(from).getCapability<&ZeedzINO.Collection{ZeedzINO.ZeedzCollectionPublic}>(ZeedzINO.CollectionPublicPath)
+        if capability.check() {
+            let collection = capability.borrow()
+            return collection!.borrowZeedle(id: zeedleID)
+        } else {
+            return nil
+        }
     }
 
     // 

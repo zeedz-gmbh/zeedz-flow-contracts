@@ -14,8 +14,8 @@ their tokens to.
 
 */
 
-import NonFungibleToken from "./NonFungibleToken.cdc"
-
+import NonFungibleToken from 0xNON_FUNGIBLE_TOKEN
+import FungibleToken from 0xFUNGIBLE_TOKEN
 pub contract TokenForwarding {
 
     // Event that is emitted when tokens are deposited to the target receiver

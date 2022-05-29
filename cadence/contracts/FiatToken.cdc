@@ -1,6 +1,6 @@
 import Crypto
-import FungibleToken from "./FungibleToken.cdc"
-import OnChainMultiSig from "./OnChainMultiSig.cdc"
+import FungibleToken from 0xFUNGIBLE_TOKEN
+import OnChainMultiSig from 0xONCHAIN_MULTISIG
 
 pub contract FiatToken: FungibleToken {
 

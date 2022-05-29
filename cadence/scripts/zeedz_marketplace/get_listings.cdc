@@ -1,5 +1,5 @@
-import NFTStorefront from "../../contracts/NFTStorefront.cdc"
-import ZeedzMarketplace from "../../contracts/ZeedzMarketplace.cdc"
+import NFTStorefront from 0xNFT_STOREFRONT
+import ZeedzMarketplace from 0xZEEDZ_MARKETPLACE
 
 pub fun main(offset: Int, limit: Int): DisplayResult {
     var listingIds: [UInt64] = ZeedzMarketplace.getListingIDs()

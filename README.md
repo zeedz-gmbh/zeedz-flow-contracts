@@ -39,14 +39,18 @@ Many of the in-game purchases lead to real-world donations to NGOs focused on cl
 
     .
     ├── __tests__          # Jest tests
+    │   ├── src                # Flow-js-testing functions used to test the smart conract
+    │   │   ├── common.js      # Commonly used flow-js-testing functions
+    │   │   ├── zeedz.js       # Functions for testing the ZeedzINO contract
+    │   │   └── ...            # Functions for testing other contracts from this repo
+    │   ├── drops.tests.js # Tests for the ZeedzDrops contract
+    │   ├── ino.tests.js # Tests for the ZeedzINO contract
+    │   ├── marketplace.tsts.js  # Tests for the ZeedzDrops contract
+    │   └── README.md   # Folder description
     ├── cadence            # Cadence files
     │   ├── contracts      # Cadence smart contracts
     │   ├── scripts        # Scripts used to interact with the smart contracts
     │   └── transactions   # Transactions used to intreact with their respective contracts
-    ├── src                # Flow-js-testing functions used to test the smart conract
-    │   ├── common.js      # Commonly used flow-js-testing functions
-    │   ├── zeedz.js       # Functions for testing the ZeedzINO contract
-    │   └── ...            # Functions for testing other contracts from this repo
-    |   
+    │
     ├── README.md          # Repository description
     └── ...

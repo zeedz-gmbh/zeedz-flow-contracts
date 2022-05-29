@@ -1,4 +1,4 @@
-import ZeedzDrops from "../../contracts/ZeedzDrops.cdc"
+import ZeedzDrops from 0xZEEDZ_DROPS
 
 transaction(name: String, description: String, id: String, total: UInt64, saleEnabled: Bool, timeStart: UFix64, timeEnd: UFix64, prices: {String : UFix64}) {
 

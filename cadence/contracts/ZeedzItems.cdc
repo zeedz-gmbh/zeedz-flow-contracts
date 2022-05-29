@@ -1,4 +1,4 @@
-import NonFungibleToken from "./NonFungibleToken.cdc"
+import NonFungibleToken from 0xNON_FUNGIBLE_TOKEN
 
 /*
     Description: Central Smart Contract for arbitrary ZeedzItems

@@ -1,5 +1,5 @@
-import ZeedzDrops from "../../contracts/ZeedzDrops.cdc"
-import FlowToken from "../../contracts/FlowToken.cdc"
+import ZeedzDrops from 0xZEEDZ_DROPS
+import FlowToken from 0xFLOW_TOKEN
 
 transaction(name: String, description: String, id: String, total: UInt64, saleEnabled: Bool) {
 

@@ -1,6 +1,6 @@
-import ZeedzDrops from "../contracts/ZeedzDrops.cdc"
+import ZeedzDrops from 0xZEEDZ_DROPS
 import FiatToken from "../contracts/FiatToken.cdc"
-import FungibleToken from "../contracts/FungibleToken.cdc"
+import FungibleToken from 0xFUNGIBLE_TOKEN
 
 transaction(productID: UInt64, userID: String) {
 

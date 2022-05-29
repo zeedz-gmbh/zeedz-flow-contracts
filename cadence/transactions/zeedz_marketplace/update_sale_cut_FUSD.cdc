@@ -1,6 +1,6 @@
-import ZeedzMarketplace from "../../contracts/ZeedzMarketplace.cdc"
-import FUSD from "../../contracts/FUSD.cdc"
-import FungibleToken from "../../contracts/FungibleToken.cdc"
+import ZeedzMarketplace from 0xZEEDZ_MARKETPLACE
+import FUSD from 0xFUSD_TOKEN
+import FungibleToken from 0xFUNGIBLE_TOKEN
 
 // This transaction creates SaleCutRequirements of ZeedzMarketplace for NFT & Zeedz
 transaction(marketCut: Address, offsetCut: Address) {

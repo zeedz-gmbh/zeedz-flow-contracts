@@ -1,11 +1,11 @@
-import NonFungibleToken from "../../contracts/NonFungibleToken.cdc"
-import NFTStorefront from "../../../contracts/NFTStorefront.cdc"
-import ZeedzMarketplace from "../../../contracts/ZeedzMarketplace.cdc"
-import FlowToken from "../../../contracts/FlowToken.cdc"
-import FungibleToken from "../../../contracts/FungibleToken.cdc"
-import ZeedzINO from "../../../contracts/NFTs/ZeedzINO.cdc"
+import NonFungibleToken from 0xNON_FUNGIBLE_TOKEN
+import NFTStorefront from 0xNFT_STOREFRONT
+import ZeedzMarketplace from 0xZEEDZ_MARKETPLACE
+import FlowToken from 0xFLOW_TOKEN
+import FungibleToken from 0xFUNGIBLE_TOKEN
+import ZeedzINO from 0xZEEDZ_INO
 
-transaction(listingResourceID: UInt64, storefrontAddress: Address, buyPrice: UFix64) {
+transaction(listingResourceID: UInt64, storefrontAddress: Address, buyPrice: UFix64, offsetAmount: UInt64) {
     let paymentVault: @FungibleToken.Vault
     let nftReceiver: &ZeedzINO.Collection{NonFungibleToken.Receiver}
     let nftCollection: &AnyResource{ZeedzINO.ZeedzCollectionPublic}
@@ -58,7 +58,7 @@ transaction(listingResourceID: UInt64, storefrontAddress: Address, buyPrice: UFi
         let zeedleRef = self.nftCollection.borrowZeedle(id: zeedleID)
             ?? panic("No such zeedleID in that collection")
 
-        self.adminRef.increaseOffset(zeedleRef: zeedleRef, amount: UInt64(Int(buyPrice) * 420))
+        self.adminRef.increaseOffset(zeedleRef: zeedleRef, amount: offsetAmount)
 
         // Be kind and recycle
         self.storefront.cleanup(listingResourceID: listingResourceID)
