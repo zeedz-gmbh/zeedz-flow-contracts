@@ -33,7 +33,7 @@ Many of the in-game purchases lead to real-world donations to NGOs focused on cl
 
 1. `git clone` the repository to your local machine.
 2. run `npm install` to install all the dependencies.
-3. run `npm test` to start elumator tests.
+3. run `npm test drops` or `npm test ino` or `npm test marketplace` to start elumator tests.
 
 ## Folder structure
 
