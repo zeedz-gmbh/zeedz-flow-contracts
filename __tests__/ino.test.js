@@ -25,8 +25,10 @@ import {
   getZeedzMintedPerType,
   getZeedleOffset,
   increaseOffset,
+  changeOffset,
   claimZeedles,
   getCollectionMetadata,
+  changeOffsetWithFetch,
 } from "./src/zeedz_ino";
 
 import { deployNonFungibleToken, getZeedzAdminAddress } from "./src/common";
@@ -396,5 +398,75 @@ describe("Zeedz INO", () => {
         },
       ].toString(),
     );
+  });
+
+  it("account owner and admin should be able to cosign and change a zeedle's carbon offset", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployZeedz();
+
+    // Setup
+    const Bob = await getAccountAddress("Bob");
+    await setupZeedzOnAccount(Bob);
+    const ZeedzAdmin = await getZeedzAdminAddress();
+
+    // Mint instruction for Bob account shall be resolved
+    await shallPass(await mintZeedle(Bob, zeedleMetadataToMint));
+
+    // Increase offset for Bob's Zeedle shall be resolved
+    await shallPass(await increaseOffset(Bob, ZeedzAdmin, 0, 1000));
+
+    let [offset] = await getZeedleOffset(Bob, 0);
+
+    // Check the Zeedle's offset
+    expect(offset).toBe(1000);
+
+    // CHhnge offset for Bob's Zeedle shall be resolved
+    await shallPass(await changeOffset(Bob, ZeedzAdmin, 0, 500));
+
+    let [offset2] = await getZeedleOffset(Bob, 0);
+
+    // Check the Zeedle's offset
+    expect(offset2).toBe(500);
+  });
+
+  it("account owner should not be able to change a zeedle's carbon offset without an admin's signature", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployZeedz();
+
+    // Setup
+    const Bob = await getAccountAddress("Bob");
+    await setupZeedzOnAccount(Bob);
+    const Alice = await getAccountAddress("Alice");
+    await setupZeedzOnAccount(Alice);
+
+    // Mint instruction for Bob account shall be resolved
+    await shallPass(await mintZeedle(Bob, zeedleMetadataToMint));
+
+    // Increase offset instruction for Bob's Zeedle shall be reverted
+    await shallRevert(await changeOffset(Bob, Alice, 1, 1000));
+  });
+
+  it("admin should be able to change a zeedle's carbon offset", async () => {
+    // Deploy
+    await deployNonFungibleToken();
+    await deployZeedz();
+
+    // Setup
+    const Bob = await getAccountAddress("Bob");
+    await setupZeedzOnAccount(Bob);
+    const ZeedzAdmin = await getZeedzAdminAddress();
+
+    // Mint instruction for Bob account shall be resolved
+    await shallPass(await mintZeedle(Bob, zeedleMetadataToMint));
+
+    // CHange offset for Bob's Zeedle shall be resolved
+    await shallPass(await changeOffsetWithFetch(Bob, ZeedzAdmin, 0, 1000));
+
+    let [offset] = await getZeedleOffset(Bob, 0);
+
+    // Check the Zeedle's offset
+    expect(offset).toBe(1000);
   });
 });
