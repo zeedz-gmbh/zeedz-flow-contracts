@@ -94,6 +94,10 @@ pub contract ZeedzINO: NonFungibleToken {
         access(contract) fun increaseOffset(amount: UInt64) {
             self.carbonOffset = self.carbonOffset + amount
         }
+
+        access(contract) fun changeOffset(offset: UInt64) {
+            self.carbonOffset = offset
+        }
     }
 
     // 
@@ -240,6 +244,14 @@ pub contract ZeedzINO: NonFungibleToken {
         pub fun increaseOffset(zeedleRef: &ZeedzINO.NFT, amount: UInt64) {
             zeedleRef.increaseOffset(amount: amount)
             emit Offset(id: zeedleRef.id, amount: amount)
+        }
+
+        //
+        //  Change the Zeedle's total carbon offset to the given amount
+        //
+        pub fun changeOffset(zeedleRef: &ZeedzINO.NFT, offset: UInt64) {
+            zeedleRef.changeOffset(offset: offset)
+            emit Offset(id: zeedleRef.id, amount: offset)
         }
     }
 
