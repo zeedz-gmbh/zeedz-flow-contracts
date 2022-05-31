@@ -1,4 +1,4 @@
-import FungibleToken from "./FungibleToken.cdc"
+import FungibleToken from 0xFUNGIBLE_TOKEN
 
 pub contract ZeedzDrops {
 
@@ -66,7 +66,7 @@ pub contract ZeedzDrops {
             name: String,
             description: String,
             id: String,
-            total: UInt64
+            total: UInt64,
             saleEnabled: Bool,
             timeStart: UFix64,
             timeEnd: UFix64,
@@ -354,19 +354,16 @@ pub contract ZeedzDrops {
             return self.products.keys
         }
 
-        pub fun borrowProduct(id: UInt64): &Product? {
-            if self.products[id] != nil {
-                return &self.products[id] as! &Product
-            } else {
-                return nil
-            }
+        pub fun borrowProduct(id: UInt64): &ZeedzDrops.Product? {
+            return (&self.products[id] as &ZeedzDrops.Product?)!
+        }
+
+        destroy () {
+            destroy self.products
         }
 
         init(){
              self.products <- {}
-        }
-        destroy () {
-            destroy self.products
         }
     }
 
@@ -374,18 +371,24 @@ pub contract ZeedzDrops {
         return self.saleCutRequirements
     }
 
-    pub fun getAllProductIDs(): [UInt64] {
-        let drops = self.account.getCapability<&ZeedzDrops.DropsAdmin{ZeedzDrops.DropsPublic}>(ZeedzDrops.ZeedzDropsPublicPath)
-            .borrow() 
-            ?? panic("Could not borrow public drops capability")
-        return drops.getProductIDs()
+    pub fun getAllProductIDs(): [UInt64]? {
+        let capabaility =  self.account.getCapability<&ZeedzDrops.DropsAdmin{ZeedzDrops.DropsPublic}>(ZeedzDrops.ZeedzDropsPublicPath)
+        if capabaility.check() {
+            let drops = capabaility.borrow()
+            return drops!.getProductIDs()
+        } else {
+            return nil
+        }
     }
 
     pub fun getProduct(id: UInt64): &Product? {
-        let drops = self.account.getCapability<&ZeedzDrops.DropsAdmin{ZeedzDrops.DropsPublic}>(ZeedzDrops.ZeedzDropsPublicPath)
-            .borrow() 
-            ?? panic("Could not borrow public drops capability")
-        return drops.borrowProduct(id: id)
+        let capabaility =  self.account.getCapability<&ZeedzDrops.DropsAdmin{ZeedzDrops.DropsPublic}>(ZeedzDrops.ZeedzDropsPublicPath)
+        if capabaility.check() {
+            let drops = capabaility.borrow()
+            return drops!.borrowProduct(id: id)
+        } else {
+            return nil
+        }
     }
 
     init () {

@@ -1,6 +1,6 @@
-import NonFungibleToken from "../../contracts/NonFungibleToken.cdc"
-import ZeedzINO from "../../contracts/ZeedzINO.cdc"
-import FungibleToken from "../../contracts/FungibleToken.cdc"
+import NonFungibleToken from 0xNON_FUNGIBLE_TOKEN
+import ZeedzINO from 0xZEEDZ_INO
+import FungibleToken from 0xFUNGIBLE_TOKEN
 
 transaction(claimIDs: [UInt64]) {
     prepare(recipient: AuthAccount, admin: AuthAccount) {

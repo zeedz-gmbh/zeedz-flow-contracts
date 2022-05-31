@@ -23,7 +23,7 @@
     "@onflow/fcl": "^0.0.77",
     "@onflow/fcl-config": "^0.0.1",
     "@onflow/types": "^0.0.5",
-    "flow-js-testing": "^0.2.1"
+    "flow-js-testing": "^0.2.3-alpha.6"
   },
   "devDependencies": {
     "@babel/core": "^7.16.0",

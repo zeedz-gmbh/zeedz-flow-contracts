@@ -60,14 +60,14 @@ export const deployZeedz = async () => {
 };
 
 export const setupZeedzOnAccount = async (account) => {
-  const name = "zeedz/setup_account";
+  const name = "zeedz_ino/setup_account";
   const signers = [account];
 
   return sendTransaction({ name, signers });
 };
 
 export const getZeedzSupply = async () => {
-  const name = "zeedz/get_zeedz_supply";
+  const name = "zeedz_ino/get_zeedz_supply";
 
   return executeScript({ name });
 };
@@ -75,7 +75,7 @@ export const getZeedzSupply = async () => {
 export const mintZeedle = async (recipient, metadata) => {
   const ZeedzAdmin = await getZeedzAdminAddress();
 
-  const name = "zeedz/mint_zeedle";
+  const name = "zeedz_ino/mint_zeedle";
   const args = [
     recipient,
     metadata.name,
@@ -96,7 +96,7 @@ export const mintZeedle = async (recipient, metadata) => {
 export const batchMintZeedle = async (recipient, metadata) => {
   const ZeedzAdmin = await getZeedzAdminAddress();
 
-  const name = "zeedz/batch_mint_zeedles";
+  const name = "zeedz_ino/batch_mint_zeedles";
   const args = [recipient, [metadata]];
   const signers = [ZeedzAdmin];
 
@@ -104,7 +104,7 @@ export const batchMintZeedle = async (recipient, metadata) => {
 };
 
 export const transferZeedle = async (sender, recipient, zeedleId) => {
-  const name = "zeedz/transfer_zeedle";
+  const name = "zeedz_ino/transfer_zeedle";
   const args = [recipient, zeedleId];
   const signers = [sender];
 
@@ -112,21 +112,21 @@ export const transferZeedle = async (sender, recipient, zeedleId) => {
 };
 
 export const getZeedleMetadata = async (account, zeedleID) => {
-  const name = "zeedz/get_zeedle_metadata";
+  const name = "zeedz_ino/get_zeedle_metadata";
   const args = [account, zeedleID];
 
   return executeScript({ name, args });
 };
 
 export const getZeedleCount = async (account) => {
-  const name = "zeedz/get_collection_length";
+  const name = "zeedz_ino/get_collection_length";
   const args = [account];
 
   return executeScript({ name, args });
 };
 
 export const burnZeedle = async (owner, zeedleId) => {
-  const name = "zeedz/burn_zeedle";
+  const name = "zeedz_ino/burn_zeedle";
   const args = [zeedleId];
   const signers = [owner];
 
@@ -134,13 +134,13 @@ export const burnZeedle = async (owner, zeedleId) => {
 };
 
 export const getZeedzMintedPerType = async () => {
-  const name = "zeedz/get_minted_per_type";
+  const name = "zeedz_ino/get_minted_per_type";
 
   return executeScript({ name });
 };
 
 export const increaseOffset = async (owner, admin, zeedleId, amount) => {
-  const name = "zeedz/admin_increase_zeedle_offset";
+  const name = "zeedz_ino/admin_increase_zeedle_offset";
   const args = [zeedleId, amount];
   const signers = [owner, admin];
 
@@ -148,7 +148,7 @@ export const increaseOffset = async (owner, admin, zeedleId, amount) => {
 };
 
 export const getZeedleOffset = async (account, zeedleID) => {
-  const name = "zeedz/get_zeedle_offset";
+  const name = "zeedz_ino/get_zeedle_offset";
   const args = [account, zeedleID];
 
   return executeScript({ name, args });
@@ -162,7 +162,7 @@ export const setupZeedzItemsAndZeedzINOOnAccount = async (account) => {
 };
 
 export const claimZeedles = async (signer, admin, claimIDs) => {
-  const name = "zeedz/claim";
+  const name = "zeedz_ino/claim";
   const args = [claimIDs];
   const signers = [signer, admin];
 
@@ -170,7 +170,7 @@ export const claimZeedles = async (signer, admin, claimIDs) => {
 };
 
 export const getCollectionMetadata = async (account) => {
-  const name = "zeedz/get_collection_metadata";
+  const name = "zeedz_ino/get_collection_metadata";
   const args = [account];
 
   return executeScript({ name, args });

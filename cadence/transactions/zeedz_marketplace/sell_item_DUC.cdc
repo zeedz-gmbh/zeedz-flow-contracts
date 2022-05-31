@@ -1,9 +1,9 @@
-import NonFungibleToken from "../../contracts/NonFungibleToken.cdc"
-import NFTStorefront from "../../contracts/NFTStorefront.cdc"
-import ZeedzMarketplace from "../../contracts/ZeedzMarketplace.cdc"
-import ZeedzINO from "../../contracts/ZeedzINO.cdc"
-import DapperUtilityCoin from "../../contracts/DapperUtilityCoin.cdc"
-import FungibleToken from "../../contracts/FungibleToken.cdc"
+import NonFungibleToken from 0xNON_FUNGIBLE_TOKEN
+import NFTStorefront from 0xNFT_STOREFRONT
+import ZeedzMarketplace from 0xZEEDZ_MARKETPLACE
+import ZeedzINO from 0xZEEDZ_INO
+import DapperUtilityCoin from 0xDUC_TOKEN
+import FungibleToken from 0xFUNGIBLE_TOKEN
 
 transaction(saleItemID: UInt64, saleItemPrice: UFix64) {
     let ducReceiver: Capability<&DapperUtilityCoin.Vault{FungibleToken.Receiver}>

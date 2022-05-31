@@ -1,11 +1,11 @@
-import NonFungibleToken from "../../contracts/NonFungibleToken.cdc"
-import ZeedzINO from "../../contracts/ZeedzINO.cdc"
+import NonFungibleToken from 0xNON_FUNGIBLE_TOKEN
+import ZeedzINO from 0xZEEDZ_INO
 
 /*
     This script returns the metadata for a Zeedle NFT in an account's collection.
 */
 
-pub fun main(address: Address, zeedleID: UInt64): UInt64 {
+pub fun main(address: Address, zeedleID: UInt64): {String: AnyStruct} {
 
     let owner = getAccount(address)
 
@@ -16,5 +16,5 @@ pub fun main(address: Address, zeedleID: UInt64): UInt64 {
     let Zeedle = collectionBorrow.borrowZeedle(id: zeedleID)
         ?? panic("No such zeedleID in that collection")
 
-    return Zeedle.carbonOffset
+    return Zeedle.getMetadata()
 }

@@ -1,4 +1,4 @@
-import ZeedzINO from "../../contracts/ZeedzINO.cdc"
+import ZeedzINO from 0xZEEDZ_INO
 
 pub fun main(address: Address): Bool {
     let owner = getAccount(address)

@@ -1,9 +1,9 @@
-import NonFungibleToken from "../../contracts/NonFungibleToken.cdc"
-import NFTStorefront from "../../contracts/NFTStorefront.cdc"
-import ZeedzMarketplace from "../../contracts/ZeedzMarketplace.cdc"
-import ZeedzINO from "../../contracts/ZeedzINO.cdc"
-import FUSD from "../../contracts/FUSD.cdc"
-import FungibleToken from "../../contracts/FungibleToken.cdc"
+import NonFungibleToken from 0xNON_FUNGIBLE_TOKEN
+import NFTStorefront from 0xNFT_STOREFRONT
+import ZeedzMarketplace from 0xZEEDZ_MARKETPLACE
+import ZeedzINO from 0xZEEDZ_INO
+import FUSD from 0xFUSD_TOKEN
+import FungibleToken from 0xFUNGIBLE_TOKEN
 
 transaction(saleItemID: UInt64, saleItemPrice: UFix64) {
     let fusdReceiver: Capability<&FUSD.Vault{FungibleToken.Receiver}>

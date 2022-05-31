@@ -1,5 +1,5 @@
-import FungibleToken from "./FungibleToken.cdc"
-import NonFungibleToken from "./NonFungibleToken.cdc"
+import FungibleToken from 0xFUNGIBLE_TOKEN
+import NonFungibleToken from 0xNON_FUNGIBLE_TOKEN
 
 // NFTStorefront
 //
@@ -214,9 +214,8 @@ pub contract NFTStorefront {
             let ref = self.nftProviderCapability.borrow()!.borrowNFT(id: self.getDetails().nftID)
             //- CANNOT DO THIS IN PRECONDITION: "member of restricted type is not accessible: isInstance"
             //  result.isInstance(self.getDetails().nftType): "token has wrong type"
-            assert(ref.isInstance(self.getDetails().nftType), message: "token has wrong type")
-            assert(ref.id == self.getDetails().nftID, message: "token has wrong ID")
-            return ref as &NonFungibleToken.NFT
+            assert(ref!.id == self.getDetails().nftID, message: "token has wrong ID")
+            return ref! as &NonFungibleToken.NFT
         }
 
         // getDetails
@@ -249,7 +248,6 @@ pub contract NFTStorefront {
             // to implement the functionality behind the interface in any given way.
             // Therefore we cannot trust the Collection resource behind the interface,
             // and we must check the NFT resource it gives us to make sure that it is the correct one.
-            assert(nft.isInstance(self.details.nftType), message: "withdrawn NFT is not of specified type")
             assert(nft.id == self.details.nftID, message: "withdrawn NFT does not have specified ID")
 
             // Rather than aborting the transaction if any receiver is absent when we try to pay it,
@@ -333,8 +331,7 @@ pub contract NFTStorefront {
 
             // This will precondition assert if the token is not available.
             let nft = provider!.borrowNFT(id: self.details.nftID)
-            assert(nft.isInstance(self.details.nftType), message: "token is not of specified type")
-            assert(nft.id == self.details.nftID, message: "token does not have specified ID")
+            assert(nft!.id == self.details.nftID, message: "token does not have specified ID")
         }
     }
 
@@ -439,7 +436,7 @@ pub contract NFTStorefront {
         //
         pub fun borrowListing(listingResourceID: UInt64): &Listing{ListingPublic}? {
             if self.listings[listingResourceID] != nil {
-                return &self.listings[listingResourceID] as! &Listing{ListingPublic}
+                return (&self.listings[listingResourceID] as &Listing{ListingPublic}?)!
             } else {
                 return nil
             }

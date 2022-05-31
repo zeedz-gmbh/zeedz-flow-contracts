@@ -59,7 +59,7 @@ export const buyZeedzINO = async (sender, seller, listingId, buyPrice) => {
 
 export const buyZeedzINOIncreaseOffset = async (sender, admin, seller, listingId, buyPrice) => {
   const name = "zeedz_marketplace/buy_item_offset_FLOW";
-  const args = [listingId, seller, buyPrice];
+  const args = [listingId, seller, buyPrice, 69];
   const signers = [sender, admin];
 
   return sendTransaction({ name, args, signers });

@@ -1,4 +1,4 @@
-import ZeedzDrops from "../contracts/ZeedzDrops.cdc"
+import ZeedzDrops from 0xZEEDZ_DROPS
 
 transaction(productID: UInt64, startTime: UFix64) {
 

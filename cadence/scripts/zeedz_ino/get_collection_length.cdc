@@ -1,5 +1,5 @@
-import NonFungibleToken from "../../contracts/NonFungibleToken.cdc"
-import ZeedzINO from "../../contracts/ZeedzINO.cdc"
+import NonFungibleToken from 0xNON_FUNGIBLE_TOKEN
+import ZeedzINO from 0xZEEDZ_INO
 
 /*
     This script returns the size of an account's ZeedzINO collection.

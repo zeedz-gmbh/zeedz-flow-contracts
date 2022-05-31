@@ -1,5 +1,5 @@
-import ZeedzINO from "../../contracts/ZeedzINO.cdc"
-import NonFungibleToken from "../../contracts/NonFungibleToken.cdc"
+import ZeedzINO from 0xZEEDZ_INO
+import NonFungibleToken from 0xNON_FUNGIBLE_TOKEN
 
 transaction(recipient: Address, typeID: UInt32, metadata: {String : String}) {
 

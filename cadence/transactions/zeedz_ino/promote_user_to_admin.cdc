@@ -1,5 +1,4 @@
-
-import ZeedzINO from "../../contracts/ZeedzINO.cdc"
+import ZeedzINO from 0xZEEDZ_INO
 
 /* 
     This transaction gives an user the administrator capability

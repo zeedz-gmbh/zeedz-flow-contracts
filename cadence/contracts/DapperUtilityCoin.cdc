@@ -1,4 +1,4 @@
-import FungibleToken from "./FungibleToken.cdc"
+import FungibleToken from 0xFUNGIBLE_TOKEN
 
 pub contract DapperUtilityCoin: FungibleToken {
 
