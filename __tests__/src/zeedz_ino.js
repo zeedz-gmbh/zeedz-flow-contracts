@@ -147,6 +147,22 @@ export const increaseOffset = async (owner, admin, zeedleId, amount) => {
   return sendTransaction({ name, args, signers });
 };
 
+export const changeOffset = async (owner, admin, zeedleId, offset) => {
+  const name = "zeedz_ino/admin_change_zeedle_offset";
+  const args = [zeedleId, offset];
+  const signers = [owner, admin];
+
+  return sendTransaction({ name, args, signers });
+};
+
+export const changeOffsetWithFetch = async (owner, admin, zeedleId, offset) => {
+  const name = "zeedz_ino/admin_change_zeedle_offset_with_fetch";
+  const args = [owner, zeedleId, offset];
+  const signers = [admin];
+
+  return sendTransaction({ name, args, signers });
+};
+
 export const getZeedleOffset = async (account, zeedleID) => {
   const name = "zeedz_ino/get_zeedle_offset";
   const args = [account, zeedleID];
