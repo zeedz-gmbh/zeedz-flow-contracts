@@ -243,7 +243,7 @@ pub contract ZeedzINO: NonFungibleToken {
         //
         pub fun increaseOffset(zeedleRef: &ZeedzINO.NFT, amount: UInt64) {
             zeedleRef.increaseOffset(amount: amount)
-            emit Offset(id: zeedleRef.id, amount: amount)
+            emit Offset(id: zeedleRef.id, amount: zeedleRef.carbonOffset)
         }
 
         //
