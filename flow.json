@@ -27,6 +27,9 @@
     },
     "DapperUtilityCoin": {
       "source": "./cadence/contracts/DapperUtilityCoin.cdc"
+    },
+    "ZeedzDrops": {
+      "source": "./cadence/contracts/ZeedzDrops.cdc"
     }
   },
   "networks": {
