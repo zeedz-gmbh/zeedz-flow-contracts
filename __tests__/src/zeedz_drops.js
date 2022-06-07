@@ -127,3 +127,11 @@ export const buyProductWithDiscountFlow = async (id, cognito, discount, user, ad
 
   return sendTransaction({ name, args, signers });
 };
+
+export const setTime = async (id, startTime, endTime, admin) => {
+  const name = "zeedz_drops/set_time";
+  const args = [id, startTime, endTime];
+  const signers = [admin];
+
+  return sendTransaction({ name, args, signers });
+};

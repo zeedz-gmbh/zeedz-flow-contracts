@@ -26,6 +26,7 @@ import {
   setStartTime,
   setEndTime,
   buyProductWithDiscountFlow,
+  setTime,
 } from "./src/zeedz_drops";
 
 import { getZeedzAdminAddress } from "./src/common";
@@ -529,5 +530,59 @@ describe("Zeedz Drops", () => {
 
     expect(balance).toStrictEqual("43.10100000"); // 69.5 - (1.0 - discount) * 33.0;
     expect(details.sold).toStrictEqual(1);
+  });
+
+  it("admin shall be able to simultaneously change start and end time of a product if current starttime is lesser than new starttime", async () => {
+    // Deploy
+    await deployZeedzDrops();
+
+    // Setup
+    const ZeedzAdmin = await getZeedzAdminAddress();
+
+    const { name, description, id, total, saleEnabled } = testProduct;
+
+    // Transaction Shall Pass
+    await shallPass(await addProductTest(name, description, id, total, saleEnabled, ZeedzAdmin));
+
+    const newStartTime = "420.00000000";
+
+    const newEndTime = "920.00000000";
+
+    const [products] = await getAllProductIds();
+
+    await shallPass(await setTime(products[0], newStartTime, newEndTime, ZeedzAdmin));
+
+    const [details] = await getProductDetails(products[0]);
+
+    // Check Result
+    expect(details.timeStart).toStrictEqual(newStartTime);
+    expect(details.timeEnd).toStrictEqual(newEndTime);
+  });
+
+  it("admin shall be able to simultaneously change start and end time of a product if current starttime is greater than new starttime", async () => {
+    // Deploy
+    await deployZeedzDrops();
+
+    // Setup
+    const ZeedzAdmin = await getZeedzAdminAddress();
+
+    const { name, description, id, total, saleEnabled } = testProduct;
+
+    // Transaction Shall Pass
+    await shallPass(await addProductTest(name, description, id, total, saleEnabled, ZeedzAdmin));
+
+    const newStartTime = "2652722543.00000000";
+
+    const newEndTime = "3652722543.00000000";
+
+    const [products] = await getAllProductIds();
+
+    await shallPass(await setTime(products[0], newStartTime, newEndTime, ZeedzAdmin));
+
+    const [details] = await getProductDetails(products[0]);
+
+    // Check Result
+    expect(details.timeStart).toStrictEqual(newStartTime);
+    expect(details.timeEnd).toStrictEqual(newEndTime);
   });
 });
