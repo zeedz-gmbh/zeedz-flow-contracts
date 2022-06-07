@@ -10,6 +10,8 @@ pub contract ZeedzDrops {
 
     pub event ProductRemoved(productID: UInt64)
 
+    pub event ProductUpdated(productID: UInt64, details: ProductDetails, field: String)
+
     pub let ZeedzDropsStoragePath: StoragePath
 
     pub let ZeedzDropsPublicPath: PublicPath
@@ -314,16 +316,19 @@ pub contract ZeedzDrops {
         pub fun setSaleEnabledStatus(productID: UInt64, status: Bool) {
             let product = self.borrowProduct(id: productID) ?? panic("not able to borrow specified product")
             product.details.setSaleEnabledStatus(status: status)
+            emit ProductUpdated(productID: productID, details: product.getDetails(), field: "saleEnabled")          
         }
 
         pub fun setStartTime(productID: UInt64, startTime: UFix64,) {
             let product = self.borrowProduct(id :productID) ?? panic("not able to borrow specified product")
             product.details.setStartTime(startTime: startTime)
+            emit ProductUpdated(productID: productID, details: product.getDetails(), field: "startTime")   
         }
 
         pub fun setEndTime(productID: UInt64, endTime: UFix64) {
             let product = self.borrowProduct(id :productID) ?? panic("not able to borrow specified product")
             product.details.setEndTime(endTime: endTime)
+            emit ProductUpdated(productID: productID, details: product.getDetails(), field: "endTime")   
         }
 
         pub fun purchase(productID: UInt64, payment: @FungibleToken.Vault, vaultType: Type, userID: String) {
@@ -348,6 +353,7 @@ pub contract ZeedzDrops {
         pub fun setPrices(productID: UInt64, prices: {String : UFix64}) {
             let product = self.borrowProduct(id: productID) ?? panic("not able to borrow specified product")
             product.details.setPrices(prices: prices)
+            emit ProductUpdated(productID: productID, details: product.getDetails(), field: "prices")   
         }
 
         pub fun getProductIDs(): [UInt64] {
