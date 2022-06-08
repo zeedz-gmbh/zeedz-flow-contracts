@@ -104,7 +104,7 @@ pub contract interface NonFungibleToken {
     pub resource interface CollectionPublic {
         pub fun deposit(token: @NFT)
         pub fun getIDs(): [UInt64]
-        pub fun borrowNFT(id: UInt64): &NFT?
+        pub fun borrowNFT(id: UInt64): &NFT
     }
 
     // Requirement for the the concrete resource type
@@ -127,7 +127,7 @@ pub contract interface NonFungibleToken {
 
         // Returns a borrowed reference to an NFT in the collection
         // so that the caller can read data and call methods from it
-        pub fun borrowNFT(id: UInt64): &NFT? {
+        pub fun borrowNFT(id: UInt64): &NFT {
             pre {
                 self.ownedNFTs[id] != nil: "NFT does not exist in the collection!"
             }
