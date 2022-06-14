@@ -1,5 +1,5 @@
 import ZeedzDrops from 0xZEEDZ_DROPS
-import FlowToken from "../contracts/FlowToken.cdc"
+import FlowToken from 0xFLOW_TOKEN
 import FungibleToken from 0xFUNGIBLE_TOKEN
 
 transaction(productID: UInt64, userID: String) {
