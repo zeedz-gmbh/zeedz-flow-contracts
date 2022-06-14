@@ -1,5 +1,5 @@
 import ZeedzDrops from 0xZEEDZ_DROPS
-import FUSD from "../contracts/FUSD.cdc"
+import FUSD from 0xFUSD_TOKEN
 import FungibleToken from 0xFUNGIBLE_TOKEN
 
 transaction(productID: UInt64, userID: String) {
