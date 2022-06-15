@@ -4,7 +4,7 @@ pub contract ZeedzDrops {
 
     pub event ProductPurchased(productID: UInt64, details: ProductDetails, currency: String, userID: String)
 
-    pub event ProductAdded(productID: UInt64, productDetails: ProductDetails)
+    pub event ProductAdded(productID: UInt64, details: ProductDetails)
 
     pub event ProductsReserved(productID: UInt64, amount: UInt64)
 
@@ -137,13 +137,13 @@ pub contract ZeedzDrops {
             vaultType: Type,
             userID: String)
         pub fun addProduct(
-            name: String, 
-            description: String, 
-            id: String, 
-            total: UInt64, 
-            saleEnabled: Bool, 
-            timeStart: UFix64, 
-            timeEnd: UFix64, 
+            name: String,
+            description: String,
+            id: String,
+            total: UInt64,
+            saleEnabled: Bool,
+            timeStart: UFix64,
+            timeEnd: UFix64,
             prices: {String : UFix64}): UInt64
         pub fun setPrices(productID: UInt64, prices: {String : UFix64})
     }
@@ -158,7 +158,7 @@ pub contract ZeedzDrops {
     }
 
     pub resource Product: ProductPublic {
-  
+
         access(contract) let details: ProductDetails
 
         pub fun getDetails(): ProductDetails {
@@ -237,22 +237,22 @@ pub contract ZeedzDrops {
         }
 
         init (
-            name: String, 
-            description: String, 
-            id: String, 
-            total: UInt64, 
-            saleEnabled: Bool, 
-            timeStart: UFix64, 
-            timeEnd: UFix64, 
+            name: String,
+            description: String,
+            id: String,
+            total: UInt64,
+            saleEnabled: Bool,
+            timeStart: UFix64,
+            timeEnd: UFix64,
             prices: {String : UFix64}) {
             self.details = ProductDetails(
-                name: name, 
-                description: description, 
-                id: id, 
-                total: total, 
-                saleEnabled: saleEnabled, 
-                timeStart: timeStart, 
-                timeEnd: timeEnd, 
+                name: name,
+                description: description,
+                id: id,
+                total: total,
+                saleEnabled: saleEnabled,
+                timeStart: timeStart,
+                timeEnd: timeEnd,
                 prices: prices
                 )
         }
@@ -260,18 +260,18 @@ pub contract ZeedzDrops {
 
     pub resource DropsAdmin: ProductsManager, DropsManager, DropsPublic {
         pub fun addProduct(
-            name: String, 
-            description: String, 
-            id: String, 
-            total: UInt64, 
-            saleEnabled: Bool, 
-            timeStart: UFix64, 
-            timeEnd: UFix64, 
+            name: String,
+            description: String,
+            id: String,
+            total: UInt64,
+            saleEnabled: Bool,
+            timeStart: UFix64,
+            timeEnd: UFix64,
             prices: {String : UFix64}
             ): UInt64 {
             let product <- create Product(
-                        name: name, 
-                        description: description, 
+                        name: name,
+                        description: description,
                         id: id,
                         total: total,
                         saleEnabled: saleEnabled,
@@ -283,14 +283,14 @@ pub contract ZeedzDrops {
             let productID = product.uuid
 
             let details = product.getDetails()
-            
+
             let oldProduct <- self.products[productID] <- product
             // Note that oldProduct will always be nil, but we have to handle it.
             destroy oldProduct
 
             emit ProductAdded(
                 productID: productID,
-                productDetails: details
+                details: details
             )
 
             return productID
@@ -316,19 +316,19 @@ pub contract ZeedzDrops {
         pub fun setSaleEnabledStatus(productID: UInt64, status: Bool) {
             let product = self.borrowProduct(id: productID) ?? panic("not able to borrow specified product")
             product.details.setSaleEnabledStatus(status: status)
-            emit ProductUpdated(productID: productID, details: product.getDetails(), field: "saleEnabled")          
+            emit ProductUpdated(productID: productID, details: product.getDetails(), field: "saleEnabled")
         }
 
         pub fun setStartTime(productID: UInt64, startTime: UFix64,) {
             let product = self.borrowProduct(id :productID) ?? panic("not able to borrow specified product")
             product.details.setStartTime(startTime: startTime)
-            emit ProductUpdated(productID: productID, details: product.getDetails(), field: "startTime")   
+            emit ProductUpdated(productID: productID, details: product.getDetails(), field: "startTime")
         }
 
         pub fun setEndTime(productID: UInt64, endTime: UFix64) {
             let product = self.borrowProduct(id :productID) ?? panic("not able to borrow specified product")
             product.details.setEndTime(endTime: endTime)
-            emit ProductUpdated(productID: productID, details: product.getDetails(), field: "endTime")   
+            emit ProductUpdated(productID: productID, details: product.getDetails(), field: "endTime")
         }
 
         pub fun purchase(productID: UInt64, payment: @FungibleToken.Vault, vaultType: Type, userID: String) {
@@ -353,7 +353,7 @@ pub contract ZeedzDrops {
         pub fun setPrices(productID: UInt64, prices: {String : UFix64}) {
             let product = self.borrowProduct(id: productID) ?? panic("not able to borrow specified product")
             product.details.setPrices(prices: prices)
-            emit ProductUpdated(productID: productID, details: product.getDetails(), field: "prices")   
+            emit ProductUpdated(productID: productID, details: product.getDetails(), field: "prices")
         }
 
         pub fun getProductIDs(): [UInt64] {
