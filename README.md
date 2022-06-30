@@ -6,11 +6,17 @@ This repository contains the Cadence contracts & their respective flow-js test c
 
 ### Flow
 
-| Contract | Address            | Environment       |
-| -------- | ------------------ | ----------------- |
-| ZeedzINO | 0x3395cee8c1898879 | DEV - Testnet     |
-| ZeedzINO | 0x2dda9145001182e0 | STAGING - Testnet |
-| ZeedzINO | 0x62b3063fbe672fc8 | PROD - Mainnet    |
+| Contract         | Address            | Environment       |
+| ---------------- | ------------------ | ----------------- |
+| ZeedzINO         | 0x3395cee8c1898879 | DEV - Testnet     |
+| ZeedzINO         | 0x2dda9145001182e0 | STAGING - Testnet |
+| ZeedzINO         | 0x62b3063fbe672fc8 | PROD - Mainnet    |
+| ZeedzMarketplace | 0x3395cee8c1898879 | DEV - Testnet     |
+| ZeedzMarketplace | 0x2dda9145001182e0 | STAGING - Testnet |
+| ZeedzMarketplace | 0x62b3063fbe672fc8 | PROD - Mainnet    |
+| ZeedzDrops       | 0x3395cee8c1898879 | DEV - Testnet     |
+| ZeedzDrops       | 0x2dda9145001182e0 | STAGING - Testnet |
+| ZeedzDrops       | 0x62b3063fbe672fc8 | PROD - Mainnet    |
 
 ## What is Zeedz
 
