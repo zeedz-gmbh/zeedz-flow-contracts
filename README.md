@@ -2,6 +2,16 @@
 
 This repository contains the Cadence contracts & their respective flow-js test cases.
 
+## Deployments
+
+### Flow
+
+| Contract | Address            | Environment       |
+| -------- | ------------------ | ----------------- |
+| ZeedzINO | 0x3395cee8c1898879 | DEV - Testnet     |
+| ZeedzINO | 0x2dda9145001182e0 | STAGING - Testnet |
+| ZeedzINO | 0x62b3063fbe672fc8 | PROD - Mainnet    |
+
 ## What is Zeedz
 
 Zeedz is the first play-for-purpose game where players reduce global carbon emissions by collecting plant-inspired creatures: Zeedles. They live as NFTs on an eco-friendly blockchain (Flow) and grow with the real-world weather.
