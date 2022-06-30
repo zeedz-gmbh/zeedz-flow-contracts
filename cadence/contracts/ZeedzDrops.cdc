@@ -277,8 +277,7 @@ pub contract ZeedzDrops {
                         saleEnabled: saleEnabled,
                         timeStart: timeStart,
                         timeEnd: timeEnd,
-                        prices: prices
-                    )
+                        prices: prices)
 
             let productID = product.uuid
 
