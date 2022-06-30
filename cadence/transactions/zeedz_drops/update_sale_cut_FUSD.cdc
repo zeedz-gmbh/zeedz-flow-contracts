@@ -17,7 +17,7 @@ transaction(marketCut: Address) {
 
         // market SaleCut
         if marketRatio > 0.0 {
-            let marketFUSDReceiver = getAccount(marketCut).getCapability<&FUSD.Vault{FungibleToken.Receiver}>(/public/fusdReceive)
+            let marketFUSDReceiver = getAccount(marketCut).getCapability<&FUSD.Vault{FungibleToken.Receiver}>(/public/fusdReceiver)
             assert(marketFUSDReceiver.borrow() != nil, message: "Missing or mis-typed market FUSD receiver")
             requirements.append(ZeedzDrops.SaleCutRequirement(receiver: marketFUSDReceiver, ratio: marketRatio))
         }
