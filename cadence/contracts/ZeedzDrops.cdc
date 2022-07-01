@@ -395,10 +395,16 @@ pub contract ZeedzDrops {
         return self.saleCutRequirements
     }
 
+    //
+    // Returns all of the current product ids
+    //
     pub fun getAllProductIDs(): [UInt64]? {
       return self.products.keys
     }
 
+    //
+    // Returns a reference to a product which can be used to access the product's details
+    //
     pub fun borrowProduct(id: UInt64): &ZeedzDrops.Product? {
         return (&self.products[id] as &ZeedzDrops.Product?)!
     }
@@ -406,6 +412,7 @@ pub contract ZeedzDrops {
     init () {
         self.ZeedzDropsStoragePath = /storage/ZeedzDrops
         self.ZeedzDropsPublicPath= /public/ZeedzDrops
+
         self.saleCutRequirements = {}
         self.products <- {}
 
