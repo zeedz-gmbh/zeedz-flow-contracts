@@ -16,11 +16,9 @@ pub contract ZeedzDrops {
     pub let ZeedzDropsPublicPath: PublicPath
 
     // {Type of the FungibleToken => array of SaleCutRequirements}
-
     access(contract) var saleCutRequirements: {String : [SaleCutRequirement]}
 
     // {Product.uuid => Product}
-
     access(contract) var products: @{UInt64: Product}
 
     //
