@@ -10,7 +10,7 @@ transaction(productID: UInt64, userID: String) {
     let adminRef: &ZeedzDrops.DropsAdmin{ZeedzDrops.ProductsManager}
 
     prepare(acct: AuthAccount, admin: AuthAccount) {
-        self.productRef =  ZeedzDrops.getProduct(id: productID) 
+        self.productRef =  ZeedzDrops.borrowProduct(id: productID) 
             ?? panic("Product with specified id not found")
 
         self.vaultType = Type<@FlowToken.Vault>()

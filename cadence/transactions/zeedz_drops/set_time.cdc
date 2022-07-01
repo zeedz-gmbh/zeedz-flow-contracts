@@ -10,7 +10,7 @@ transaction(productID: UInt64, startTime: UFix64, endTime: UFix64) {
     prepare(acct: AuthAccount) {
         self.dropsAdmin = acct.borrow<&ZeedzDrops.DropsAdmin{ZeedzDrops.ProductsManager}>(from: ZeedzDrops.ZeedzDropsStoragePath)
             ?? panic("Missing or mis-typed admin resource")
-        self.productRef =  ZeedzDrops.getProduct(id: productID) 
+        self.productRef =  ZeedzDrops.borrowProduct(id: productID) 
             ?? panic("Product with specified id not found")
         self.oldEndTime = self.productRef!.getDetails().timeEnd
         self.oldStartTime = self.productRef!.getDetails().timeStart
