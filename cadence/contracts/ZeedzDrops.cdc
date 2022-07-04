@@ -2,22 +2,29 @@ import FungibleToken from 0xFUNGIBLE_TOKEN
 
 pub contract ZeedzDrops {
 
+    // Events 
+    
     pub event ProductPurchased(productID: UInt64, details: ProductDetails, currency: String, userID: String)
-
     pub event ProductAdded(productID: UInt64, details: ProductDetails)
-
     pub event ProductsReserved(productID: UInt64, amount: UInt64)
-
     pub event ProductRemoved(productID: UInt64)
-
     pub event ProductUpdated(productID: UInt64, details: ProductDetails, field: String)
 
-    pub let ZeedzDropsStoragePath: StoragePath
+    // Paths
 
+    pub let ZeedzDropsStoragePath: StoragePath
     pub let ZeedzDropsPublicPath: PublicPath
 
+    // {Type of the FungibleToken => array of SaleCutRequirements}
     access(contract) var saleCutRequirements: {String : [SaleCutRequirement]}
 
+    // {Product.uuid => Product}
+    access(contract) var products: @{UInt64: Product}
+
+    //
+    // Used to defined sale cuts for each product sold via this contract.
+    // Contains a FungibleToken reciever capability for the sale cut recieving address and a ratio which defines the percentage of the sale cut.
+    //
     pub struct SaleCutRequirement {
         pub let receiver: Capability<&{FungibleToken.Receiver}>
 
@@ -33,6 +40,9 @@ pub contract ZeedzDrops {
         }
     }
 
+    //
+    // A struct used to define the details of a Product
+    //
     pub struct ProductDetails {
         // product name
         pub let name: String
@@ -118,11 +128,17 @@ pub contract ZeedzDrops {
         }
     }
 
-
+    //   
+    // An interface providing the details function to a Product
+    //
     pub resource interface ProductPublic {
         pub fun getDetails(): ProductDetails
     }
 
+
+    //   
+    // An interface used by the ZeedzDrops Contract Administrator to manage various Product fields.
+    //
     pub resource interface ProductsManager {
         pub fun setSaleEnabledStatus(productID: UInt64, status: Bool)
         pub fun setStartTime(productID: UInt64, startTime: UFix64)
@@ -148,15 +164,17 @@ pub contract ZeedzDrops {
         pub fun setPrices(productID: UInt64, prices: {String : UFix64})
     }
 
+    //   
+    // An interface used by the ZeedzDrops Contract Administrator to manage the Drops Contract fields
+    //
     pub resource interface DropsManager {
         pub fun updateSaleCutRequirement(requirements: [SaleCutRequirement], vaultType: Type)
     }
 
-    pub resource interface DropsPublic {
-        pub fun getProductIDs(): [UInt64]
-        pub fun borrowProduct(id: UInt64): &Product?
-    }
-
+    //   
+    // A resource which represents a product available for purchase on chain. The purchase methods are protected
+    // by the administrator interface in order to prevent bot attacks.
+    //
     pub resource Product: ProductPublic {
 
         access(contract) let details: ProductDetails
@@ -165,6 +183,12 @@ pub contract ZeedzDrops {
             return self.details
         }
 
+        //
+        // Used to purchase a product on chain, a payment in the form of a FungibleToken.Vault has to be supplied 
+        // to this function, along with the vault type and the Zeedz user cognitoID. If all the checks are passed and
+        // after the purchase is complete, our backend will process the ProductPurchased event 
+        // and assign the purchased product to the specified Zeedz cognito userID.
+        //
         access(contract) fun purchase(payment: @FungibleToken.Vault, vaultType: Type, userID: String) {
             pre {
                 self.details.saleEnabled == true: "the sale of this product is disabled"
@@ -197,6 +221,10 @@ pub contract ZeedzDrops {
             emit ProductPurchased(productID: self.uuid, details: self.details, currency: vaultType.identifier, userID: userID)
         }
 
+        //
+        // Used to purchase a product on chain with a discount, uses the same logic as the purchase method, along 
+        // with a discout modifier. Protected by the admin interface in order to check the validity of the supplied discount vaule.
+        //
         access(contract) fun purchaseWithDiscount(payment: @FungibleToken.Vault, discount: UFix64, productID: UInt64, vaultType: Type, userID: String) {
              pre {
                 discount < 1.0: "discount cannot be higher than 100%"
@@ -258,7 +286,11 @@ pub contract ZeedzDrops {
         }
     }
 
-    pub resource DropsAdmin: ProductsManager, DropsManager, DropsPublic {
+    //
+    // This resource is owned by the ZeedzDrops Administrator and it has acess to all the functions that are needed
+    // to modify the available products on chain.
+    //
+    pub resource DropsAdmin: ProductsManager, DropsManager {
         pub fun addProduct(
             name: String,
             description: String,
@@ -283,7 +315,7 @@ pub contract ZeedzDrops {
 
             let details = product.getDetails()
 
-            let oldProduct <- self.products[productID] <- product
+            let oldProduct <- ZeedzDrops.products[productID] <- product
             // Note that oldProduct will always be nil, but we have to handle it.
             destroy oldProduct
 
@@ -295,10 +327,8 @@ pub contract ZeedzDrops {
             return productID
         }
 
-        access(contract) var products: @{UInt64: Product}
-
         pub fun reserve(productID: UInt64, amount: UInt64) {
-            let product = self.borrowProduct(id: productID) ?? panic("not able to borrow specified product")
+            let product = ZeedzDrops.borrowProduct(id: productID) ?? panic("not able to borrow specified product")
             assert(product.details.total - product.details.sold >= amount, message: "reserve amount can't be higher than available pack amount")
             product.details.reserve(amount: amount)
             emit ProductsReserved(productID: productID, amount: amount)
@@ -306,37 +336,37 @@ pub contract ZeedzDrops {
         }
         pub fun removeProduct(productID: UInt64) {
             pre {
-                self.products[productID] != nil: "could not find product with given id"
+                ZeedzDrops.products[productID] != nil: "could not find product with given id"
             }
-            let product <- self.products.remove(key: productID)!
+            let product <- ZeedzDrops.products.remove(key: productID)!
             destroy product
         }
 
         pub fun setSaleEnabledStatus(productID: UInt64, status: Bool) {
-            let product = self.borrowProduct(id: productID) ?? panic("not able to borrow specified product")
+            let product = ZeedzDrops.borrowProduct(id: productID) ?? panic("not able to borrow specified product")
             product.details.setSaleEnabledStatus(status: status)
             emit ProductUpdated(productID: productID, details: product.getDetails(), field: "saleEnabled")
         }
 
         pub fun setStartTime(productID: UInt64, startTime: UFix64,) {
-            let product = self.borrowProduct(id :productID) ?? panic("not able to borrow specified product")
+            let product = ZeedzDrops.borrowProduct(id :productID) ?? panic("not able to borrow specified product")
             product.details.setStartTime(startTime: startTime)
             emit ProductUpdated(productID: productID, details: product.getDetails(), field: "startTime")
         }
 
         pub fun setEndTime(productID: UInt64, endTime: UFix64) {
-            let product = self.borrowProduct(id :productID) ?? panic("not able to borrow specified product")
+            let product = ZeedzDrops.borrowProduct(id :productID) ?? panic("not able to borrow specified product")
             product.details.setEndTime(endTime: endTime)
             emit ProductUpdated(productID: productID, details: product.getDetails(), field: "endTime")
         }
 
         pub fun purchase(productID: UInt64, payment: @FungibleToken.Vault, vaultType: Type, userID: String) {
-            let product = self.borrowProduct(id: productID) ?? panic("not able to borrow specified product")
+            let product = ZeedzDrops.borrowProduct(id: productID) ?? panic("not able to borrow specified product")
             product.purchase(payment: <- payment, vaultType: vaultType, userID: userID)
         }
 
         pub fun purchaseWithDiscount(productID: UInt64, payment: @FungibleToken.Vault, discount: UFix64, vaultType: Type, userID: String) {
-            let product = self.borrowProduct(id: productID) ?? panic("not able to borrow specified product")
+            let product = ZeedzDrops.borrowProduct(id: productID) ?? panic("not able to borrow specified product")
             product.purchaseWithDiscount(payment: <- payment, discount: discount, productID: productID, vaultType: vaultType, userID: userID)
         }
 
@@ -350,59 +380,41 @@ pub contract ZeedzDrops {
         }
 
         pub fun setPrices(productID: UInt64, prices: {String : UFix64}) {
-            let product = self.borrowProduct(id: productID) ?? panic("not able to borrow specified product")
+            let product = ZeedzDrops.borrowProduct(id: productID) ?? panic("not able to borrow specified product")
             product.details.setPrices(prices: prices)
             emit ProductUpdated(productID: productID, details: product.getDetails(), field: "prices")
         }
-
-        pub fun getProductIDs(): [UInt64] {
-            return self.products.keys
-        }
-
-        pub fun borrowProduct(id: UInt64): &ZeedzDrops.Product? {
-            return (&self.products[id] as &ZeedzDrops.Product?)!
-        }
-
-        destroy () {
-            destroy self.products
-        }
-
-        init(){
-             self.products <- {}
-        }
     }
 
+    //
+    // Returns the current sale cut requirements
+    //
     pub fun getAllSaleCutRequirements(): {String: [SaleCutRequirement]} {
         return self.saleCutRequirements
     }
 
+    //
+    // Returns all of the current product ids
+    //
     pub fun getAllProductIDs(): [UInt64]? {
-        let capabaility =  self.account.getCapability<&ZeedzDrops.DropsAdmin{ZeedzDrops.DropsPublic}>(ZeedzDrops.ZeedzDropsPublicPath)
-        if capabaility.check() {
-            let drops = capabaility.borrow()
-            return drops!.getProductIDs()
-        } else {
-            return nil
-        }
+      return self.products.keys
     }
 
-    pub fun getProduct(id: UInt64): &Product? {
-        let capabaility =  self.account.getCapability<&ZeedzDrops.DropsAdmin{ZeedzDrops.DropsPublic}>(ZeedzDrops.ZeedzDropsPublicPath)
-        if capabaility.check() {
-            let drops = capabaility.borrow()
-            return drops!.borrowProduct(id: id)
-        } else {
-            return nil
-        }
+    //
+    // Returns a reference to a product which can be used to access the product's details
+    //
+    pub fun borrowProduct(id: UInt64): &ZeedzDrops.Product? {
+        return (&self.products[id] as &ZeedzDrops.Product?)!
     }
 
     init () {
         self.ZeedzDropsStoragePath = /storage/ZeedzDrops
         self.ZeedzDropsPublicPath= /public/ZeedzDrops
+
         self.saleCutRequirements = {}
+        self.products <- {}
 
         let admin <- create DropsAdmin()
         self.account.save(<-admin, to: self.ZeedzDropsStoragePath)
-        self.account.link<&ZeedzDrops.DropsAdmin{ZeedzDrops.DropsPublic}>(self.ZeedzDropsPublicPath, target: self.ZeedzDropsStoragePath)
     }
 }
