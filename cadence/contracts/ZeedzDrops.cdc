@@ -272,7 +272,8 @@ pub contract ZeedzDrops {
             saleEnabled: Bool,
             timeStart: UFix64,
             timeEnd: UFix64,
-            prices: {String : UFix64}) {
+            prices: {String : UFix64}
+            ) {
             self.details = ProductDetails(
                 name: name,
                 description: description,
