@@ -6,7 +6,6 @@ pub contract ZeedzDrops {
     
     pub event ProductPurchased(productID: UInt64, details: ProductDetails, currency: String, userID: String)
     pub event ProductAdded(productID: UInt64, details: ProductDetails)
-    pub event ProductsReserved(productID: UInt64, amount: UInt64)
     pub event ProductRemoved(productID: UInt64)
     pub event ProductUpdated(productID: UInt64, details: ProductDetails, field: String)
 
@@ -332,7 +331,7 @@ pub contract ZeedzDrops {
             let product = ZeedzDrops.borrowProduct(id: productID) ?? panic("not able to borrow specified product")
             assert(product.details.total - product.details.sold >= amount, message: "reserve amount can't be higher than available pack amount")
             product.details.reserve(amount: amount)
-            emit ProductsReserved(productID: productID, amount: amount)
+            emit ProductUpdated(productID: productID, details: product.getDetails(), field: "reserved")
 
         }
         pub fun removeProduct(productID: UInt64) {
