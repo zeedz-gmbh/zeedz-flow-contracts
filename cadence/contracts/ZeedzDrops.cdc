@@ -12,7 +12,6 @@ pub contract ZeedzDrops {
     // Paths
 
     pub let ZeedzDropsStoragePath: StoragePath
-    pub let ZeedzDropsPublicPath: PublicPath
 
     // {Type of the FungibleToken => array of SaleCutRequirements}
     access(contract) var saleCutRequirements: {String : [SaleCutRequirement]}
@@ -409,7 +408,6 @@ pub contract ZeedzDrops {
 
     init () {
         self.ZeedzDropsStoragePath = /storage/ZeedzDrops
-        self.ZeedzDropsPublicPath= /public/ZeedzDrops
 
         self.saleCutRequirements = {}
         self.products <- {}
