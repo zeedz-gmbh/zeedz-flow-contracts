@@ -117,7 +117,7 @@ pub contract ZeedzDrops {
             self.reserved = self.reserved + amount
         }
 
-        access(contract) fun setPrices(prices: {String : UFix64}){
+        access(contract) fun setPrices(prices: {String : UFix64}) {
             self.prices = prices
         }
 
