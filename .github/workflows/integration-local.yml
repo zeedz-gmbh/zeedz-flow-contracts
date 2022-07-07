@@ -26,7 +26,7 @@ jobs:
         run: npm i
 
       - name: Integration Test ZeedzINO
-        run: npm test ino --coverage
+        run: npm test nft --coverage
 
       - name: Integration Test ZeedzDrops
         run: npm test drops --coverage
